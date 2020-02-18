@@ -174,8 +174,6 @@ public class groundGen : MonoBehaviour
         double[][][] chunkTerrain;
 
         double dist;
-        //Debug.Log("starting the script bitch");
-        //Debug.Log(chunks.Count);
 
         for (int i1  = 0; i1 < chunks.Count; i1++)
         {

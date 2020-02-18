@@ -579,12 +579,11 @@ public class noise
         int counter = 0;
         int[] pointVectorCord;
         double[] point = new double[2] { x, y };
-        string temp2;
+
         foreach (double y1 in yVal)
         {
             foreach (double x1 in xVal)
             {
-                temp2 = "";
                 pointVectorCord = new int[2];
 
                 temp = (1 + region[1]) * 3 + (1 + region[0]) - y1 * 3 * region[1] - x1 * region[0];
