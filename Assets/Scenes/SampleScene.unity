@@ -257,7 +257,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f191eb77026a4f541804299f5d8a41bf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  seed: 0
+  seed: 1
   mf: {fileID: 0}
   mesh: {fileID: 0}
   vertices: []
@@ -268,7 +268,6 @@ MonoBehaviour:
   pointVisible: 0
   test: 1
   linearAproxCond: 0
-  key: 3
 --- !u!4 &910123272
 Transform:
   m_ObjectHideFlags: 0

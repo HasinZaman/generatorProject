@@ -5,10 +5,11 @@ using UnityEngine;
 
 public class chunk
 {
+    //declaring chunk variables
     public int seed;
-    public string id;
+    public int id;
 
-    public string[] neghboringChunks;
+    public int[] neghboringChunks = new int[27];
 
     public double dist;
     public Vector3 startingPos;
@@ -18,8 +19,8 @@ public class chunk
     public noise[] heightMaps;
 
     System.Random random;
-    
-	public chunk(int seed, int heightMapLayer, double dist, Vector3 chunkSize, Vector3 startingPos)
+   
+	public chunk(int seed, int heightMapLayer, double dist, Vector3 chunkSize, Vector3 startingPos, int id)
 	{
         this.seed = seed;
 
@@ -27,11 +28,14 @@ public class chunk
         this.startingPos = startingPos;
         this.dist = dist;
 
+        this.id = id;
+
 
         this.random = new System.Random(seed);
 
         this.heightMaps = new noise[heightMapLayer];
-
+        
+        //creates multiple height maps for added details
         for (int i1 = 0; i1 < heightMapLayer; i1++)
         {
             this.heightMaps[i1] = new noise(
@@ -52,122 +56,103 @@ public class chunk
         }
     }
 
-    public List<List<List<double[]>>>[] getGrid()
+    //converts surronding chunk ids into chunk height map grids
+    public List<List<List<double[]>>>[] getNeghboringHeightMaps(int heightMapLevel, List<chunk> chunkSearchList)
     {
-        List<List<List<double[]>>>[] grids = new List<List<List<double[]>>>[heightMaps.Length];
-
-        for (int i1 = 0; i1 < heightMaps.Length; i1++)
+        List<List<List<double[]>>>[] grids = new List<List<List<double[]>>>[8];
+        
+        for (int i1 = 0; i1 < grids.Length; i1++)
         {
-            grids[i1] = heightMaps[i1].grid;
+            if (chunkSearchList.Exists(c => c.id == neghboringChunks[i1]))
+            {
+                grids[i1] = chunkSearchList.Find(c => c.id == neghboringChunks[i1]).heightMaps[heightMapLevel - 1].grid;
+            }
+            else
+            {
+                grids[i1] = null;
+            }
         }
         return grids;
     }
 
-    private int chunkZone(int x, int y, int[] samplesPerCell, int[] sampleCount)
-    {
-        if (x < samplesPerCell[0] / 2 && y < samplesPerCell[1] / 2)
-        {
-            return 0;
-        }
-        else if ((samplesPerCell[0] / 2 < x && x < sampleCount[0] - samplesPerCell[0] / 2) && y < samplesPerCell[1] / 2)
-        {
-            return 1;
-        }
-        else if (sampleCount[0] - samplesPerCell[0] / 2 < x && y < samplesPerCell[1] / 2)
-        {
-            return 2;
-        }
-        else if (sampleCount[0] - samplesPerCell[0] / 2 < x && (samplesPerCell[1] / 2 < y && y < sampleCount[1] - samplesPerCell[1] / 2))
-        {
-            return 3;
-        }
-        else if (sampleCount[0] - samplesPerCell[0] / 2 < x && sampleCount[0] - samplesPerCell[0] / 2 < y)
-        {
-            return 4;
-        }
-        else if ((samplesPerCell[0] / 2 < x && x < sampleCount[0] - samplesPerCell[0] / 2) && sampleCount[0] - samplesPerCell[0] / 2 < y)
-        {
-            return 5;
-        }
-        else if (x < samplesPerCell[0] / 2 && sampleCount[0] - samplesPerCell[0] / 2 < y)
-        {
-            return 6;
-        }
-        else if (x < samplesPerCell[0] / 2 && (samplesPerCell[1] / 2 < y && y < sampleCount[1] - samplesPerCell[1] / 2))
-        {
-            return 7;
-        }
-        return -1;
-    }
-
-    public double[][][] getTerrain(int heightMapLayers, int[] samplesPerCell, double amplitude, List<List<List<double[]>>>[] surroundingChunks)
+    //calculates terrian using the chunks height maps
+    public double[][][] getTerrain(int heightMapLayers, int[] samplesPerCell, double amplitude, double translation, List<List<List<double[]>>>[] surroundingChunks)
     {
         double[][][] terrainMap = new double[Convert.ToInt32(samplesPerCell[0] * this.chunkSize.x * Math.Pow(2, heightMapLayers -1)) + samplesPerCell[0] / 2][][];
-
-        int zone;
+        
         double sample;
-        double[] offset = new double[]
-        {
-            0.1/samplesPerCell[0],
-            0.1/samplesPerCell[1],
-            0.1/samplesPerCell[2]
-        };
-        double xOffset = 0, zOffset = 0;
+        double[] offset;
+
+        double[] sampleCord = new double[2];
+        
         for (int x = 0; x < terrainMap.Length; x++)
         {
+
             terrainMap[x] = new double[Convert.ToInt32(samplesPerCell[1] * this.chunkSize.y * Math.Pow(2, heightMapLayers - 1)) + samplesPerCell[1] / 2][];
+
             for (int y = 0; y < terrainMap[x].Length; y++)
             {
-                terrainMap[x][y] = new double[Convert.ToInt32(samplesPerCell[2] * this.chunkSize.z * Math.Pow(2, heightMapLayers - 1)) + samplesPerCell[2] / 2];
 
+                terrainMap[x][y] = new double[Convert.ToInt32(samplesPerCell[2] * this.chunkSize.z * Math.Pow(2, heightMapLayers - 1)) + samplesPerCell[2] / 2];
+                
                 for (int z = 0; z < terrainMap[x][y].Length; z++)
                 {
-                    Debug.Log(x + "," + y + "," + z);
-
-                    zone = chunkZone(x, z, samplesPerCell, new int[] { terrainMap.Length, terrainMap[x].Length, terrainMap[x][y].Length });
-
-                    if (zone == -1)
+                    if(y == terrainMap[x].Length - 1)
                     {
-                        Debug.Log("core");
                         sample = 0;
-                        for (int i1  = 0; i1 <  heightMapLayers; i1++)
-                        {
-                            sample += this.heightMaps[i1].sample(
-                                (x / samplesPerCell[0] - samplesPerCell[0]) * Math.Pow(2, heightMapLayers - 1 - i1) + offset[0],
-                                (z / samplesPerCell[1] - samplesPerCell[1]) * Math.Pow(2, heightMapLayers - 1 - i1) + offset[2]
-                                ) * amplitude / Math.Pow(2,heightMapLayers - i1 - 1);
-                        }
-                        terrainMap[x][y][z] = sample;
-                    }
-                    else if (surroundingChunks[zone] != null)
-                    {
-                        Debug.Log("edge");
-                        sample = 0;
-
-                        
-                        for (int i1 = 0; i1 < heightMapLayers; i1++)
-                        {
-                            if (zone == 0 || zone == 1 || zone == 2)
-                            {
-                                zOffset = samplesPerCell[0] / 2;
-                            }
-
-                            if (zone == 0 || zone == 7 || zone == 6)
-                            {
-                                xOffset = samplesPerCell[0] / 2;
-                            }
-                            sample += this.heightMaps[i1].sampleEdge(
-                                surroundingChunks,
-                                ((x + xOffset) / samplesPerCell[0] - samplesPerCell[0]) * Math.Pow(2, heightMapLayers - 1 - i1) + offset[0],
-                                ((z + zOffset) / samplesPerCell[1] - samplesPerCell[1]) * Math.Pow(2, heightMapLayers - 1 - i1) + offset[2]
-                                ) * amplitude / Math.Pow(2, heightMapLayers - i1 - 1);
-                        }
-                        terrainMap[x][y][z] = sample;
                     }
                     else
                     {
-                        Debug.Log("nothing");
-                        terrainMap[x][y][z] = double.NaN;
+                        sample = 0;
+                        for (int i1 = 0; i1 < heightMapLayers; i1++)
+                        {
+                            offset = new double[]
+                               {
+                            0.1/samplesPerCell[0],
+                            0.1/samplesPerCell[1],
+                            0.1/samplesPerCell[2]
+                               };
+                            if (x == 0)
+                            {
+                                sampleCord[0] = -0.5;
+                            }
+                            else if (x == terrainMap.Length - 1)
+                            {
+                                sampleCord[0] = Math.Floor((Convert.ToDouble(x - (float)samplesPerCell[0] / 2) / samplesPerCell[0]) * Math.Pow(2, heightMapLayers - 1 - i1) + offset[0]) + 0.5;
+                            }
+                            else
+                            {
+                                sampleCord[0] = (Convert.ToDouble(x - (float)samplesPerCell[0] / 2) / samplesPerCell[0]) * Math.Pow(2, heightMapLayers - 1 - i1) + offset[0];
+                            }
+
+                            if (z == 0)
+                            {
+                                sampleCord[1] = -0.5;
+                            }
+                            else if (z == terrainMap[x][y].Length - 1)
+                            {
+                                sampleCord[1] = Math.Floor((Convert.ToDouble(z - (float)samplesPerCell[2] / 2) / samplesPerCell[2]) * Math.Pow(2, heightMapLayers - 1 - i1) + offset[2]) + 0.5;
+                            }
+                            else
+                            {
+                                sampleCord[1] = (Convert.ToDouble(z - (float)samplesPerCell[2] / 2) / samplesPerCell[2]) * Math.Pow(2, heightMapLayers - 1 - i1) + offset[2];
+                            }
+                            
+                            sample += this.heightMaps[i1].sample(
+                                sampleCord[0],
+                                sampleCord[1],
+                                surroundingChunks
+                                ) * amplitude / Math.Pow(2, heightMapLayers - i1 - 1) + translation;
+                        }
+                    }
+                    
+                    if (sample < y)
+                    {
+                        terrainMap[x][y][z] = sample - y / Math.Pow(2, heightMapLayers - 1);
+                    }
+                    else
+                    {
+                        terrainMap[x][y][z] = 0;
                     }
                 }
             }
@@ -188,7 +173,6 @@ public class chunk
             0.1/samplesPerCell[1],
             0.1/samplesPerCell[2]
         };
-        Debug.Log("samples per cell" + samplesPerCell[0] + "|" + samplesPerCell[1] + "|" + samplesPerCell[2]);
         for (int x = 0; x < terrainMap.Length; x++)
         {
             terrainMap[x] = new double[Convert.ToInt32(samplesPerCell[1] * this.chunkSize.y * Math.Pow(2, heightMapLayers - 1))][];
@@ -198,22 +182,15 @@ public class chunk
 
                 for (int z = 0; z < terrainMap[x][y].Length; z++)
                 {
-                    Debug.Log("core");
-                    Debug.Log(x + "," + y + "," + z);
 
                     sample = 0;
                     for (int i1 = 0; i1 < heightMapLayers; i1++)
                     {
                         sample += this.heightMaps[i1].sample(
-                            (Convert.ToDouble(x) / samplesPerCell[0]/* - samplesPerCell[0]*/) * Math.Pow(2, heightMapLayers - 1 - i1) + offset[0],
-                            (Convert.ToDouble(z) / samplesPerCell[2]/* - samplesPerCell[2]*/) * Math.Pow(2, heightMapLayers - 1 - i1) + offset[2]
+                            (Convert.ToDouble(x) / samplesPerCell[0]) * Math.Pow(2, heightMapLayers - 1 - i1) + offset[0],
+                            (Convert.ToDouble(z) / samplesPerCell[2]) * Math.Pow(2, heightMapLayers - 1 - i1) + offset[2]
                             ) * amplitude / Math.Pow(2, heightMapLayers - i1 - 1) + translation;
-
-                        Debug.Log
-                        (
-                            "x:" + ((Convert.ToDouble(x) / samplesPerCell[0]/* - samplesPerCell[0]*/) * Math.Pow(2, heightMapLayers - 1 - i1) + offset[0]) +
-                            "z:" + ((Convert.ToDouble(z) / samplesPerCell[2]/* - samplesPerCell[2]*/) * Math.Pow(2, heightMapLayers - 1 - i1) + offset[2])
-                        );
+                        
                     }
                     if(sample < y)
                     {
@@ -223,12 +200,10 @@ public class chunk
                     {
                         terrainMap[x][y][z] = 0;
                     }
-                    Debug.Log("val:"+(float)terrainMap[x][y][z]);
                 }
             }
         }
-
-
+        
         return terrainMap;
     }
 

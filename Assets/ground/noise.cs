@@ -78,22 +78,22 @@ public class noise
             return true;
         }
 
-        if (x < -1)
+        if (x < 0)
         {
             return true;
         }
 
-        if (y < -1)
+        if (y < 0)
         {
             return true;
         }
 
-        if (x > grid[0][0].Count)
+        if (x > grid[0][0].Count - 1)
         {
             return true;
         }
 
-        if (y > grid[0][0].Count)
+        if (y > grid[0][0].Count - 1)
         {
             return true;
         }
@@ -107,17 +107,17 @@ public class noise
             return true;
         }
 
-        if (x < -1)
+        if (x < 0)
         {
             return true;
         }
 
-        if (y < -1)
+        if (y < 0)
         {
             return true;
         }
 
-        if (z < -1)
+        if (z < 0)
         {
             return true;
         }
@@ -140,8 +140,7 @@ public class noise
         return false;
     }
 
-
-    public double sample(double x, double y)
+    public double sample(double x, double y, double[][] pointVectors)
     {
         if (sampleCoordCheck(x, y))
         {
@@ -152,7 +151,72 @@ public class noise
 
             double newX = x, newY = y;
 
-            if (x < -1)
+            if (x < 0)
+            {
+                newX = grid[0][0].Count + x % grid[0][0].Count;
+            }
+            else if (x > grid[0][0].Count - 1)
+            {
+                newX = x % grid[0][0].Count - 1;
+            }
+
+            if (y < 0)
+            {
+                newY = grid[0].Count + y % grid[0].Count;
+            }
+            else if (y > grid[0].Count - 1)
+            {
+                newY = y % grid[0].Count - 1;
+            }
+
+            if (newX != x || newY != y)
+            {
+                return sample(newX, newY, pointVectors);
+            }
+        }
+
+        double[][] pointDist = new double[][]
+        {
+            new double[]{x % 1, y % 1},
+            new double[]{x % 1 - 1, y % 1},
+            new double[]{x % 1 - 1, y % 1 - 1},
+            new double[]{x % 1, y % 1 - 1}
+        };
+
+        double[] pointValue = vecterDistDotProduct(pointVectors, pointDist);
+
+        double A = cosineInterpolate(
+            pointValue[0],
+            pointValue[1],
+            x % 1
+        );
+
+        double B = cosineInterpolate(
+            pointValue[3],
+            pointValue[2],
+            x % 1
+        );
+
+        double C = cosineInterpolate(
+            A,
+            B,
+            y % 1
+        );
+
+        return C;
+    }
+    private double sample(double x, double y, double z, double[][] pointVectors)
+    {
+        if (sampleCoordCheck(x, y, z))
+        {
+            if (Math.Round(x) == x || Math.Round(y) == y || Math.Round(z) == z)
+            {
+                return 0;
+            }
+
+            double newX = x, newY = y, newZ = z;
+
+            if (x < 0)
             {
                 newX = grid[0][0].Count + x % grid[0][0].Count;
             }
@@ -161,7 +225,7 @@ public class noise
                 newX = x % grid[0][0].Count;
             }
 
-            if (y < -1)
+            if (y < 0)
             {
                 newY = grid[0].Count + y % grid[0].Count;
             }
@@ -170,12 +234,84 @@ public class noise
                 newY = y % grid[0].Count;
             }
 
-            if (newX != x || newY != y)
+            if (z < 0)
             {
-                return sample(newX, newY);
+                newZ = grid.Count + z % grid.Count;
+            }
+            else if (z > grid.Count)
+            {
+                newZ = z % grid.Count;
+            }
+
+            if (newX != x || newY != y || newZ != z)
+            {
+                return sample(newX, newY, newZ, pointVectors);
             }
         }
 
+
+        double[][] pointDist = new double[][]
+        {
+            new double[]{ x % 1, y % 1, z % 1},
+            new double[]{ x % 1 - 1, y % 1, z % 1},
+            new double[]{ x % 1 -1, y % 1 - 1, z % 1},
+            new double[]{ x % 1, y % 1 - 1, z % 1},
+
+            new double[]{ x % 1, y % 1, z % 1 - 1},
+            new double[]{ x % 1 - 1, y % 1, z % 1 - 1},
+            new double[]{ x % 1 - 1, y % 1 - 1, z % 1 - 1},
+            new double[]{ x % 1, y % 1 - 1, z % 1 - 1}
+        };
+
+        double[] pointValue = vecterDistDotProduct(pointVectors, pointDist);
+
+        double A = cosineInterpolate(
+            pointValue[0],
+            pointValue[1],
+            x % 1
+        );
+
+        double B = cosineInterpolate(
+            pointValue[3],
+            pointValue[2],
+            x % 1
+        );
+
+        double C = cosineInterpolate(
+            A,
+            B,
+            y % 1
+        );
+
+        double D = cosineInterpolate(
+            pointValue[4],
+            pointValue[5],
+            x % 1
+        );
+
+        double E = cosineInterpolate(
+            pointValue[7],
+            pointValue[6],
+            x % 1
+        );
+
+        double F = cosineInterpolate(
+            D,
+            E,
+            y % 1
+        );
+
+        double G = cosineInterpolate(
+            C,
+            F,
+            z % 1
+        );
+
+        return G;
+    }
+
+    public double sample(double x, double y)
+    {
         double[][] pointVectors = new double[4][]{
             null,
             null,
@@ -211,81 +347,10 @@ public class noise
         pointVectors[2] = grid[0][Convert.ToInt32(right)][Convert.ToInt32(top)];
         pointVectors[3] = grid[0][Convert.ToInt32(left)][Convert.ToInt32(top)];
 
-        double[][] pointDist = new double[][]
-        {
-            new double[]{x % 1, y % 1},
-            new double[]{x % 1 - 1, y % 1},
-            new double[]{x % 1 - 1, y % 1 - 1},
-            new double[]{x % 1, y % 1 - 1}
-        };
-
-        double[] pointValue = vecterDistDotProduct(pointVectors, pointDist);
-
-        double A = cosineInterpolate(
-            pointValue[0],
-            pointValue[1],
-            x % 1
-        );
-
-        double B = cosineInterpolate(
-            pointValue[3],
-            pointValue[2],
-            x % 1
-        );
-
-        double C = cosineInterpolate(
-            A,
-            B,
-            y % 1
-        );
-
-        return C;
+        return sample(x, y, pointVectors);
     }
-
     public double sample(double x, double y, double z)
     {
-        if (sampleCoordCheck(x, y, z))
-        {
-            if (Math.Round(x) == x || Math.Round(y) == y || Math.Round(z) == z)
-            {
-                return 0;
-            }
-
-            double newX = x, newY = y, newZ = z;
-
-            if (x < -1)
-            {
-                newX = grid[0][0].Count + x % grid[0][0].Count;
-            }
-            else if (x > grid[0][0].Count)
-            {
-                newX = x % grid[0][0].Count;
-            }
-
-            if (y < -1)
-            {
-                newY = grid[0].Count + y % grid[0].Count;
-            }
-            else if (y > grid[0].Count)
-            {
-                newY = y % grid[0].Count;
-            }
-
-            if (z < -1)
-            {
-                newZ = grid.Count + z % grid.Count;
-            }
-            else if (z > grid.Count)
-            {
-                newZ = z % grid.Count;
-            }
-
-            if (newX != x || newY != y || newZ != z)
-            {
-                return sample(newX, newY, newZ);
-            }
-        }
-
         double[][] pointVectors = new double[8][]{
             null,
             null,
@@ -341,272 +406,87 @@ public class noise
         pointVectors[6] = grid[Convert.ToInt32(front)][Convert.ToInt32(right)][Convert.ToInt32(top)];
         pointVectors[7] = grid[Convert.ToInt32(front)][Convert.ToInt32(left)][Convert.ToInt32(top)];
 
-        double[][] pointDist = new double[][]
-        {
-            new double[]{ x % 1, y % 1, z % 1},
-            new double[]{ x % 1 - 1, y % 1, z % 1},
-            new double[]{ x % 1 -1, y % 1 - 1, z % 1},
-            new double[]{ x % 1, y % 1 - 1, z % 1},
-
-            new double[]{ x % 1, y % 1, z % 1 - 1},
-            new double[]{ x % 1 - 1, y % 1, z % 1 - 1},
-            new double[]{ x % 1 - 1, y % 1 - 1, z % 1 - 1},
-            new double[]{ x % 1, y % 1 - 1, z % 1 - 1}
-        };
-
-        double[] pointValue = vecterDistDotProduct(pointVectors, pointDist);
-
-        double A = cosineInterpolate(
-            pointValue[0],
-            pointValue[1],
-            x % 1
-        );
-
-        double B = cosineInterpolate(
-            pointValue[3],
-            pointValue[2],
-            x % 1
-        );
-
-        double C = cosineInterpolate(
-            A,
-            B,
-            y % 1
-        );
-
-        double D = cosineInterpolate(
-            pointValue[4],
-            pointValue[5],
-            x % 1
-        );
-
-        double E = cosineInterpolate(
-            pointValue[7],
-            pointValue[6],
-            x % 1
-        );
-
-        double F = cosineInterpolate(
-            D,
-            E,
-            y % 1
-        );
-
-        double G = cosineInterpolate(
-            C,
-            F,
-            z % 1
-        );
-
-        return G;
+        return sample(x, y, z, pointVectors);
     }
 
-    public double sample(double x, double y, double[][] pointVectors)
+    private int cornerPointFinder(int counter, int axis, int maxVal)
     {
-        if (sampleCoordCheck(x, y))
+        if(axis == 0)
         {
-            if (Math.Round(x) == x || Math.Round(y) == y)
+            if(counter == 0 || counter == 3)
+            {
+                return maxVal - 1;
+            }
+            else
+            {
+                return 0;
+            }
+        }
+        else
+        {
+            if (counter == 0 || counter == 1)
+            {
+                return maxVal - 1;
+            }
+            else
             {
                 return 0;
             }
 
-            double newX = x, newY = y;
-
-            if (x < -1)
+        }
+    }
+    private int edgePointFinder1(double val, int counter, int axis)
+    {
+        if (axis == 0)
+        {
+            if (counter == 0 || counter == 3)
             {
-                newX = grid[0][0].Count + x % grid[0][0].Count;
+                return Convert.ToInt32(Math.Floor(val));
             }
-            else if (x > grid[0][0].Count)
+            else
             {
-                newX = x % grid[0][0].Count;
-            }
-
-            if (y < -1)
-            {
-                newY = grid[0].Count + y % grid[0].Count;
-            }
-            else if (y > grid[0].Count)
-            {
-                newY = y % grid[0].Count;
-            }
-
-            if (newX != x || newY != y)
-            {
-                return sample(newX, newY, pointVectors);
+                return Convert.ToInt32(Math.Ceiling(val));
             }
         }
-
-        double[][] pointDist = new double[][]
+        else
         {
-            new double[]{x % 1, y % 1},
-            new double[]{x % 1 - 1, y % 1},
-            new double[]{x % 1 - 1, y % 1 - 1},
-            new double[]{x % 1, y % 1 - 1}
-        };
-
-        double[] pointValue = vecterDistDotProduct(pointVectors, pointDist);
-
-        double A = cosineInterpolate(
-            pointValue[0],
-            pointValue[1],
-            x % 1
-        );
-
-        double B = cosineInterpolate(
-            pointValue[3],
-            pointValue[2],
-            x % 1
-        );
-
-        double C = cosineInterpolate(
-            A,
-            B,
-            y % 1
-        );
-
-        return C;
+            if (counter == 0 || counter == 1)
+            {
+                return Convert.ToInt32(Math.Floor(val));
+            }
+            else
+            {
+                return Convert.ToInt32(Math.Ceiling(val));
+            }
+        }
     }
-
-    public double sample(double x, double y, double z, double[][] pointVectors)
+    private int edgePointFinder2(int maxVal, int counter, int axis)
     {
-        if (sampleCoordCheck(x, y, z))
+        if (axis == 0)
         {
-            if (Math.Round(x) == x || Math.Round(y) == y || Math.Round(z) == z)
+            if (counter == 0 || counter == 3)
+            {
+                return maxVal - 1;
+            }
+            else
             {
                 return 0;
             }
-
-            double newX = x, newY = y, newZ = z;
-
-            if (x < -1)
-            {
-                newX = grid[0][0].Count + x % grid[0][0].Count;
-            }
-            else if (x > grid[0][0].Count)
-            {
-                newX = x % grid[0][0].Count;
-            }
-
-            if (y < -1)
-            {
-                newY = grid[0].Count + y % grid[0].Count;
-            }
-            else if (y > grid[0].Count)
-            {
-                newY = y % grid[0].Count;
-            }
-
-            if (z < -1)
-            {
-                newZ = grid.Count + z % grid.Count;
-            }
-            else if (z > grid.Count)
-            {
-                newZ = z % grid.Count;
-            }
-
-            if (newX != x || newY != y || newZ != z)
-            {
-                return sample(newX, newY, newZ, pointVectors);
-            }
         }
-        
-
-        double[][] pointDist = new double[][]
+        else
         {
-            new double[]{ x % 1, y % 1, z % 1},
-            new double[]{ x % 1 - 1, y % 1, z % 1},
-            new double[]{ x % 1 -1, y % 1 - 1, z % 1},
-            new double[]{ x % 1, y % 1 - 1, z % 1},
-
-            new double[]{ x % 1, y % 1, z % 1 - 1},
-            new double[]{ x % 1 - 1, y % 1, z % 1 - 1},
-            new double[]{ x % 1 - 1, y % 1 - 1, z % 1 - 1},
-            new double[]{ x % 1, y % 1 - 1, z % 1 - 1}
-        };
-
-        double[] pointValue = vecterDistDotProduct(pointVectors, pointDist);
-
-        double A = cosineInterpolate(
-            pointValue[0],
-            pointValue[1],
-            x % 1
-        );
-
-        double B = cosineInterpolate(
-            pointValue[3],
-            pointValue[2],
-            x % 1
-        );
-
-        double C = cosineInterpolate(
-            A,
-            B,
-            y % 1
-        );
-
-        double D = cosineInterpolate(
-            pointValue[4],
-            pointValue[5],
-            x % 1
-        );
-
-        double E = cosineInterpolate(
-            pointValue[7],
-            pointValue[6],
-            x % 1
-        );
-
-        double F = cosineInterpolate(
-            D,
-            E,
-            y % 1
-        );
-
-        double G = cosineInterpolate(
-            C,
-            F,
-            z % 1
-        );
-
-        return G;
-    }
-
-    public double sampleEdge(List<List<List<double[]>>>[] suroundingGrid, double x, double y)
-    {
-        if (sampleCoordCheck(x, y))
-        {
-            if (Math.Round(x) == x || Math.Round(y) == y)
+            if (counter == 0 || counter == 1)
+            {
+                return maxVal - 1;
+            }
+            else
             {
                 return 0;
             }
-
-            double newX = x, newY = y;
-
-            if (x < -1)
-            {
-                newX = grid[0][0].Count + x % grid[0][0].Count;
-            }
-            else if (x > grid[0][0].Count)
-            {
-                newX = x % grid[0][0].Count;
-            }
-
-            if (y < -1)
-            {
-                newY = grid[0].Count + y % grid[0].Count;
-            }
-            else if (y > grid[0].Count)
-            {
-                newY = y % grid[0].Count;
-            }
-
-            if (newX != x || newY != y)
-            {
-                return sampleEdge(suroundingGrid, newX, newY);
-            }
         }
-
+    }
+    public double sample(double x, double y, List<List<List<double[]>>>[] suroundingGrid)
+    {
         double[][] pointVectors = new double[4][]{
             null,
             null,
@@ -614,94 +494,167 @@ public class noise
             null
             };
 
-        //idea
-        /*
-         List<List<List<List<double[]>>>>[] grids = new List<List<List<List<double[]>>>>[4]{
-            new List<List<List<List<double[]>>>>{grid},
-            new List<List<List<List<double[]>>>>{grid},
-            new List<List<List<List<double[]>>>>{grid},
-            new List<List<List<List<double[]>>>>{grid}
-            }; 
-         */
-
-        List<List<List<double[]>>>[] grids = new List<List<List<double[]>>>[4]{
-            grid,
-            grid,
-            grid,
-            grid
-            };
-
-        double left = Math.Floor(x);
-        double right = Math.Ceiling(x);
-        double bottom = Math.Floor(y);
-        double top = Math.Ceiling(y);
-
-        if (Math.Floor(x) == -1)
-        {
-            grids[0] = suroundingGrid[7];
-            grids[3] = suroundingGrid[7];
-            left = grid[0][0].Count - 1;
-        }
-        else if (Math.Ceiling(x) == grid[0][0].Count)
-        {
-            grids[1] = suroundingGrid[3];
-            grids[2] = suroundingGrid[3];
-            right = 0;
-        }
-
-        if (Math.Floor(y) == -1)
-        {
-            if(grids[0] == suroundingGrid[7])
-            {
-                grids[0] = suroundingGrid[0];
-            }
-            else
-            {
-                grids[0] = suroundingGrid[1];
-            }
-
-            if(grids[1] == suroundingGrid[3])
-            {
-                grids[1] = suroundingGrid[2];
-            }
-            else
-            {
-                grids[1] = suroundingGrid[1];
-            }
-            bottom = grid[0].Count - 1;
-        }
-        else if (Math.Ceiling(y) == grid[0].Count)
-        {
-            if (grids[3] == suroundingGrid[7])
-            {
-                grids[3] = suroundingGrid[6];
-            }
-            else
-            {
-                grids[3] = suroundingGrid[5];
-            }
-
-            if (grids[2] == suroundingGrid[3])
-            {
-                grids[2] = suroundingGrid[4];
-            }
-            else
-            {
-                grids[2] = suroundingGrid[5];
-            }
-            top = 0;
-        }
-
-        pointVectors[0] = grids[0][0][Convert.ToInt32(left)][Convert.ToInt32(bottom)];
-        pointVectors[1] = grids[1][0][Convert.ToInt32(right)][Convert.ToInt32(bottom)];
-        pointVectors[2] = grids[2][0][Convert.ToInt32(right)][Convert.ToInt32(top)];
-        pointVectors[3] = grids[3][0][Convert.ToInt32(left)][Convert.ToInt32(top)];
+        List<List<List<double[]>>>[] grids = new List<List<List<double[]>>>[4];
         
+        double[] region = new double[2] {0, 0};
+        double zone = 0;
+
+        if (x < 0)
+        {
+            region[0] -= 1;
+        }
+        else if (x > grid[0].Count - 1)
+        {
+            region[0] += 1;
+        }
+
+        if (y < 0)
+        {
+            region[1] -= 1;
+        }
+        else if (y > grid[0][0].Count - 1)
+        {
+            region[1] += 1;
+        }
+        zone = (1 + region[1]) * 3 + (1 + region[0]);
+
+        if (zone >= 4)
+        {
+            zone -= 1;
+        }
+
+        if(region[1] == 0 && region[0] == 0)
+        {
+            return sample(x, y);
+        }
+
+        double[] xVal;
+        double[] yVal;
+
+        if (region[0] < 0)
+        {
+            xVal = new double[2]
+            {
+                0,1
+            };
+        }
+        else if (region[0] > 0)
+        {
+            xVal = new double[2]
+            {
+                1,0
+            };
+        }
+        else
+        {
+            xVal = new double[2]
+            {
+                0,0
+            };
+        }
+
+        if (region[1] < 0)
+        {
+            yVal = new double[2]
+            {
+                0,1
+            };
+        }
+        else if (region[1] > 0)
+        {
+            yVal = new double[2]
+            {
+                1,0
+            };
+        }
+        else
+        {
+            yVal = new double[2]
+            {
+                0,0
+            };
+        }
+        double temp;
+
+        int counter = 0;
+        int[] pointVectorCord;
+        double[] point = new double[2] { x, y };
+        string temp2;
+        foreach (double y1 in yVal)
+        {
+            foreach (double x1 in xVal)
+            {
+                temp2 = "";
+                pointVectorCord = new int[2];
+
+                temp = (1 + region[1]) * 3 + (1 + region[0]) - y1 * 3 * region[1] - x1 * region[0];
+                
+                if (temp == 4)
+                {
+                    grids[counter] = grid;
+                }
+                else if (temp > 4)
+                {
+                    temp -= 1;
+                    grids[counter] = suroundingGrid[Convert.ToInt32(temp)];
+                }
+                else
+                {
+                    grids[counter] = suroundingGrid[Convert.ToInt32(temp)];
+                }
+
+                if(grids[counter] == null)
+                {
+                    return 0;
+                }
+                
+
+                for(int i1 = 0; i1 < 2; i1++)
+                {
+                    if(Math.Abs(region[0]) != Math.Abs(region[1]))
+                    {
+                        if (region[i1] == 0)
+                        {
+                            pointVectorCord[i1] = edgePointFinder1(point[i1], counter, i1);
+                        }
+                        else
+                        {
+                            if (i1 == 0)
+                            {
+                                pointVectorCord[i1] = edgePointFinder2(grids[counter][0].Count, counter, i1);
+                            }
+                            else
+                            {
+                                pointVectorCord[i1] = edgePointFinder2(grids[counter][0][0].Count, counter, i1);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        if (i1 == 0)
+                        {
+                            pointVectorCord[i1] = cornerPointFinder(counter, i1, grids[counter][0].Count);
+                        }
+                        else
+                        {
+                            pointVectorCord[i1] = cornerPointFinder(counter, i1, grids[counter][0][0].Count);
+                        }
+                    }
+                    
+                }
+                pointVectors[counter] = grids[counter][0][pointVectorCord[0]][pointVectorCord[1]];
+
+                counter += 1;
+            }
+            Array.Reverse(xVal);
+            
+        }
 
         return sample(x, y, pointVectors);
     }
 
-    public double sampleEdge(List<List<List<int>>>[] suroundingGrid, double x, double y, double z)
+    //unfinished
+    public double sample(double x, double y, double z, List<List<List<int>>>[] suroundingGrid)
     {
         double[][] pointVectors = new double[8][]{
             null,
@@ -714,9 +667,19 @@ public class noise
             null
             };
 
+        List<List<List<double[]>>>[] grids = new List<List<List<double[]>>>[8]{
+            grid,
+            grid,
+            grid,
+            grid,
+            grid,
+            grid,
+            grid,
+            grid
+            };
+
         return sample(x, y, z, pointVectors);
     }
-
 }
 
 
