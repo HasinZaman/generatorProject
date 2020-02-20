@@ -26,15 +26,5 @@ public class testPoint : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        double threshold = kewl.GetComponent<groundGen>().threshold;
-        bool visible = kewl.GetComponent<groundGen>().pointVisible;
-        if (value > threshold && visible)
-        {
-            GetComponent<Renderer>().enabled = true;
-        }
-        else
-        {
-            GetComponent<Renderer>().enabled = false;
-        }
     }
 }

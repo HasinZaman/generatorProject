@@ -258,16 +258,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   seed: 1
+  chunksMaxGenration: {x: 3, y: 3}
+  defaultChunkHeightMapLayers: 3
+  defaultChunkDist: {x: 5, y: 5, z: 5}
+  defaultChunkGridSize: {x: 4, y: 4, z: 4}
+  defaultChunkSamplesPerCell: 0a0000000a0000000a000000
+  amplitude: 5
+  translation: 20
   mf: {fileID: 0}
   mesh: {fileID: 0}
-  vertices: []
-  triangles: 
   uv: []
   threshold: 0
-  point: {fileID: 7734549919441456827, guid: 28c1e1ff13dab694d9a36bcefd9a5140, type: 3}
-  pointVisible: 0
   test: 1
-  linearAproxCond: 0
 --- !u!4 &910123272
 Transform:
   m_ObjectHideFlags: 0

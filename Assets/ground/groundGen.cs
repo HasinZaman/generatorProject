@@ -2,11 +2,12 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
-
+using System.Threading;
+using System.Linq;
 
 public class groundGen : MonoBehaviour
 {
+
     //declaring variable
 
     // noise variables
@@ -16,77 +17,88 @@ public class groundGen : MonoBehaviour
     //chunk
     public List<chunk> chunks = new List<chunk> { };
 
+    //chunk genration settings
+    public Vector2 chunksMaxGenration = new Vector2(2, 2);
+
+    //chunk default settings
+    public int defaultChunkHeightMapLayers = 3;
+    public Vector3 defaultChunkDist = new Vector3(5, 5, 5);
+    public Vector3 defaultChunkGridSize = new Vector3(2, 2, 2);
+    public int[] defaultChunkSamplesPerCell = new int[] { 4, 4, 4 };
+    public double amplitude = 5;
+    public double translation = 1;
+
     //mesh
     public MeshFilter mf;
     public Mesh mesh;
-    public List<Vector3> vertices = new List<Vector3>();
-    public List<int> triangles = new List<int>();
     public List<Vector2> uv = new List<Vector2>();
 
     public double threshold;
-    public GameObject point;
-    public bool pointVisible=false;
 
     public bool test = true;
-    public bool linearAproxCond = true;
-    
 
-    int kewlKewl(double x, double y, int maxX, int maxY)
+
+    int kewlKewl(double x, double y, float maxX, float maxY)
     {
-        if(x < 0 || y < 0 || x >= maxX || y >= maxY)
+        if (x < 0 || y < 0 || x >= maxX || y >= maxY)
         {
             return -1;
         }
-        return Convert.ToInt32(y*maxX+x);
+        return Convert.ToInt32(y * maxX + x);
     }
 
     // Start is called before the first frame update
     void Start()
     {
-        noise aa = new noise(
-                1,
-                new double[][] {
-                    new double[2]{0,1},
-                    new double[2]{1,1},
-                    new double[2]{1,0},
-                    new double[2]{1,-1},
-                    new double[2]{0,-1},
-                    new double[2]{-1,-1},
-                    new double[2]{-1,0},
-                    new double[2]{-1,1}
-                },
-                Convert.ToInt32(2),
-                Convert.ToInt32(2)
-            );
-
         random = new System.Random(seed);
 
         mf = GetComponent<MeshFilter>();
         mesh = new Mesh();
         mf.mesh = mesh;
 
-        int xMax = 4;
-        int yMax = 4;
-
-        for(double y = 0; y < yMax; y++)
+        for (double y = 0; y < chunksMaxGenration.y; y++)
         {
-            for(double x = 0; x < xMax; x++)
+            for (double x = 0; x < chunksMaxGenration.x; x++)
             {
-                chunks.Add(new chunk(random.Next(), 3, 5, new Vector3(2, 2, 2), new Vector3(Convert.ToSingle(11.25 * x), 0, Convert.ToSingle(11.25 * y)), Convert.ToInt32(x + y * xMax)));
+                chunks.Add
+                (
+                    new chunk(
+                        random.Next(),
+                        defaultChunkHeightMapLayers,
+                        1,
+                        defaultChunkDist,
+                        defaultChunkGridSize,
+                        new Vector3
+                        (
+                            Convert.ToSingle(defaultChunkDist.x * x),
+                            0,
+                            Convert.ToSingle(defaultChunkDist.z * y)
+                        ),
+                        Convert.ToInt32(x + y * chunksMaxGenration.x),
+                        defaultChunkSamplesPerCell,
+                        amplitude,
+                        translation
+                    )
+                );
 
-                chunks[Convert.ToInt32(x + y * xMax)].neghboringChunks[0] = kewlKewl(x-1,y-1, xMax, yMax);
-                chunks[Convert.ToInt32(x + y * xMax)].neghboringChunks[1] = kewlKewl(x, y - 1, xMax, yMax);
-                chunks[Convert.ToInt32(x + y * xMax)].neghboringChunks[2] = kewlKewl(x + 1, y - 1, xMax, yMax);
+                chunks[Convert.ToInt32(x + y * chunksMaxGenration.x)].neghboringChunks[0] = kewlKewl(x - 1, y - 1, chunksMaxGenration.x, chunksMaxGenration.y);
+                chunks[Convert.ToInt32(x + y * chunksMaxGenration.x)].neghboringChunks[1] = kewlKewl(x, y - 1, chunksMaxGenration.x, chunksMaxGenration.y);
+                chunks[Convert.ToInt32(x + y * chunksMaxGenration.x)].neghboringChunks[2] = kewlKewl(x + 1, y - 1, chunksMaxGenration.x, chunksMaxGenration.y);
 
-                chunks[Convert.ToInt32(x + y * xMax)].neghboringChunks[3] = kewlKewl(x - 1, y, xMax, yMax);
-                chunks[Convert.ToInt32(x + y * xMax)].neghboringChunks[4] = kewlKewl(x + 1, y, xMax, yMax);
+                chunks[Convert.ToInt32(x + y * chunksMaxGenration.x)].neghboringChunks[3] = kewlKewl(x - 1, y, chunksMaxGenration.x, chunksMaxGenration.y);
+                chunks[Convert.ToInt32(x + y * chunksMaxGenration.x)].neghboringChunks[4] = kewlKewl(x + 1, y, chunksMaxGenration.x, chunksMaxGenration.y);
 
-                chunks[Convert.ToInt32(x + y * xMax)].neghboringChunks[5] = kewlKewl(x - 1, y + 1, xMax, yMax);
-                chunks[Convert.ToInt32(x + y * xMax)].neghboringChunks[6] = kewlKewl(x, y + 1, xMax, yMax);
-                chunks[Convert.ToInt32(x + y * xMax)].neghboringChunks[7] = kewlKewl(x + 1, y + 1, xMax, yMax);
+                chunks[Convert.ToInt32(x + y * chunksMaxGenration.x)].neghboringChunks[5] = kewlKewl(x - 1, y + 1, chunksMaxGenration.x, chunksMaxGenration.y);
+                chunks[Convert.ToInt32(x + y * chunksMaxGenration.x)].neghboringChunks[6] = kewlKewl(x, y + 1, chunksMaxGenration.x, chunksMaxGenration.y);
+                chunks[Convert.ToInt32(x + y * chunksMaxGenration.x)].neghboringChunks[7] = kewlKewl(x + 1, y + 1, chunksMaxGenration.x, chunksMaxGenration.y);
             }
         }
 
+        foreach (chunk c in chunks)
+        {
+            c.updateChunkGrids(chunks);
+            c.chunkThread.Start();
+        }
 
         /*noise = new noise(
             seed,
@@ -121,132 +133,64 @@ public class groundGen : MonoBehaviour
 
 
     }
+    
 
     // Update is called once per frame
     void Update()
     {
-        if (test)
+        bool readyCond = chunks.Any(c => c.chunkThread.IsAlive == false);
+
+        if (readyCond && test)
+        {
+            updateMesh();
+        }
+        if(chunks.TrueForAll(c => c.chunkThread.IsAlive == false))
         {
             test = false;
-            genrateGround(4);
-
         }
     }
-
-    double surfaceCalc(double x1, double x2, double mode, double t)
+    int counter = 0;
+    void updateMesh()
     {
-        if(mode == 0 || x1 == threshold)
-        {
-            return 0;
-        }
-        else if(mode == 1 || x2 == threshold)
-        {
-            return 1;
-        }else if(x1 == x2)
-        {
-            return 1;
-        }else if(x1 > x2)
-        {
-            return surfaceCalc(x2, x1, mode, 1 - t);
-        }
-        double val = 1 / (Math.Max(x1, x2) - Math.Min(x1, x2)) * (t-Math.Min(x1,x2));
-        
-        if(val > 1)
-        {
-            return 1;
-        }else if (val < 0)
-        {
-            return 0;
-        }
+        counter += 1;
+        Vector3[] verticesTemp = new Vector3[0];
+        int[] triangleTemp1;
 
-        return val;
-    }
+        int[] triangleTemp2 = new int[0];
+        int indexCount = 0;
 
-    void genrateGround(int samplesFromCells)
-    {
-        int[] pointsTemp;
-        Vector3 pointTemp;
-        marchingCube marching = new marchingCube();
 
-        vertices = new List<Vector3>();
-        triangles = new List<int>();
-
-        double[][][] chunkTerrain;
-
-        double dist;
-
-        for (int i1  = 0; i1 < chunks.Count; i1++)
+        for(int i1 = 0; i1 < chunks.Count; i1++)
         {
-            dist = chunks[i1].dist / samplesFromCells;
-
-            chunkTerrain = chunks[i1].getTerrain(1, new int[] { samplesFromCells, samplesFromCells, samplesFromCells }, 5, 5, chunks[i1].getNeghboringHeightMaps(1,chunks));
-            //chunkTerrain = chunks[i1].getTerrain(1, new int[] { samplesFromCells, samplesFromCells, samplesFromCells }, 3, 1);
-            
-            for (int x = 0; x < chunkTerrain.Length - 1; x++)
+            if(chunks[i1].vertices != null && chunks[i1].triangles != null)
             {
-                for (int y = 0; y < chunkTerrain[x].Length - 1; y++)
+                try
                 {
-                    for (int z = 0; z <chunkTerrain[x][y].Length - 1; z++)
+                    triangleTemp1 = new int[chunks[i1].triangles.Length];
+
+                    for (int i2 = 0; i2 < chunks[i1].triangles.Length; i2++)
                     {
-                        
-
-                        pointsTemp = marching.getPoint
-                        (
-                            new double[8]
-                            {
-                                chunkTerrain[x][y + 1][z + 1],
-                                chunkTerrain[x+1][y + 1][z + 1],
-                                chunkTerrain[x+1][y + 1][z],
-                                chunkTerrain[x][y + 1][z],
-
-
-                                chunkTerrain[x][y][z + 1],
-                                chunkTerrain[x+1][y][z + 1],
-                                chunkTerrain[x+1][y][z],
-                                chunkTerrain[x][y][z]
-                            },
-                            threshold
-                        );
-
-                        for (int i2 = 0; i2 < pointsTemp.Length; i2++)
-                        {
-                            pointTemp = marching.points[pointsTemp[i2]];
-
-                            if (linearAproxCond)
-                            {
-                                pointTemp.x = Convert.ToSingle((surfaceCalc(chunkTerrain[x][y][z], chunkTerrain[x + 1][y][z], pointTemp.x, threshold) + x) * dist + chunks[i1].startingPos.x);
-                                
-                                pointTemp.y = Convert.ToSingle((surfaceCalc(chunkTerrain[x][y][z], chunkTerrain[x][y + 1][z], pointTemp.y, threshold) + y) * dist + chunks[i1].startingPos.y);
-                                
-                                pointTemp.z = Convert.ToSingle((surfaceCalc(chunkTerrain[x][y][z], chunkTerrain[x][y][z + 1], pointTemp.z, threshold) + z) * dist + chunks[i1].startingPos.z);
-                            }
-                            else
-                            {
-                                pointTemp.x = Convert.ToSingle((pointTemp.x + x) * dist + chunks[i1].startingPos.x);
-
-                                pointTemp.y = Convert.ToSingle((pointTemp.y + y) * dist + chunks[i1].startingPos.y);
-
-                                pointTemp.z = Convert.ToSingle((pointTemp.z + z) * dist + chunks[i1].startingPos.z);
-                            }
-                            if (vertices.Contains(pointTemp) == false)
-                            {
-                                vertices.Add(pointTemp);
-                                triangles.Add(vertices.Count - 1);
-                            }
-                            else
-                            {
-                                triangles.Add(vertices.FindIndex(point => point == pointTemp));
-                            }
-                        }
+                        triangleTemp1[i2] = chunks[i1].triangles[i2] + indexCount;
                     }
+
+                    triangleTemp2 = triangleTemp2.Concat(triangleTemp1).ToArray();
+                    verticesTemp = verticesTemp.Concat(chunks[i1].vertices).ToArray();
+
+                    indexCount = verticesTemp.Length;
+
                 }
+                finally
+                {
+
+                }
+
             }
         }
-        
+
         mesh.Clear();
 
-        mesh.vertices = vertices.ToArray();
-        mesh.triangles = triangles.ToArray();
+        mesh.vertices = verticesTemp;
+        mesh.triangles = triangleTemp2;
 
         mesh.RecalculateNormals();
     }

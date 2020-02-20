@@ -12,6 +12,8 @@ public class noise
     public int seed;
     private System.Random random;
 
+
+
     public noise(int seedRaw, double[][] vectersRaw, int width, int height, int depth)
     {
         seed = seedRaw;
