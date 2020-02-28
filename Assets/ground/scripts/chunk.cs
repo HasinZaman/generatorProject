@@ -81,7 +81,7 @@ public class chunk
 
     public void genrateMesh()
     {
-        this.terrainMap = new double[Convert.ToInt32(samplesPerCell[0] * this.chunkSize.x * Math.Pow(2, heightMapLayer - 1)) + samplesPerCell[0] / 2][][];
+        this.terrainMap = new double[Convert.ToInt32(samplesPerCell[0] * this.chunkSize.x * Math.Pow(2, heightMapLayer - 1)) + samplesPerCell[0]][][];
 
         double sample;
         double[] offset;
@@ -91,41 +91,38 @@ public class chunk
         for (int x = 0; x < terrainMap.Length; x++)
         {
 
-            terrainMap[x] = new double[Convert.ToInt32(samplesPerCell[1] * this.chunkSize.y * Math.Pow(2, heightMapLayer - 1)) + samplesPerCell[1] / 2][];
+            terrainMap[x] = new double[Convert.ToInt32(samplesPerCell[1] * this.chunkSize.y * Math.Pow(2, heightMapLayer - 1)) + samplesPerCell[1]][];
 
             for (int y = 0; y < terrainMap[x].Length; y++)
             {
 
-                terrainMap[x][y] = new double[Convert.ToInt32(samplesPerCell[2] * this.chunkSize.z * Math.Pow(2, heightMapLayer - 1)) + samplesPerCell[2] / 2];
+                terrainMap[x][y] = new double[Convert.ToInt32(samplesPerCell[2] * this.chunkSize.z * Math.Pow(2, heightMapLayer - 1)) + samplesPerCell[2]];
 
                 for (int z = 0; z < terrainMap[x][y].Length; z++)
                 {
-                    if (y == terrainMap[x].Length - 1)
+                    sample = 0;
+
+                    if (y != terrainMap[x].Length - 1)
                     {
-                        sample = 0;
-                    }
-                    else
-                    {
-                        sample = 0;
                         for (int i1 = 0; i1 < heightMapLayer; i1++)
                         {
                             offset = new double[]
-                               {
-                            0.1/samplesPerCell[0],
-                            0.1/samplesPerCell[1],
-                            0.1/samplesPerCell[2]
-                               };
+                            {
+                                0.1/samplesPerCell[0],
+                                0.1/samplesPerCell[1],
+                                0.1/samplesPerCell[2]
+                            };
                             if (x == 0)
                             {
                                 sampleCord[0] = -0.5;
                             }
                             else if (x == terrainMap.Length - 1)
                             {
-                                sampleCord[0] = Math.Floor((Convert.ToDouble(x - (float)samplesPerCell[0] / 2) / samplesPerCell[0]) * Math.Pow(2, heightMapLayer - 1 - i1) + offset[0]) + 0.5;
+                                sampleCord[0] = Math.Floor((Convert.ToDouble((float)x - (float)samplesPerCell[0]) / samplesPerCell[0]) * Math.Pow(2, heightMapLayer - 1 - i1) + offset[0]) + 0.5;
                             }
                             else
                             {
-                                sampleCord[0] = (Convert.ToDouble(x - (float)samplesPerCell[0] / 2) / samplesPerCell[0]) * Math.Pow(2, heightMapLayer - 1 - i1) + offset[0];
+                                sampleCord[0] = (Convert.ToDouble((float)x - (float)samplesPerCell[0]) / samplesPerCell[0]) * Math.Pow(2, heightMapLayer - 1 - i1) + offset[0];
                             }
 
                             if (z == 0)
@@ -134,11 +131,11 @@ public class chunk
                             }
                             else if (z == terrainMap[x][y].Length - 1)
                             {
-                                sampleCord[1] = Math.Floor((Convert.ToDouble(z - (float)samplesPerCell[2] / 2) / samplesPerCell[2]) * Math.Pow(2, heightMapLayer - 1 - i1) + offset[2]) + 0.5;
+                                sampleCord[1] = Math.Floor((Convert.ToDouble((float)z - (float)samplesPerCell[2]) / samplesPerCell[2]) * Math.Pow(2, heightMapLayer - 1 - i1) + offset[2]) + 0.5;
                             }
                             else
                             {
-                                sampleCord[1] = (Convert.ToDouble(z - (float)samplesPerCell[2] / 2) / samplesPerCell[2]) * Math.Pow(2, heightMapLayer - 1 - i1) + offset[2];
+                                sampleCord[1] = (Convert.ToDouble((float)z - (float)samplesPerCell[2]) / samplesPerCell[2]) * Math.Pow(2, heightMapLayer - 1 - i1) + offset[2];
                             }
 
                             sample += this.heightMaps[i1].sample(
