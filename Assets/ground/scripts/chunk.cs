@@ -33,8 +33,10 @@ public class chunk
 
     System.Random random;
 
+    //sets up the chunk
     public chunk(int seed,int totalHeightMaps, int heightMapLayer, Vector3 dist, Vector3 chunkSize, Vector3 startingPos, int id, int[] samplesPerCell, double amplitude, double translation)
     {
+        //assigns the chunk variables
         this.seed = seed;
 
         this.chunkSize = chunkSize;
@@ -71,23 +73,29 @@ public class chunk
                 Convert.ToInt32(chunkSize.y * Math.Pow(2, i1))
             );
         }
-       chunkThread = new Thread(genrateMesh);
+
+        //chunkThread creates a new thread to run beside the main thread and to speed up the script
+        chunkThread = new Thread(genrateMesh);
     }
 
-    public void updateChunkGrids(List<chunk> chunkSearchList)
+    //updates near by grids
+    public void updateChunkGrids(List<chunk> chunkSearchList)//remove function
     {
         neighboringChunksGrids = getNeghboringHeightMaps(chunkSearchList);
     }
 
+    //genrateMesh creates sets up the terrainMap
     public void genrateMesh()
     {
-        this.terrainMap = new double[Convert.ToInt32(samplesPerCell[0] * this.chunkSize.x * Math.Pow(2, heightMapLayer - 1)) + samplesPerCell[0]][][];
-
+        //declares function variables
         double sample;
+        //offset exists to ensure that sample coord is never a whole number
         double[] offset;
 
         double[] sampleCord = new double[2];
 
+        //sets up the terrainMap
+        this.terrainMap = new double[Convert.ToInt32(samplesPerCell[0] * this.chunkSize.x * Math.Pow(2, heightMapLayer - 1)) + samplesPerCell[0]][][];
         for (int x = 0; x < terrainMap.Length; x++)
         {
 
@@ -101,7 +109,7 @@ public class chunk
                 for (int z = 0; z < terrainMap[x][y].Length; z++)
                 {
                     sample = 0;
-
+                    //if y == terrainMap[x].Length - 1 then the function is at the top and sample is set to 0 inorder to ensure the top is rendered
                     if (y != terrainMap[x].Length - 1)
                     {
                         for (int i1 = 0; i1 < heightMapLayer; i1++)
@@ -112,6 +120,8 @@ public class chunk
                                 0.1/samplesPerCell[1],
                                 0.1/samplesPerCell[2]
                             };
+
+                            //if any coordinate is at the edge of then the sample coord is assigned inorder to ensure the seems of every chunk align
                             if (x == 0)
                             {
                                 sampleCord[0] = -0.5;
@@ -137,28 +147,25 @@ public class chunk
                             {
                                 sampleCord[1] = (Convert.ToDouble((float)z - (float)samplesPerCell[2]) / samplesPerCell[2]) * Math.Pow(2, heightMapLayer - 1 - i1) + offset[2];
                             }
-
+                            
                             sample += this.heightMaps[i1].sample(
                                 sampleCord[0],
                                 sampleCord[1],
                                 neighboringChunksGrids
-                                ) * amplitude / Math.Pow(2, heightMapLayer - i1 - 1) + translation;
+                                );
+                            
+                            if (sample != 0)
+                            {
+                                sample= sample * amplitude / Math.Pow(2, heightMapLayer - i1 - 1) + translation;
+                            }
                         }
                     }
-
-                    if (sample < y)
-                    {
-                        terrainMap[x][y][z] = sample - y / Math.Pow(2, heightMapLayer - 1);
-                    }
-                    else
-                    {
-                        terrainMap[x][y][z] = 0;
-                    }
+                    terrainMap[x][y][z] = sample - y / Math.Pow(2, heightMapLayer - 1);
                 }
             }
         }
+        //meshPrep sets up the triangles and vertice arrays inorder to be used in the ground mesh
         meshPrep();
-        Debug.Log("done");
     }
 
     //converts surronding chunk ids into chunk height map grids
@@ -180,17 +187,22 @@ public class chunk
         return grids;
     }
 
+    //mesh prep sets up the chunks triangles and vertices
     public void meshPrep()
     {
-        int[] pointsTemp;
+        //declares function varriables
+        Vector3[] pointsTemp;
         Vector3 pointTemp;
+        double[][][] cubeVertices;
         marchingCube marching = new marchingCube();
 
         List<Vector3> verticesTemp = new List<Vector3>();
         List<int> trianglesTemp = new List<int>();
-        
-        //chunkTerrain = chunks[i1].getTerrain(1, new int[] { samplesFromCells, samplesFromCells, samplesFromCells }, 3, 1);
 
+
+        //marching.lerpCond = true;
+
+        //distPerSamples get the distance between samples inorder to ensure chunk has a width, lenght and height that is exactly dist
         Vector3 distPerSample = new Vector3
         (
             dist.x / (terrainMap.Length - 1),
@@ -198,42 +210,49 @@ public class chunk
             dist.z / (terrainMap[0][0].Length - 1)
         );
 
+        //goes through terrainMap and gets the cubes triangles and meshes
         for (int x = 0; x < terrainMap.Length - 1; x++)
         {
             for (int y = 0; y < terrainMap[x].Length - 1; y++)
             {
                 for (int z = 0; z < terrainMap[x][y].Length - 1; z++)
                 {
+                    //gets the vertices for the current cube
+                    cubeVertices = new double[2][][];
+                    for(int x1 = 0; x1 < 2; x1++)
+                    {
+                        cubeVertices[x1] = new double[2][];
+                        for(int y1 = 0; y1 < 2; y1++)
+                        {
+                            cubeVertices[x1][y1] = new double[2];
+                            for(int z1 = 0; z1 < 2; z1++)
+                            {
+                                cubeVertices[x1][y1][z1] = terrainMap[x + x1][y + y1][z + z1];
+                            }
+                        }
+                    }
 
-
+                    //gets the vertices for the current cube
                     pointsTemp = marching.getPoint
                     (
-                        new double[8]
-                        {
-                            terrainMap[x][y + 1][z + 1],
-                            terrainMap[x+1][y + 1][z + 1],
-                            terrainMap[x+1][y + 1][z],
-                            terrainMap[x][y + 1][z],
-
-
-                            terrainMap[x][y][z + 1],
-                            terrainMap[x+1][y][z + 1],
-                            terrainMap[x+1][y][z],
-                            terrainMap[x][y][z]
-                        },
+                        cubeVertices,
                         threshold
                     );
 
-                    for (int i2 = 0; i2 < pointsTemp.Length; i2++)
+                    //adds the vertices from pointTemp to the triangle and vertice array
+                    for (int i1 = 0; i1 < pointsTemp.Length; i1++)
                     {
-                        pointTemp = marching.points[pointsTemp[i2]];
+                        pointTemp = pointsTemp[i1];
 
+                        //converts the pointTemp form marching cube vertices into global vertices
                         pointTemp.x = Convert.ToSingle((pointTemp.x + x) * distPerSample[0] + startingPos.x);
 
                         pointTemp.y = Convert.ToSingle((pointTemp.y + y) * distPerSample[1] + startingPos.y);
 
                         pointTemp.z = Convert.ToSingle((pointTemp.z + z) * distPerSample[2] + startingPos.z);
                         
+                        //checks if the vertice exists in the  vertice array
+                        //if the vertice was found then the vertice would be shared rather than a new one being made
                         if (verticesTemp.Contains(pointTemp) == false)
                         {
                             verticesTemp.Add(pointTemp);

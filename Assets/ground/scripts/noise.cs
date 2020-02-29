@@ -5,15 +5,28 @@ using UnityEngine;
 
 public class noise
 {
+    //declaring object variables
+
+    //grid variable holds the vectors used inorder to generate perlin noise
     public List<List<List<double[]>>> grid = new List<List<List<double[]>>>();
 
+    //vectors variable holds a pool of vectors that will be inserted into grid
     private double[][] vectors;
-
+    
     public int seed;
     private System.Random random;
 
+    //sets up the noise algorthim for 2d perlin noise
+    public noise(int seedRaw, double[][] vectersRaw, int width, int height)
+    {
+        seed = seedRaw;
+        vectors = vectersRaw;
+        random = new System.Random(seed);
 
+        createGrid(width, height, 1);
+    }
 
+    //sets up the noise algorthim for 3d perlin noise
     public noise(int seedRaw, double[][] vectersRaw, int width, int height, int depth)
     {
         seed = seedRaw;
@@ -22,16 +35,8 @@ public class noise
 
         createGrid(width, height, depth);
     }
-    public noise(int seedRaw, double[][] vectersRaw, int width, int height)
-    {
-        seed = seedRaw;
-        vectors = vectersRaw;
-        random = new System.Random(seed);
 
-        createGrid(width, height, 1);
-
-    }
-
+    //create the grid by using the pool of vectors in vectors array
     private void createGrid(int width, int height, int depth)
     {
         for (int z = 0; z < depth; z++)
@@ -49,6 +54,8 @@ public class noise
             }
         }
     }
+
+    //calculates the dot products of the 4 corners in a cell
     private double[] vecterDistDotProduct(double[][] vectors, double[][] dist)
     {
         double[] dotProducts = new double[vectors.Length];
@@ -67,12 +74,16 @@ public class noise
         }
         return dotProducts;
     }
+
+    //returns the itermediate value using cosine interpolation
     private double cosineInterpolate(double y1, double y2, double intermediaryPoint)
     {
         double mu = (1 - Math.Cos(intermediaryPoint * Math.PI)) / 2;
 
         return y1 * (1 - mu) + y2 * mu;
     }
+
+    //checks if the sample coordinate are valid - 2d version 
     private bool sampleCoordCheck(double x, double y)
     {
         if (Math.Round(x) == x || Math.Round(y) == y)
@@ -95,13 +106,14 @@ public class noise
             return true;
         }
 
-        if (y > grid[0][0].Count - 1)
+        if (y > grid[0].Count - 1)
         {
             return true;
         }
 
         return false;
     }
+    //checks if the sample coordinate are valid - 3d version 
     private bool sampleCoordCheck(double x, double y, double z)
     {
         if (Math.Round(x) == x || Math.Round(y) == y || Math.Round(z) == z)
@@ -142,17 +154,27 @@ public class noise
         return false;
     }
 
-    public double sample(double x, double y, double[][] pointVectors)
+    //gets the sample value - 2d version
+    private double sample(double x, double y, double[][] pointVectors)
     {
+        //checks if the sample coordinate is valid
         if (sampleCoordCheck(x, y))
         {
+            //if x or y is a whole return 0
+            
             if (Math.Round(x) == x || Math.Round(y) == y)
             {
                 return 0;
+                /*
+                 *if x or y equals to zero,
+                 *the perlin noise algorthim would return 0 after doing all the caluculation
+                 * by return 0 now, the algorthim can take a short cut without doing any of the calculations required
+                 */
             }
 
             double newX = x, newY = y;
 
+            //checks if coordinate is are too small or too small. then fixes the coordinates
             if (x < 0)
             {
                 newX = grid[0][0].Count + x % grid[0][0].Count;
@@ -171,12 +193,14 @@ public class noise
                 newY = y % grid[0].Count - 1;
             }
 
+            //if any fixes are required then restart the sample function with the fixed coordinates
             if (newX != x || newY != y)
             {
                 return sample(newX, newY, pointVectors);
             }
         }
 
+        //gets the distance to the four closest corners
         double[][] pointDist = new double[][]
         {
             new double[]{x % 1, y % 1},
@@ -185,8 +209,10 @@ public class noise
             new double[]{x % 1, y % 1 - 1}
         };
 
+        //gets the dot product of all the corners
         double[] pointValue = vecterDistDotProduct(pointVectors, pointDist);
 
+        //interoplate the sample values
         double A = cosineInterpolate(
             pointValue[0],
             pointValue[1],
@@ -207,17 +233,27 @@ public class noise
 
         return C;
     }
+    
+    //gets the sample value - 3d version
     private double sample(double x, double y, double z, double[][] pointVectors)
     {
+        //checks if the sample coordinate is valid
         if (sampleCoordCheck(x, y, z))
         {
+            //if x, y or z is a whole return 0
             if (Math.Round(x) == x || Math.Round(y) == y || Math.Round(z) == z)
             {
+                /*
+                 *if x, y or z equals to zero,
+                 *the perlin noise algorthim would return 0 after doing all the caluculation
+                 * by return 0 now, the algorthim can take a short cut without doing any of the calculations required
+                 */
                 return 0;
             }
 
             double newX = x, newY = y, newZ = z;
 
+            //checks if coordinate is are too small or too small. then fixes the coordinates
             if (x < 0)
             {
                 newX = grid[0][0].Count + x % grid[0][0].Count;
@@ -245,6 +281,7 @@ public class noise
                 newZ = z % grid.Count;
             }
 
+            //if any fixes are required then restart the sample function with the fixed coordinates
             if (newX != x || newY != y || newZ != z)
             {
                 return sample(newX, newY, newZ, pointVectors);
@@ -252,6 +289,7 @@ public class noise
         }
 
 
+        //gets the distance to nearest eight closest corners
         double[][] pointDist = new double[][]
         {
             new double[]{ x % 1, y % 1, z % 1},
@@ -265,8 +303,10 @@ public class noise
             new double[]{ x % 1, y % 1 - 1, z % 1 - 1}
         };
 
+        //gets the dot product for every corner
         double[] pointValue = vecterDistDotProduct(pointVectors, pointDist);
 
+        // gets the interpolated value using the dot products
         double A = cosineInterpolate(
             pointValue[0],
             pointValue[1],
@@ -312,8 +352,10 @@ public class noise
         return G;
     }
 
+    //gets the sample - 2d version
     public double sample(double x, double y)
     {
+        //declares the point vectors
         double[][] pointVectors = new double[4][]{
             null,
             null,
@@ -321,38 +363,44 @@ public class noise
             null
             };
 
+        //set up the default values of the orientation variables
+        //the orientation variables are used to find the vectors that will be used to calcuate the sample
         double left = Math.Floor(x);
         double right = Math.Ceiling(x);
         double bottom = Math.Floor(y);
         double top = Math.Ceiling(y);
 
-        if (Math.Floor(x) == -1)
+        //in the case of an invalid oreintation value, the grid is assumed to be repeating in the x and y axis and the invaild oreintation value is replaced.
+        if (left == -1)
         {
             left = grid[0][0].Count - 1;
         }
-        else if (Math.Ceiling(x) == grid[0][0].Count)
+        else if (right == grid[0][0].Count)
         {
             right = 0;
         }
 
-        if (Math.Floor(y) == -1)
+        if (bottom == -1)
         {
             bottom = grid[0].Count - 1;
         }
-        else if (Math.Ceiling(y) == grid[0].Count)
+        else if (top == grid[0].Count)
         {
             top = 0;
         }
 
-        pointVectors[0] = grid[0][Convert.ToInt32(left)][Convert.ToInt32(bottom)];
-        pointVectors[1] = grid[0][Convert.ToInt32(right)][Convert.ToInt32(bottom)];
-        pointVectors[2] = grid[0][Convert.ToInt32(right)][Convert.ToInt32(top)];
-        pointVectors[3] = grid[0][Convert.ToInt32(left)][Convert.ToInt32(top)];
+        //sets up point vectors using the orrientation variables
+        pointVectors[0] = grid[0][Convert.ToInt32(bottom)][Convert.ToInt32(left)];
+        pointVectors[1] = grid[0][Convert.ToInt32(bottom)][Convert.ToInt32(right)];
+        pointVectors[2] = grid[0][Convert.ToInt32(top)][Convert.ToInt32(right)];
+        pointVectors[3] = grid[0][Convert.ToInt32(top)][Convert.ToInt32(left)];
 
+        //uses the private sample function to get the sample
         return sample(x, y, pointVectors);
     }
     public double sample(double x, double y, double z)
     {
+        //declares the point vectors
         double[][] pointVectors = new double[8][]{
             null,
             null,
@@ -364,13 +412,16 @@ public class noise
             null
             };
 
+        //set up the default values of the orientation variables
+        //the orientation variables are used to find the vectors that will be used to calcuate the sample
         double left = Math.Floor(x);
         double right = Math.Ceiling(x);
         double bottom = Math.Floor(y);
         double top = Math.Ceiling(y);
         double back = Math.Floor(z);
         double front = Math.Ceiling(z);
-
+        
+        //in the case of an invalid oreintation value, the grid is assumed to be repeating in the x and y axis and the invaild oreintation value is replaced.
         if (Math.Floor(x) == -1)
         {
             left = grid[0][0].Count - 1;
@@ -398,19 +449,22 @@ public class noise
             front = 0;
         }
 
-        pointVectors[0] = grid[Convert.ToInt32(back)][Convert.ToInt32(left)][Convert.ToInt32(bottom)];
-        pointVectors[1] = grid[Convert.ToInt32(back)][Convert.ToInt32(right)][Convert.ToInt32(bottom)];
-        pointVectors[2] = grid[Convert.ToInt32(back)][Convert.ToInt32(right)][Convert.ToInt32(top)];
-        pointVectors[3] = grid[Convert.ToInt32(back)][Convert.ToInt32(left)][Convert.ToInt32(top)];
+        //sets up point vectors using the orrientation variables
+        pointVectors[0] = grid[Convert.ToInt32(back)][Convert.ToInt32(bottom)][Convert.ToInt32(left)];
+        pointVectors[1] = grid[Convert.ToInt32(back)][Convert.ToInt32(bottom)][Convert.ToInt32(right)];
+        pointVectors[2] = grid[Convert.ToInt32(back)][Convert.ToInt32(top)][Convert.ToInt32(right)];
+        pointVectors[3] = grid[Convert.ToInt32(back)][Convert.ToInt32(top)][Convert.ToInt32(left)];
 
-        pointVectors[4] = grid[Convert.ToInt32(front)][Convert.ToInt32(left)][Convert.ToInt32(bottom)];
-        pointVectors[5] = grid[Convert.ToInt32(front)][Convert.ToInt32(right)][Convert.ToInt32(bottom)];
-        pointVectors[6] = grid[Convert.ToInt32(front)][Convert.ToInt32(right)][Convert.ToInt32(top)];
-        pointVectors[7] = grid[Convert.ToInt32(front)][Convert.ToInt32(left)][Convert.ToInt32(top)];
+        pointVectors[4] = grid[Convert.ToInt32(front)][Convert.ToInt32(bottom)][Convert.ToInt32(left)];
+        pointVectors[5] = grid[Convert.ToInt32(front)][Convert.ToInt32(bottom)][Convert.ToInt32(right)];
+        pointVectors[6] = grid[Convert.ToInt32(front)][Convert.ToInt32(top)][Convert.ToInt32(right)];
+        pointVectors[7] = grid[Convert.ToInt32(front)][Convert.ToInt32(top)][Convert.ToInt32(left)];
 
+        //uses the private sample function to get the sample
         return sample(x, y, z, pointVectors);
     }
 
+    //find the index of a corner vector - used for find the samples that are inbetween chunks
     private int cornerPointFinder(int counter, int axis, int maxVal)
     {
         if(axis == 0)
@@ -437,6 +491,7 @@ public class noise
 
         }
     }
+    //find the index of a edge vector - used for find the samples that are inbetween chunks
     private int edgePointFinder1(double val, int counter, int axis)
     {
         if (axis == 0)
@@ -462,6 +517,7 @@ public class noise
             }
         }
     }
+    //find the index of a edge vector - used for find the samples that are inbetween chunks
     private int edgePointFinder2(int maxVal, int counter, int axis)
     {
         if (axis == 0)
@@ -487,6 +543,9 @@ public class noise
             }
         }
     }
+
+    // comment function
+    //gets the sample that is between two chunks
     public double sample(double x, double y, List<List<List<double[]>>>[] suroundingGrid)
     {
         double[][] pointVectors = new double[4][]{
@@ -498,9 +557,11 @@ public class noise
 
         List<List<List<double[]>>>[] grids = new List<List<List<double[]>>>[4];
         
+        //region holds the index of chunks that going to be used
         double[] region = new double[2] {0, 0};
         double zone = 0;
-
+        
+        //finds the region depending on the coordinates
         if (x < 0)
         {
             region[0] -= 1;
@@ -529,10 +590,11 @@ public class noise
         {
             return sample(x, y);
         }
-
+        
         double[] xVal;
         double[] yVal;
 
+        //find xVal and yVal depending on region
         if (region[0] < 0)
         {
             xVal = new double[2]
@@ -576,6 +638,7 @@ public class noise
                 0,0
             };
         }
+
         double temp;
 
         int counter = 0;

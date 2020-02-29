@@ -3,6 +3,8 @@ using UnityEngine;
 
 public class marchingCube
 {
+    public bool lerpCond = false;
+
     public int[] edgeTable = new int[256]
     {
         0x0  , 0x109, 0x203, 0x30a, 0x406, 0x50f, 0x605, 0x70c,
@@ -301,29 +303,54 @@ public class marchingCube
 
     public Vector3[] points = new Vector3[12]
     {
-        new Vector3((float) 0.5, 0, 0),
-        new Vector3(1, 0, (float) 0.5),
-        new Vector3((float) 0.5, 0, 1),
-        new Vector3(0, 0, (float) 0.5),
+        new Vector3(0.5f, 0, 0),
+        new Vector3(1, 0, 0.5f),
+        new Vector3(0.5f, 0, 1),
+        new Vector3(0, 0, 0.5f),
 
-        new Vector3((float) 0.5, 1, 0),
-        new Vector3(1, 1, (float) 0.5),
-        new Vector3((float) 0.5, 1, 1),
-        new Vector3(0, 1, (float) 0.5),
+        new Vector3(0.5f, 1, 0),
+        new Vector3(1, 1, 0.5f),
+        new Vector3(0.5f, 1, 1),
+        new Vector3(0, 1, 0.5f),
 
-        new Vector3(0, (float) 0.5, 0),
-        new Vector3(1, (float) 0.5, 0),
-        new Vector3(1, (float) 0.5, 1),
-        new Vector3(0, (float) 0.5, 1)
+        new Vector3(0, 0.5f, 0),
+        new Vector3(1, 0.5f, 0),
+        new Vector3(1, 0.5f, 1),
+        new Vector3(0, 0.5f, 1)
     };
+    
 
-    public int[] getPoint(double[] points, double threshold)
+    public Vector3[] getPoint(double[][][] cubeVertices, double threshold)
     {
-        string index = "";
+        //declaring function variables
 
-        for(int i1 = 0; i1 < 8; i1++)
+        //index is stored as a binary number
+        string index = "";
+        int[] triangles;
+        Vector3[] verticesReturn;
+
+        //verticesTemp re-organizes the cubeVertices in a manner if a point is active
+        double[] verticesTemp = new double[]
         {
-            if(points[i1] < threshold)
+            cubeVertices[0][1][1],
+            cubeVertices[1][1][1],
+            cubeVertices[1][1][0],
+            cubeVertices[0][1][0],
+
+            cubeVertices[0][0][1],
+            cubeVertices[1][0][1],
+            cubeVertices[1][0][0],
+            cubeVertices[0][0][0]
+        };
+
+        for (int i1 = 0; i1 < 8; i1++)
+        {
+            /*
+             * checks if a point is active
+             * 1 = active
+             * 0 = not active
+             */
+            if (verticesTemp[i1] < threshold)
             {
                 index += "0";
             }
@@ -332,6 +359,63 @@ public class marchingCube
                 index += "1";
             }
         }
-        return triTable[Convert.ToInt32(index, 2)];
+
+        //converts the index into an int and used to find the trianges in tritable
+        triangles = triTable[Convert.ToInt32(index, 2)];
+
+        verticesReturn = new Vector3[triangles.Length];
+
+        //converts the triangles into an array of vertices
+        for (int i1 = 0; i1 < verticesReturn.Length; i1++)
+        {
+            verticesReturn[i1] = points[triangles[i1]];
+        }
+        
+        if (lerpCond)
+        {
+            for (int i1 = 0; i1 < verticesReturn.Length; i1++)
+            {
+                /*
+                 * linear interpolation is used to find the vertice 
+                 */
+                if (verticesReturn[i1].x == 0.5)
+                {
+                    verticesReturn[i1].x =
+                        lerp
+                        (
+                            cubeVertices[0][Convert.ToInt32(verticesReturn[i1].y)][Convert.ToInt32(verticesReturn[i1].z)], 
+                            cubeVertices[1][Convert.ToInt32(verticesReturn[i1].y)][Convert.ToInt32(verticesReturn[i1].z)], 
+                            threshold
+                        );
+                }
+                else if(verticesReturn[i1].y == 0.5)
+                {
+                    verticesReturn[i1].y =
+                        lerp
+                        (
+                            cubeVertices[Convert.ToInt32(verticesReturn[i1].x)][0][Convert.ToInt32(verticesReturn[i1].z)],
+                            cubeVertices[Convert.ToInt32(verticesReturn[i1].x)][1][Convert.ToInt32(verticesReturn[i1].z)],
+                            threshold
+                        );
+                }
+                else if(verticesReturn[i1].z == 0.5)
+                {
+                    verticesReturn[i1].z =
+                        lerp
+                        (
+                            cubeVertices[Convert.ToInt32(verticesReturn[i1].x)][Convert.ToInt32(verticesReturn[i1].y)][0],
+                            cubeVertices[Convert.ToInt32(verticesReturn[i1].x)][Convert.ToInt32(verticesReturn[i1].y)][1],
+                            threshold
+                        );
+                }
+            }
+        }
+        return verticesReturn;
+    }
+
+    //linear interpolation
+    float lerp(double x1, double x2, double t)
+    {
+        return Convert.ToSingle((t - x1) / (x2 - x1));
     }
 }

@@ -261,14 +261,14 @@ MonoBehaviour:
   chunksMaxGenration: {x: 3, y: 3}
   defaultChunkHeightMapLayers: 3
   defaultChunkDist: {x: 5, y: 5, z: 5}
-  defaultChunkGridSize: {x: 4, y: 4, z: 4}
+  defaultChunkGridSize: {x: 3, y: 3, z: 3}
   defaultChunkSamplesPerCell: 0a0000000a0000000a000000
-  amplitude: 5
+  amplitude: 10
   translation: 20
   mf: {fileID: 0}
   mesh: {fileID: 0}
   uv: []
-  threshold: 0
+  threshold: -0.3
   test: 1
 --- !u!4 &910123272
 Transform:

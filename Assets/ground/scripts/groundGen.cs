@@ -37,7 +37,7 @@ public class groundGen : MonoBehaviour
 
     public bool test = true;
 
-
+    //gets the id of a chunk
     int kewlKewl(double x, double y, float maxX, float maxY)
     {
         if (x < 0 || y < 0 || x >= maxX || y >= maxY)
@@ -56,6 +56,7 @@ public class groundGen : MonoBehaviour
         mesh = new Mesh();
         mf.mesh = mesh;
 
+        //creates chunks
         for (double y = 0; y < chunksMaxGenration.y; y++)
         {
             for (double x = 0; x < chunksMaxGenration.x; x++)
@@ -81,6 +82,7 @@ public class groundGen : MonoBehaviour
                     )
                 );
 
+                //assigns the surronding chunk id
                 chunks[Convert.ToInt32(x + y * chunksMaxGenration.x)].neghboringChunks[0] = kewlKewl(x - 1, y - 1, chunksMaxGenration.x, chunksMaxGenration.y);
                 chunks[Convert.ToInt32(x + y * chunksMaxGenration.x)].neghboringChunks[1] = kewlKewl(x, y - 1, chunksMaxGenration.x, chunksMaxGenration.y);
                 chunks[Convert.ToInt32(x + y * chunksMaxGenration.x)].neghboringChunks[2] = kewlKewl(x + 1, y - 1, chunksMaxGenration.x, chunksMaxGenration.y);
@@ -94,6 +96,7 @@ public class groundGen : MonoBehaviour
             }
         }
 
+        //the chunkThread is started
         foreach (chunk c in chunks)
         {
             c.updateChunkGrids(chunks);
@@ -138,30 +141,34 @@ public class groundGen : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        //checks if any chunk has finished updating the chunk mesh
         bool readyCond = chunks.Any(c => c.chunkThread.IsAlive == false);
-
+        
         if (readyCond && test)
         {
             updateMesh();
         }
+
         if(chunks.TrueForAll(c => c.chunkThread.IsAlive == false))
         {
             test = false;
         }
     }
-    int counter = 0;
+    
+    //updateMesh combine chunk meshs into one mesh
     void updateMesh()
     {
-        counter += 1;
+        //declare function variables
         Vector3[] verticesTemp = new Vector3[0];
         int[] triangleTemp1;
 
         int[] triangleTemp2 = new int[0];
         int indexCount = 0;
-
+        
 
         for(int i1 = 0; i1 < chunks.Count; i1++)
         {
+            //checks if the function has vertices and triangles
             if(chunks[i1].vertices != null && chunks[i1].triangles != null)
             {
                 try
@@ -187,6 +194,7 @@ public class groundGen : MonoBehaviour
             }
         }
 
+        //updates mesh
         mesh.Clear();
 
         mesh.vertices = verticesTemp;
