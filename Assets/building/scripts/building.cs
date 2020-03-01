@@ -49,7 +49,7 @@ public class building : MonoBehaviour
                 buildingMap[x][y] = new double[Convert.ToInt32(samplesPerCell.z * samplesPerCell.z)];
                 for(int z = 0; z < buildingMap[x][y].Length; z++)
                 {
-                    buildingMap[x][y][z] = -1;
+                    buildingMap[x][y][z] = -5;
                 }
             }
         }
@@ -97,54 +97,96 @@ public class building : MonoBehaviour
         Vector3[] pointsTemp;
         Vector3 pointTemp;
         double[][][] cubeVertices;
-        
+        double[][][] cubeVerticesShadow;
+
         Vector3 distPerSample = new Vector3
         (
             cellDim.x / samplesPerCell.x,
             cellDim.y / samplesPerCell.y,
             cellDim.z / samplesPerCell.z
         );
+
         List<Vector3> verticesTemp = new List<Vector3>();
         List<int> trianglesTemp = new List<int>();
 
-        bool meshUpdateCond = true;
+        List<Vector3> verticesShadowTemp = new List<Vector3>();
+        List<int> trianglesShadowTemp = new List<int>();
 
         for (int x = 0; x < buildingMap.Length - 1; x++)
         {
             //stop level * samplesPerCell.y
-            for (int y = 0; y < Math.Min(buildingMap[x].Length - 1, level * samplesPerCell.y); y++)
+            for (int y = 0; y < Math.Min(buildingMap[x].Length - 1, (level + 1) * samplesPerCell.y); y++)
             {
                 for(int z = 0; z < buildingMap[x][y].Length - 1; z++)
                 {
-
                     cubeVertices = new double[2][][];
+                    cubeVerticesShadow = new double[2][][];
                     for (int x1 = 0; x1< 2; x1++)
                     {
                         cubeVertices[x1] = new double[2][];
+                        cubeVerticesShadow[x1] = new double[2][];
                         for (int y1 = 0; y1 < 2; y1++)
                         {
                             cubeVertices[x1][y1] = new double[2];
+                            cubeVerticesShadow[x1][y1] = new double[2];
                             for (int z1 = 0; z1 <2; z1++)
                             {
-                                if(y + y1 == Math.Min(buildingMap[x].Length - 1, level * samplesPerCell.y))
+                                if (y + y1 == level * samplesPerCell.y)
                                 {
+                                    Debug.Log("top");
                                     cubeVertices[x1][y1][z1] = -1;
                                 }
-                                else
+                                else if( y < level * samplesPerCell.y)
                                 {
                                     cubeVertices[x1][y1][z1] = buildingMap[x + x1][y + y1][z + z1];
                                 }
+                                cubeVerticesShadow[x1][y1][z1] = buildingMap[x + x1][y + y1][z + z1];
                             }
                         }
                     }
 
-                    //gets the vertices for the current cube
+                    if(y < level * samplesPerCell.y){
+                        //gets the vertices for the current cube
+                        pointsTemp = marching.getPoint
+                        (
+                            cubeVertices,
+                            0
+                        );
+
+                        //adds the vertices from pointTemp to the triangle and vertice array
+                        for (int i1 = 0; i1 < pointsTemp.Length; i1++)
+                        {
+                            pointTemp = pointsTemp[i1];
+
+                            //converts the pointTemp form marching cube vertices into global vertices
+                            pointTemp.x = Convert.ToSingle((pointTemp.x + x) * distPerSample[0] + startingPos.x);
+
+                            pointTemp.y = Convert.ToSingle((pointTemp.y + y) * distPerSample[1] + startingPos.y);
+
+                            pointTemp.z = Convert.ToSingle((pointTemp.z + z) * distPerSample[2] + startingPos.z);
+
+                            //checks if the vertice exists in the  vertice array
+                            //if the vertice was found then the vertice would be shared rather than a new one being made
+                            if (verticesTemp.Contains(pointTemp) == false)
+                            {
+                                verticesTemp.Add(pointTemp);
+                                trianglesTemp.Add(verticesTemp.Count - 1);
+                            }
+                            else
+                            {
+                                trianglesTemp.Add(verticesTemp.FindIndex(point => point == pointTemp));
+                            }
+                        }
+                    }
+                    
+
+                    //shadow
                     pointsTemp = marching.getPoint
                     (
-                        cubeVertices,
+                        cubeVerticesShadow,
                         0
                     );
-                    
+
                     //adds the vertices from pointTemp to the triangle and vertice array
                     for (int i1 = 0; i1 < pointsTemp.Length; i1++)
                     {
@@ -156,17 +198,17 @@ public class building : MonoBehaviour
                         pointTemp.y = Convert.ToSingle((pointTemp.y + y) * distPerSample[1] + startingPos.y);
 
                         pointTemp.z = Convert.ToSingle((pointTemp.z + z) * distPerSample[2] + startingPos.z);
-                        
+
                         //checks if the vertice exists in the  vertice array
                         //if the vertice was found then the vertice would be shared rather than a new one being made
-                        if (verticesTemp.Contains(pointTemp) == false)
+                        if (verticesShadowTemp.Contains(pointTemp) == false)
                         {
-                            verticesTemp.Add(pointTemp);
-                            trianglesTemp.Add(verticesTemp.Count - 1);
+                            verticesShadowTemp.Add(pointTemp);
+                            trianglesShadowTemp.Add(verticesShadowTemp.Count - 1);
                         }
                         else
                         {
-                            trianglesTemp.Add(verticesTemp.FindIndex(point => point == pointTemp));
+                            trianglesShadowTemp.Add(verticesShadowTemp.FindIndex(point => point == pointTemp));
                         }
                     }
                 }
@@ -182,77 +224,12 @@ public class building : MonoBehaviour
         mesh.triangles = this.triangles;
 
         mesh.RecalculateNormals();
-
-        meshUpdateCond = false;
-
-        for (int x = 0; x < buildingMap.Length - 1; x++)
-        {
-            //stop level * samplesPerCell.y
-            for (int y = Convert.ToInt32(Math.Min(buildingMap[x].Length - 1, level * samplesPerCell.y)) - 1; y < buildingMap[x].Length - 1; y++)
-            {
-                for (int z = 0; z < buildingMap[x][y].Length - 1; z++)
-                {
-
-                    cubeVertices = new double[2][][];
-                    for (int x1 = 0; x1 < 2; x1++)
-                    {
-                        cubeVertices[x1] = new double[2][];
-                        for (int y1 = 0; y1 < 2; y1++)
-                        {
-                            cubeVertices[x1][y1] = new double[2];
-                            for (int z1 = 0; z1 < 2; z1++)
-                            {
-                                if (y + y1 == Math.Min(buildingMap[x].Length - 1, level * samplesPerCell.y))
-                                {
-                                    cubeVertices[x1][y1][z1] = -1;
-                                }
-                                else
-                                {
-                                    cubeVertices[x1][y1][z1] = buildingMap[x + x1][y + y1][z + z1];
-                                }
-                            }
-                        }
-                    }
-
-                    //gets the vertices for the current cube
-                    pointsTemp = marching.getPoint
-                    (
-                        cubeVertices,
-                        0
-                    );
-
-                    //adds the vertices from pointTemp to the triangle and vertice array
-                    for (int i1 = 0; i1 < pointsTemp.Length; i1++)
-                    {
-                        pointTemp = pointsTemp[i1];
-
-                        //converts the pointTemp form marching cube vertices into global vertices
-                        pointTemp.x = Convert.ToSingle((pointTemp.x + x) * distPerSample[0] + startingPos.x);
-
-                        pointTemp.y = Convert.ToSingle((pointTemp.y + y) * distPerSample[1] + startingPos.y);
-
-                        pointTemp.z = Convert.ToSingle((pointTemp.z + z) * distPerSample[2] + startingPos.z);
-
-                        //checks if the vertice exists in the  vertice array
-                        //if the vertice was found then the vertice would be shared rather than a new one being made
-                        if (verticesTemp.Contains(pointTemp) == false)
-                        {
-                            verticesTemp.Add(pointTemp);
-                            trianglesTemp.Add(verticesTemp.Count - 1);
-                        }
-                        else
-                        {
-                            trianglesTemp.Add(verticesTemp.FindIndex(point => point == pointTemp));
-                        }
-                    }
-                }
-            }
-        }
+        
 
         buildingShadowMesh.Clear();
 
-        buildingShadowMesh.vertices = verticesTemp.ToArray();
-        buildingShadowMesh.triangles = trianglesTemp.ToArray();
+        buildingShadowMesh.vertices = verticesShadowTemp.ToArray();
+        buildingShadowMesh.triangles = trianglesShadowTemp.ToArray();
         buildingShadowMesh.RecalculateNormals();
     }
 
