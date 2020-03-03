@@ -1,6 +1,11 @@
 ﻿using System;
 using UnityEngine;
 
+public class point
+{
+    public double val;
+}
+
 public class marchingCube
 {
     public bool lerpCond = false;
