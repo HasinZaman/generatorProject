@@ -6,12 +6,19 @@ using UnityEngine;
 
 public class buildingPoint : point
 {
-    public string pointMaterial;
+    public List<string> pointMaterial = new List<string> { };
 
-    public buildingPoint(double val, string pointMaterial)
+    public buildingPoint(double val)
     {
         this.val = val;
-        this.pointMaterial = pointMaterial;
+    }
+
+    public void addMaterial(string material)
+    {
+        if (pointMaterial.Contains(material) == false)
+        {
+            pointMaterial.Add(material);
+        }
     }
 }
 
@@ -68,12 +75,13 @@ public class building : MonoBehaviour
                 buildingMap[x][y] = new buildingPoint[Convert.ToInt32(buildingCellDim.z * samplesPerCell.z)];
                 for(int z = 0; z < buildingMap[x][y].Length; z++)
                 {
-                    buildingMap[x][y][z] = new buildingPoint(-5, "");
+                    buildingMap[x][y][z] = new buildingPoint(-5);
                 }
             }
         }
 
-        makeRoom(new int[] { 1, 1, 1 }, new int[] { 2, 2, 4 });
+        makeRoom(new int[] { 1, 0, 1 }, new int[] { 2, 3, 4 });
+        makeWindow(new int[] { 1, 1, 2 }, new int[] { 1, 2, 4 });
 
         meshUpdate();
     }
@@ -89,7 +97,7 @@ public class building : MonoBehaviour
                 for (int y = 0; y < roomSpec[1] * samplesPerCell.y + 1; y++)
                 {
                     buildingMap[Convert.ToInt32(startingPos[0] * samplesPerCell.x + x)][Convert.ToInt32(startingPos[1] * samplesPerCell.y + y )][Convert.ToInt32((roomSpec[2] * i1 + startingPos[2]) * samplesPerCell.z)].val = 1;
-                    buildingMap[Convert.ToInt32(startingPos[0] * samplesPerCell.x + x)][Convert.ToInt32(startingPos[1] * samplesPerCell.y + y)][Convert.ToInt32((roomSpec[2] * i1 + startingPos[2]) * samplesPerCell.z)].pointMaterial = "wall";
+                    buildingMap[Convert.ToInt32(startingPos[0] * samplesPerCell.x + x)][Convert.ToInt32(startingPos[1] * samplesPerCell.y + y)][Convert.ToInt32((roomSpec[2] * i1 + startingPos[2]) * samplesPerCell.z)].addMaterial("wall");
                 }
             }
 
@@ -100,7 +108,7 @@ public class building : MonoBehaviour
                 for (int z = 0; z < roomSpec[2] * samplesPerCell.z + 1; z++)
                 {
                     buildingMap[Convert.ToInt32((roomSpec[0] * i1 + startingPos[0]) * samplesPerCell.x)][Convert.ToInt32(startingPos[1] * samplesPerCell.y + y )][Convert.ToInt32(startingPos[2] * samplesPerCell.z + z)].val = 1;
-                    buildingMap[Convert.ToInt32((roomSpec[0] * i1 + startingPos[0]) * samplesPerCell.x)][Convert.ToInt32(startingPos[1] * samplesPerCell.y + y)][Convert.ToInt32(startingPos[2] * samplesPerCell.z + z)].pointMaterial = "wall";
+                    buildingMap[Convert.ToInt32((roomSpec[0] * i1 + startingPos[0]) * samplesPerCell.x)][Convert.ToInt32(startingPos[1] * samplesPerCell.y + y)][Convert.ToInt32(startingPos[2] * samplesPerCell.z + z)].addMaterial("wall");
                 }
             }
         }
@@ -112,62 +120,84 @@ public class building : MonoBehaviour
                 for (int z = 0; z < roomSpec[2] * samplesPerCell.z + 1; z++)
                 {
                     buildingMap[Convert.ToInt32(startingPos[0] * samplesPerCell.x + x)][Convert.ToInt32((roomSpec[1] * i1 + startingPos[1]) * samplesPerCell.y)][Convert.ToInt32(startingPos[2] * samplesPerCell.z + z)].val = 1;
-                    buildingMap[Convert.ToInt32(startingPos[0] * samplesPerCell.x + x)][Convert.ToInt32((roomSpec[1] * i1 + startingPos[1]) * samplesPerCell.y)][Convert.ToInt32(startingPos[2] * samplesPerCell.z + z)].pointMaterial = "floor/ceilling";
+                    buildingMap[Convert.ToInt32(startingPos[0] * samplesPerCell.x + x)][Convert.ToInt32((roomSpec[1] * i1 + startingPos[1]) * samplesPerCell.y)][Convert.ToInt32(startingPos[2] * samplesPerCell.z + z)].addMaterial("floor/ceilling");
 
                 }
             }
         }
     }
 
-    double pointCalc(string material1, string material2, double val)
+    public void makeWindow(int[] startingPos, int[]endPos)
     {
-        
+        for (int x = Convert.ToInt32(startingPos[0] * samplesPerCell.x); x < endPos[0] * samplesPerCell.x + 1; x++)
+        {
+            for (int y = Convert.ToInt32(startingPos[1] * samplesPerCell.y); y < endPos[1] * samplesPerCell.y + 1; y++)
+            {
+                for (int z = Convert.ToInt32(startingPos[2] * samplesPerCell.z); z < endPos[2] * samplesPerCell.z + 1; z++)
+                {
+                    if(buildingMap[x][y][z].pointMaterial.Contains("wall"))
+                    {
+                        buildingMap[x][y][z].val = 1;
+                        buildingMap[x][y][z].pointMaterial.Remove("wall");
+                        buildingMap[x][y][z].addMaterial("window");
+                    }
+                }
+            }
+        }
+    }
 
+    double pointCalc(string material1, List<string> material2, double val)
+    {
         switch (material1)
         {
             case "shadow":
-                switch (material2)
+                if(material2.Any(m2 => new List<string> { "wall", "floor/ceilling", "floor", "ceilling" }.Any(m => m == m2)))
                 {
-                    case "wall": case "floor/ceilling":
-                        return val;
-                    case "": case "window":
-                        return -5;
+                    return val;
+                }
+                else if (material2.Any(m2 => new List<string> { "window" }.Any(m => m == m2)))
+                {
+                    return -5;
                 }
                 break;
             case "wall":
-                switch (material2)
+                if (material2.Any(m2 => new List<string> { "wall", "window" }.Any(m => m == m2)))
                 {
-                    case "wall": case "floor": case "ceilling": case "floor/ceilling":
-                        return val;
-                    case "": case "window":
-                        return -5;
+                    return val;
+                }
+                else if (material2.Any(m2 => new List<string> { "floor", "ceilling", "floor/ceilling"}.Any(m => m == m2)))
+                {
+                    return -5;
                 }
                 break;
             case "floor":
-                switch (material2)
+                if (material2.Any(m2 => new List<string> { "floor", "ceilling", "floor/ceilling" }.Any(m => m == m2)))
                 {
-                    case "floor": case "ceilling":
-                        return val;
-                    case "wall": case "window": case "":
-                        return -5;
+                    return val;
+                }
+                else if (material2.Any(m2 => new List<string> { "wall", "window" }.Any(m => m == m2)))
+                {
+                    return -5;
                 }
                 break;
             case "window":
-                switch (material2)
+                if (material2.Any(m2 => new List<string> { "wall", "window" }.Any(m => m == m2)))
                 {
-                    case "wall": case "floor": case "ceilling": case "window":
-                        return val;
-                    case "":
-                        return -5;
+                    return val;
+                }
+                else if (material2.Any(m2 => new List<string> { "floor", "ceilling", "floor/ceilling" }.Any(m => m == m2)))
+                {
+                    return -5;
                 }
                 break;
             case "ceilling":
-                switch (material2)
+                if (material2.Any(m2 => new List<string> {"floor", "ceilling", "floor/ceilling" }.Any(m => m == m2)))
                 {
-                    case "floor": case "ceilling":
-                        return val;
-                    case "wall": case "window": case "":
-                        return -5;
+                    return val;
+                }
+                else if (material2.Any(m2 => new List<string> { "wall", "window" }.Any(m => m == m2)))
+                {
+                    return -5;
                 }
                 break;
         }
@@ -181,7 +211,7 @@ public class building : MonoBehaviour
         Vector3 pointTemp;
 
         buildingPoint p;
-        string pMaterialTemp;
+        List<string> pMaterialTemp;
 
         List<Vector3> meshVertices = new List<Vector3>();
         List<int>[] subMeshTriangles = new List<int>[materials.Length];
@@ -268,33 +298,46 @@ public class building : MonoBehaviour
                             {
                                 for (int z1 = 0; z1 < 2; z1++)
                                 {
-                                    pMaterialTemp = buildingMap[x + x1][y + y1][z + z1].pointMaterial;
-
-                                    if (pMaterialTemp == "floor/ceilling")
+                                    p = buildingMap[x + x1][y + y1][z + z1];
+                                    pMaterialTemp = p.pointMaterial.AsEnumerable().ToList();
+                                    
+                                    if (pMaterialTemp.Contains("floor/ceilling"))
                                     {
+                                        pMaterialTemp.Remove("floor/ceilling");
                                         if (y1 == 0)
                                         {
-                                            pMaterialTemp = "floor";
+                                            pMaterialTemp.Add("floor");
                                         }
                                         else
                                         {
-                                            pMaterialTemp = "ceilling";
+                                            pMaterialTemp.Add("ceilling");
                                         }
                                     }
 
-                                    if (cubeMaterials.Contains(pMaterialTemp) == false && pMaterialTemp != "")
+                                    for (int i1 = 0; i1 < pMaterialTemp.Count(); i1++)
                                     {
-                                        cubeMaterials.Add(pMaterialTemp);
+                                        if (cubeMaterials.Contains(pMaterialTemp[i1]) == false)
+                                        {
+                                            cubeMaterials.Add(pMaterialTemp[i1]);
+                                        }
                                     }
                                 }
                             }
                         }
 
+                        
                         for (int m = 0; m < cubeMaterials.Count; m++)
                         {
+
+                            
                             cubeVertices.Add(new double[2][][]);
+                            if (cubeMaterials[m] == "window" && cubeMaterials.Contains("wall"))
+                            {
+                                continue;
+                            }
                             for (int x1 = 0; x1 < 2; x1++)
                             {
+                                
                                 cubeVertices[m][x1] = new double[2][];
                                 for (int y1 = 0; y1 < 2; y1++)
                                 {
@@ -302,20 +345,21 @@ public class building : MonoBehaviour
                                     for (int z1 = 0; z1 < 2; z1++)
                                     {
                                         p = buildingMap[x + x1][y + y1][z + z1];
-                                        pMaterialTemp = p.pointMaterial;
+                                        pMaterialTemp = p.pointMaterial.AsEnumerable().ToList();
 
-                                        if (pMaterialTemp == "floor/ceilling")
+                                        if (pMaterialTemp.Contains("floor/ceilling"))
                                         {
-                                            if(y1 == 0)
+                                            pMaterialTemp.Remove("floor/ceilling");
+                                            if (y1 == 1)
                                             {
-                                                pMaterialTemp = "floor";
+                                                pMaterialTemp.Add("floor");
                                             }
                                             else
                                             {
-                                                pMaterialTemp = "ceilling";
+                                                pMaterialTemp.Add("ceilling");
                                             }
                                         }
-                                        
+
                                         if (y + y1 == level * samplesPerCell.y)
                                         {
                                             cubeVertices[m][x1][y1][z1] = -1;
