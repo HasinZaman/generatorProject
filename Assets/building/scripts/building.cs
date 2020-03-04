@@ -80,8 +80,11 @@ public class building : MonoBehaviour
             }
         }
 
-        makeRoom(new int[] { 1, 0, 1 }, new int[] { 2, 3, 4 });
-        makeWindow(new int[] { 1, 1, 2 }, new int[] { 1, 2, 4 });
+        makeRoom(new int[] { 1, 0, 1 }, new int[] { 4, 3, 4 });
+        replaceMaterial(new int[] { 1, 0, 2 }, new int[] { 1, 2, 4 }, "wall", "window");
+
+
+        replaceMaterial(new int[] { 2, 3, 2 }, new int[] { 3, 3, 3 }, "floor/ceilling", "skyLight");
 
         meshUpdate();
     }
@@ -127,7 +130,7 @@ public class building : MonoBehaviour
         }
     }
 
-    public void makeWindow(int[] startingPos, int[]endPos)
+    public void replaceMaterial(int[] startingPos, int[]endPos, string targetMaterial, string newMaterial)
     {
         for (int x = Convert.ToInt32(startingPos[0] * samplesPerCell.x); x < endPos[0] * samplesPerCell.x + 1; x++)
         {
@@ -135,11 +138,11 @@ public class building : MonoBehaviour
             {
                 for (int z = Convert.ToInt32(startingPos[2] * samplesPerCell.z); z < endPos[2] * samplesPerCell.z + 1; z++)
                 {
-                    if(buildingMap[x][y][z].pointMaterial.Contains("wall"))
+                    if(buildingMap[x][y][z].pointMaterial.Contains(targetMaterial))
                     {
                         buildingMap[x][y][z].val = 1;
-                        buildingMap[x][y][z].pointMaterial.Remove("wall");
-                        buildingMap[x][y][z].addMaterial("window");
+                        buildingMap[x][y][z].pointMaterial.Remove(targetMaterial);
+                        buildingMap[x][y][z].addMaterial(newMaterial);
                     }
                 }
             }
@@ -155,7 +158,7 @@ public class building : MonoBehaviour
                 {
                     return val;
                 }
-                else if (material2.Any(m2 => new List<string> { "window" }.Any(m => m == m2)))
+                else if (material2.Any(m2 => new List<string> { "window", "skyLight" }.Any(m => m == m2)))
                 {
                     return -5;
                 }
@@ -165,13 +168,13 @@ public class building : MonoBehaviour
                 {
                     return val;
                 }
-                else if (material2.Any(m2 => new List<string> { "floor", "ceilling", "floor/ceilling"}.Any(m => m == m2)))
+                else if (material2.Any(m2 => new List<string> { "floor", "ceilling", "floor/ceilling", "skyLight" }.Any(m => m == m2)))
                 {
                     return -5;
                 }
                 break;
             case "floor":
-                if (material2.Any(m2 => new List<string> { "floor", "ceilling", "floor/ceilling" }.Any(m => m == m2)))
+                if (material2.Any(m2 => new List<string> { "floor", "ceilling", "floor/ceilling", "skyLight" }.Any(m => m == m2)))
                 {
                     return val;
                 }
@@ -185,13 +188,23 @@ public class building : MonoBehaviour
                 {
                     return val;
                 }
-                else if (material2.Any(m2 => new List<string> { "floor", "ceilling", "floor/ceilling" }.Any(m => m == m2)))
+                else if (material2.Any(m2 => new List<string> { "floor", "ceilling", "floor/ceilling", "skyLight" }.Any(m => m == m2)))
+                {
+                    return -5;
+                }
+                break;
+            case "skyLight":
+                if (material2.Any(m2 => new List<string> { "floor", "ceilling", "floor/ceilling", "skyLight" }.Any(m => m == m2)))
+                {
+                    return val;
+                }
+                else if (material2.Any(m2 => new List<string> { "wall", "window" }.Any(m => m == m2)))
                 {
                     return -5;
                 }
                 break;
             case "ceilling":
-                if (material2.Any(m2 => new List<string> {"floor", "ceilling", "floor/ceilling" }.Any(m => m == m2)))
+                if (material2.Any(m2 => new List<string> {"floor", "ceilling", "floor/ceilling", "skyLight" }.Any(m => m == m2)))
                 {
                     return val;
                 }
@@ -332,6 +345,10 @@ public class building : MonoBehaviour
                             
                             cubeVertices.Add(new double[2][][]);
                             if (cubeMaterials[m] == "window" && cubeMaterials.Contains("wall"))
+                            {
+                                continue;
+                            }
+                            if (cubeMaterials[m] == "skyLight" && cubeMaterials.Contains("floor/ceilling"))
                             {
                                 continue;
                             }
