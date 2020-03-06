@@ -323,7 +323,6 @@ public class marchingCube
         new Vector3(1, 0.5f, 1),
         new Vector3(0, 0.5f, 1)
     };
-    
 
     public Vector3[] getPoint(double[][][] cubeVertices, double threshold)
     {

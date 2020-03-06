@@ -27,7 +27,7 @@ public class building : MonoBehaviour
     //declare object variables
     public buildingPoint[][][] buildingMap;
 
-    public Vector3 startingPos;
+    public GameObject doorTemplate;
 
     public Vector3 buildingCellDim;
     public Vector3 samplesPerCell;
@@ -64,7 +64,7 @@ public class building : MonoBehaviour
         marching.lerpCond = true;
 
         renderer.materials = this.materials;
-
+        
         //sets up buildingMap
         buildingMap = new buildingPoint[Convert.ToInt32(buildingCellDim.x * samplesPerCell.x)][][];
         for (int x = 0; x < buildingMap.Length; x++)
@@ -79,73 +79,181 @@ public class building : MonoBehaviour
                 }
             }
         }
+        
+        makeRoom(new Vector3(1, 0, 1), new Vector3(4, 4, 4), 1, "floor/ceilling", "wall");
 
-        makeRoom(new int[] { 1, 0, 1 }, new int[] { 4, 3, 4 });
-        replaceMaterial(new int[] { 1, 0, 2 }, new int[] { 1, 2, 4 }, "wall", "window");
+        makeWindow(new Vector3(2, 1, 1), new Vector3(4, 3, 1), new Vector3( 0, 0, 1), 1, new string[] { "wall", "floor/ceilling" }, "window");
 
-
-        replaceMaterial(new int[] { 2, 3, 2 }, new int[] { 3, 3, 3 }, "floor/ceilling", "skyLight");
+        makeWindow(new Vector3(1, 4, 1), new Vector3(5, 4, 5), new Vector3(0, 1, 0), 1, new string[] { "floor/ceilling" }, "skyLight");
 
         meshUpdate();
     }
-
-    void makeRoom(int[] startingPos, int[] roomSpec)
+    
+    float convertToMapIndex(double pos, float sampleAxisSize)
     {
-        for(int i1 = 0; i1 < 2; i1++)
+        return convertToMapIndex(Convert.ToSingle(pos), sampleAxisSize);
+    }
+    float convertToMapIndex(int pos, float sampleAxisSize)
+    {
+        return convertToMapIndex(Convert.ToSingle(pos), sampleAxisSize);
+    }
+    float convertToMapIndex(float pos, float sampleAxisSize)
+    {
+        return pos * sampleAxisSize;
+    }
+
+    void makeSurface(Vector3 startPos, Vector3 endPos, int val, string material)
+    {
+        for (int x = Convert.ToInt32(startPos.x); x <= Convert.ToInt32(endPos.x); x++)
         {
-            //xy
-
-            for (int x = 0; x < roomSpec[0] * samplesPerCell.x + 1; x++)
+            for (int y = Convert.ToInt32(startPos.y); y <= Convert.ToInt32(endPos.y); y++)
             {
-                for (int y = 0; y < roomSpec[1] * samplesPerCell.y + 1; y++)
+                for (int z = Convert.ToInt32(startPos.z); z <= Convert.ToInt32(endPos.z); z++)
                 {
-                    buildingMap[Convert.ToInt32(startingPos[0] * samplesPerCell.x + x)][Convert.ToInt32(startingPos[1] * samplesPerCell.y + y )][Convert.ToInt32((roomSpec[2] * i1 + startingPos[2]) * samplesPerCell.z)].val = 1;
-                    buildingMap[Convert.ToInt32(startingPos[0] * samplesPerCell.x + x)][Convert.ToInt32(startingPos[1] * samplesPerCell.y + y)][Convert.ToInt32((roomSpec[2] * i1 + startingPos[2]) * samplesPerCell.z)].addMaterial("wall");
-                }
-            }
-
-            //yz
-
-            for (int y = 0; y < roomSpec[1] * samplesPerCell.y + 1; y++)
-            {
-                for (int z = 0; z < roomSpec[2] * samplesPerCell.z + 1; z++)
-                {
-                    buildingMap[Convert.ToInt32((roomSpec[0] * i1 + startingPos[0]) * samplesPerCell.x)][Convert.ToInt32(startingPos[1] * samplesPerCell.y + y )][Convert.ToInt32(startingPos[2] * samplesPerCell.z + z)].val = 1;
-                    buildingMap[Convert.ToInt32((roomSpec[0] * i1 + startingPos[0]) * samplesPerCell.x)][Convert.ToInt32(startingPos[1] * samplesPerCell.y + y)][Convert.ToInt32(startingPos[2] * samplesPerCell.z + z)].addMaterial("wall");
-                }
-            }
-        }
-        for(int i1 = 0; i1 < 2; i1++)
-        {
-            //xz
-            for (int x = 0; x < roomSpec[0] * samplesPerCell.x + 1; x++)
-            {
-                for (int z = 0; z < roomSpec[2] * samplesPerCell.z + 1; z++)
-                {
-                    buildingMap[Convert.ToInt32(startingPos[0] * samplesPerCell.x + x)][Convert.ToInt32((roomSpec[1] * i1 + startingPos[1]) * samplesPerCell.y)][Convert.ToInt32(startingPos[2] * samplesPerCell.z + z)].val = 1;
-                    buildingMap[Convert.ToInt32(startingPos[0] * samplesPerCell.x + x)][Convert.ToInt32((roomSpec[1] * i1 + startingPos[1]) * samplesPerCell.y)][Convert.ToInt32(startingPos[2] * samplesPerCell.z + z)].addMaterial("floor/ceilling");
-
+                    buildingMap[x][y][z].val = val;
+                    buildingMap[x][y][z].addMaterial( material );
                 }
             }
         }
     }
-
-    public void replaceMaterial(int[] startingPos, int[]endPos, string targetMaterial, string newMaterial)
+    void removeSurface(Vector3 startPos, Vector3 endPos, string[] material)
     {
-        for (int x = Convert.ToInt32(startingPos[0] * samplesPerCell.x); x < endPos[0] * samplesPerCell.x + 1; x++)
+        for (int x = Convert.ToInt32(startPos.x); x <= Convert.ToInt32(endPos.x); x++)
         {
-            for (int y = Convert.ToInt32(startingPos[1] * samplesPerCell.y); y < endPos[1] * samplesPerCell.y + 1; y++)
+            for (int y = Convert.ToInt32(startPos.y); y <= Convert.ToInt32(endPos.y); y++)
             {
-                for (int z = Convert.ToInt32(startingPos[2] * samplesPerCell.z); z < endPos[2] * samplesPerCell.z + 1; z++)
+                for (int z = Convert.ToInt32(startPos.z); z <= Convert.ToInt32(endPos.z); z++)
                 {
-                    if(buildingMap[x][y][z].pointMaterial.Contains(targetMaterial))
+                    for(int i1 = 0; i1 < material.Count(); i1++)
                     {
-                        buildingMap[x][y][z].val = 1;
-                        buildingMap[x][y][z].pointMaterial.Remove(targetMaterial);
-                        buildingMap[x][y][z].addMaterial(newMaterial);
+                        buildingMap[x][y][z].pointMaterial.Remove(material[i1]);
+                    }
+                    if(buildingMap[x][y][z].pointMaterial.Count() == 0)
+                    {
+                        buildingMap[x][y][z].val = 0;
                     }
                 }
             }
+        }
+    }
+    float windowOffsetStart(float input)
+    {
+        if (input == 1)
+        {
+            return 0;
+        }
+        else
+        {
+            return -1;
+        }
+    }
+    float windowOffsetEnd(float input)
+    {
+        if (input == 1)
+        {
+            return 1;
+        }
+        else
+        {
+            return 0;
+        }
+    }
+    void makeWindow(Vector3 startPos, Vector3 endPos, Vector3 axis ,int wallDepth, string[] targetMaterial, string windowMaterial)
+    {
+       removeSurface
+       (
+           new Vector3
+            (
+                convertToMapIndex(startPos.x, samplesPerCell.x) - wallDepth * windowOffsetStart(axis.x),
+                convertToMapIndex(startPos.y, samplesPerCell.y) - wallDepth * windowOffsetStart(axis.y),
+                convertToMapIndex(startPos.z, samplesPerCell.z) - wallDepth * windowOffsetStart(axis.z)
+            ),
+            new Vector3
+            (
+                convertToMapIndex(endPos.x, samplesPerCell.x) + wallDepth * windowOffsetEnd(axis.x),
+                convertToMapIndex(endPos.y, samplesPerCell.y) + wallDepth * windowOffsetEnd(axis.y),
+                convertToMapIndex(endPos.z, samplesPerCell.z) + wallDepth * windowOffsetEnd(axis.z)
+            ),
+           targetMaterial
+       );
+
+        makeSurface
+        (
+            new Vector3
+            (
+                convertToMapIndex(startPos.x, samplesPerCell.x) - wallDepth * windowOffsetStart(axis.x),
+                convertToMapIndex(startPos.y, samplesPerCell.y) - wallDepth * windowOffsetStart(axis.y),
+                convertToMapIndex(startPos.z, samplesPerCell.z) - wallDepth * windowOffsetStart(axis.z)
+            ),
+            new Vector3
+            (
+                convertToMapIndex(endPos.x, samplesPerCell.x) + wallDepth * windowOffsetEnd(axis.x),
+                convertToMapIndex(endPos.y, samplesPerCell.y) + wallDepth * windowOffsetEnd(axis.y),
+                convertToMapIndex(endPos.z, samplesPerCell.z) + wallDepth * windowOffsetEnd(axis.z)
+            ),
+            1,
+            windowMaterial
+        );
+    }
+    void makeRoom(Vector3 startPos, Vector3 roomSpec, int wallDepth, string floorMaterialId, string wallMaterialId)
+    {
+        for (int i1 = 0; i1 < 2; i1++)
+        {
+            //xy
+            makeSurface
+            (
+                new Vector3
+                (
+                    convertToMapIndex(startPos.x, samplesPerCell.x),
+                    convertToMapIndex(startPos.y, samplesPerCell.y),
+                    convertToMapIndex(roomSpec.z * i1 + startPos.z, samplesPerCell.z)
+                ),
+                new Vector3
+                (
+                    convertToMapIndex(roomSpec.x + startPos.x, samplesPerCell.x) + 1,
+                    convertToMapIndex(roomSpec.y + startPos.y, samplesPerCell.y) + wallDepth,
+                    convertToMapIndex(roomSpec.z * i1 + startPos.z, samplesPerCell.z) + wallDepth
+                ),
+                1,
+                wallMaterialId
+            );
+
+            //yz
+            makeSurface
+            (
+                new Vector3
+                (
+                    convertToMapIndex(roomSpec.x * i1 + startPos.x, samplesPerCell.x),
+                    convertToMapIndex(startPos.y, samplesPerCell.y),
+                    convertToMapIndex(startPos.z, samplesPerCell.z)
+                ),
+                new Vector3
+                (
+                    convertToMapIndex(roomSpec.x * i1 + startPos.x, samplesPerCell.x) + wallDepth,
+                    convertToMapIndex(roomSpec.y + startPos.y, samplesPerCell.y) + wallDepth,
+                    convertToMapIndex(roomSpec.z + startPos.z, samplesPerCell.z) + 1
+                ),
+                1,
+                wallMaterialId
+            );
+            //xz
+            makeSurface
+            (
+                new Vector3
+                (
+                    convertToMapIndex(startPos.x, samplesPerCell.x) + wallDepth,
+                    convertToMapIndex(roomSpec.y * i1 + startPos.y, samplesPerCell.y),
+                    convertToMapIndex(startPos.z, samplesPerCell.z) + wallDepth
+                ),
+                new Vector3
+                (
+                    convertToMapIndex(roomSpec.x + startPos.x, samplesPerCell.x) - wallDepth + 1,
+                    convertToMapIndex(roomSpec.y * i1 + startPos.y, samplesPerCell.y) + wallDepth,
+                    convertToMapIndex(roomSpec.z + startPos.z, samplesPerCell.z) - wallDepth + 1
+                ),
+                1,
+                floorMaterialId
+            );
         }
     }
 
@@ -154,37 +262,40 @@ public class building : MonoBehaviour
         switch (material1)
         {
             case "shadow":
-                if(material2.Any(m2 => new List<string> { "wall", "floor/ceilling", "floor", "ceilling" }.Any(m => m == m2)))
-                {
-                    return val;
-                }
-                else if (material2.Any(m2 => new List<string> { "window", "skyLight" }.Any(m => m == m2)))
+                if (material2.Any(m2 => new List<string> { "window", "skyLight" }.Any(m => m == m2)))
                 {
                     return -5;
+                }else// if (material2.Any(m2 => new List<string> { "wall", "floor/ceilling", "floor", "ceilling" }.Any(m => m == m2)))
+                {
+                    return val;
                 }
                 break;
             case "wall":
-                if (material2.Any(m2 => new List<string> { "wall", "window" }.Any(m => m == m2)))
+                if (material2.Any(m2 => new List<string> { "wall"}.Any(m => m == m2)))
                 {
                     return val;
                 }
-                else if (material2.Any(m2 => new List<string> { "floor", "ceilling", "floor/ceilling", "skyLight" }.Any(m => m == m2)))
+                else if (material2.Any(m2 => new List<string> { "floor", "ceilling", "floor/ceilling",  "skyLight", "window" }.Any(m => m == m2)))
                 {
                     return -5;
                 }
                 break;
             case "floor":
-                if (material2.Any(m2 => new List<string> { "floor", "ceilling", "floor/ceilling", "skyLight" }.Any(m => m == m2)))
+                if (material2.Any(m2 => new List<string> { "floor", "ceilling", "floor/ceilling" }.Any(m => m == m2)))
                 {
                     return val;
                 }
-                else if (material2.Any(m2 => new List<string> { "wall", "window" }.Any(m => m == m2)))
+                else if (material2.Any(m2 => new List<string> { "wall", "window", "skyLight" }.Any(m => m == m2)))
                 {
                     return -5;
                 }
                 break;
             case "window":
-                if (material2.Any(m2 => new List<string> { "wall", "window" }.Any(m => m == m2)))
+                if (material2.Any(m2 => new List<string> { "wall" }.Any(m => m == m2)))
+                {
+                    return 0;
+                }
+                else if (material2.Any(m2 => new List<string> {"window"}.Any(m => m == m2)))
                 {
                     return val;
                 }
@@ -194,7 +305,10 @@ public class building : MonoBehaviour
                 }
                 break;
             case "skyLight":
-                if (material2.Any(m2 => new List<string> { "floor", "ceilling", "floor/ceilling", "skyLight" }.Any(m => m == m2)))
+                if (material2.Any(m2 => new List<string> { "floor", "ceilling", "floor/ceilling", "wall" }.Any(m => m == m2)))
+                {
+                    return 0;
+                }else if(material2.Any(m2 => new List<string> { "skyLight" }.Any(m => m == m2)))
                 {
                     return val;
                 }
@@ -204,11 +318,11 @@ public class building : MonoBehaviour
                 }
                 break;
             case "ceilling":
-                if (material2.Any(m2 => new List<string> {"floor", "ceilling", "floor/ceilling", "skyLight" }.Any(m => m == m2)))
+                if (material2.Any(m2 => new List<string> {"floor", "ceilling", "floor/ceilling" }.Any(m => m == m2)))
                 {
                     return val;
                 }
-                else if (material2.Any(m2 => new List<string> { "wall", "window" }.Any(m => m == m2)))
+                else if (material2.Any(m2 => new List<string> { "wall", "window", "skyLight" }.Any(m => m == m2)))
                 {
                     return -5;
                 }
@@ -219,7 +333,6 @@ public class building : MonoBehaviour
 
     void meshUpdate()
     {
-        //new method
         Vector3[] pointsTemp;
         Vector3 pointTemp;
 
@@ -237,12 +350,10 @@ public class building : MonoBehaviour
         List<Vector3> verticesShadowTemp = new List<Vector3>();
         List<int> trianglesShadowTemp = new List<int>();
         double[][][] cubeVerticesShadow;
-
-
+        
         List<double[][][]> cubeVertices;
         List<string> cubeMaterials;
-
-
+        
         Vector3 distPerSample = new Vector3
         (
             cellDim.x / samplesPerCell.x,
@@ -252,7 +363,7 @@ public class building : MonoBehaviour
 
         for (int x = 0; x < buildingMap.Length - 1; x++)
         {
-            for (int y = 0; y < Math.Min(buildingMap[x].Length - 1, (level + 1) * samplesPerCell.y); y++)
+            for (int y = 0; y < buildingMap[x].Length - 1; y++)
             {
                 for (int z = 0; z < buildingMap[x][y].Length - 1; z++)
                 {
@@ -266,6 +377,9 @@ public class building : MonoBehaviour
                             for (int z1 = 0; z1 < 2; z1++)
                             {
                                 cubeVerticesShadow[x1][y1][z1] = pointCalc("shadow", buildingMap[x + x1][y + y1][z + z1].pointMaterial, buildingMap[x + x1][y + y1][z + z1].val);
+                                if(buildingMap[x + x1][y + y1][z + z1].val == 1)
+                                {
+                                }
                             }
                         }
                     }
@@ -273,7 +387,7 @@ public class building : MonoBehaviour
                     pointsTemp = marching.getPoint
                     (
                         cubeVerticesShadow,
-                        0
+                        1
                     );
 
                     //adds the vertices from pointTemp to the triangle and vertice array
@@ -282,11 +396,11 @@ public class building : MonoBehaviour
                         pointTemp = pointsTemp[i1];
 
                         //converts the pointTemp form marching cube vertices into global vertices
-                        pointTemp.x = Convert.ToSingle((pointTemp.x + x) * distPerSample[0] + startingPos.x);
+                        pointTemp.x = Convert.ToSingle((pointTemp.x + x) * distPerSample[0]);
 
-                        pointTemp.y = Convert.ToSingle((pointTemp.y + y) * distPerSample[1] + startingPos.y);
+                        pointTemp.y = Convert.ToSingle((pointTemp.y + y) * distPerSample[1]);
 
-                        pointTemp.z = Convert.ToSingle((pointTemp.z + z) * distPerSample[2] + startingPos.z);
+                        pointTemp.z = Convert.ToSingle((pointTemp.z + z) * distPerSample[2]);
 
                         //checks if the vertice exists in the  vertice array
                         //if the vertice was found then the vertice would be shared rather than a new one being made
@@ -338,20 +452,20 @@ public class building : MonoBehaviour
                             }
                         }
 
-                        
+                        //Debug.Log(cubeMaterials.Count);
                         for (int m = 0; m < cubeMaterials.Count; m++)
                         {
 
                             
                             cubeVertices.Add(new double[2][][]);
-                            if (cubeMaterials[m] == "window" && cubeMaterials.Contains("wall"))
+                            /*if (cubeMaterials[m] == "window" && cubeMaterials.Contains("wall"))
                             {
                                 continue;
                             }
-                            if (cubeMaterials[m] == "skyLight" && cubeMaterials.Contains("floor/ceilling"))
+                            if (cubeMaterials[m] == "skyLight" && cubeMaterials.Any(m1 => new List<string> { "floor", "ceilling", "floor/ceilling"}.Any(m2 => m1 == m2)))
                             {
                                 continue;
-                            }
+                            }*/
                             for (int x1 = 0; x1 < 2; x1++)
                             {
                                 
@@ -383,6 +497,7 @@ public class building : MonoBehaviour
                                         }
                                         else
                                         {
+
                                             cubeVertices[m][x1][y1][z1] = pointCalc(cubeMaterials[m], pMaterialTemp, p.val);
                                         }
 
@@ -401,11 +516,11 @@ public class building : MonoBehaviour
                                 pointTemp = pointsTemp[i1];
 
                                 //converts the pointTemp form marching cube vertices into global vertices
-                                pointTemp.x = Convert.ToSingle((pointTemp.x + x) * distPerSample[0] + startingPos.x);
+                                pointTemp.x = Convert.ToSingle((pointTemp.x + x) * distPerSample[0]);
 
-                                pointTemp.y = Convert.ToSingle((pointTemp.y + y) * distPerSample[1] + startingPos.y);
+                                pointTemp.y = Convert.ToSingle((pointTemp.y + y) * distPerSample[1]);
 
-                                pointTemp.z = Convert.ToSingle((pointTemp.z + z) * distPerSample[2] + startingPos.z);
+                                pointTemp.z = Convert.ToSingle((pointTemp.z + z) * distPerSample[2]);
 
                                 //checks if the vertice exists in the  vertice array
                                 //if the vertice was found then the vertice would be shared rather than a new one being made
