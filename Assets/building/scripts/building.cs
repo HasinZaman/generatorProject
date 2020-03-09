@@ -28,6 +28,7 @@ public class building : MonoBehaviour
     public buildingPoint[][][] buildingMap;
 
     public GameObject doorTemplate;
+    public GameObject[] doors = new GameObject[0];
 
     public Vector3 buildingCellDim;
     public Vector3 samplesPerCell;
@@ -49,7 +50,7 @@ public class building : MonoBehaviour
     public Renderer renderer;
     
     private Mesh buildingShadowMesh;
-    private MeshFilter buildingShadowMF;
+    public MeshFilter buildingShadowMF;
 
     // Start is called before the first frame update
     void Start()
@@ -57,8 +58,7 @@ public class building : MonoBehaviour
         mesh = new Mesh();
         buildingShadowMesh = new Mesh();
         mf.mesh = mesh;
-
-        buildingShadowMF = transform.GetChild(0).GetComponent<MeshFilter>();
+        
         buildingShadowMF.mesh = buildingShadowMesh;
 
         marching.lerpCond = true;
@@ -84,7 +84,9 @@ public class building : MonoBehaviour
 
         makeWindow(new Vector3(2, 1, 1), new Vector3(4, 3, 1), new Vector3( 0, 0, 1), 1, new string[] { "wall", "floor/ceilling" }, "window");
 
-        makeWindow(new Vector3(1, 4, 1), new Vector3(5, 4, 5), new Vector3(0, 1, 0), 1, new string[] { "floor/ceilling" }, "skyLight");
+        //makeWindow(new Vector3(1, 4, 1), new Vector3(5, 4, 5), new Vector3(0, 1, 0), 1, new string[] { "floor/ceilling" }, "skyLight");
+
+        makeDoor(new Vector3(1, 0, 2), new Vector3(1, 2, 3), 1, new Vector3(1, 0, 0), 1, new float[2] { 270, 90 }, new Vector3(0, 0, 0), 20);
 
         meshUpdate();
     }
@@ -102,13 +104,32 @@ public class building : MonoBehaviour
         return pos * sampleAxisSize;
     }
 
+    int stepCalculator(float start, float end)
+    {
+        if (start <= end)
+        {
+            return 1;
+        }
+        else
+        {
+            return -1;
+        }
+    }
+    bool forLoopEndCond(int step, float start, float end)
+    {
+        if(start <= end)
+        {
+            return step <= end;
+        }
+        return step >= end;
+    }
     void makeSurface(Vector3 startPos, Vector3 endPos, int val, string material)
     {
-        for (int x = Convert.ToInt32(startPos.x); x <= Convert.ToInt32(endPos.x); x++)
+        for (int x = Convert.ToInt32(startPos.x); forLoopEndCond(x, startPos.x, endPos.x); x += stepCalculator(startPos.x, endPos.x))
         {
-            for (int y = Convert.ToInt32(startPos.y); y <= Convert.ToInt32(endPos.y); y++)
+            for (int y = Convert.ToInt32(startPos.y); forLoopEndCond(y, startPos.y, endPos.y); y += stepCalculator(startPos.y, endPos.y))
             {
-                for (int z = Convert.ToInt32(startPos.z); z <= Convert.ToInt32(endPos.z); z++)
+                for (int z = Convert.ToInt32(startPos.z); forLoopEndCond(z, startPos.z, endPos.z); z += stepCalculator(startPos.z, endPos.z))
                 {
                     buildingMap[x][y][z].val = val;
                     buildingMap[x][y][z].addMaterial( material );
@@ -118,11 +139,11 @@ public class building : MonoBehaviour
     }
     void removeSurface(Vector3 startPos, Vector3 endPos, string[] material)
     {
-        for (int x = Convert.ToInt32(startPos.x); x <= Convert.ToInt32(endPos.x); x++)
+        for (int x = Convert.ToInt32(startPos.x); forLoopEndCond(x, startPos.x, endPos.x); x += stepCalculator(startPos.x, endPos.x))
         {
-            for (int y = Convert.ToInt32(startPos.y); y <= Convert.ToInt32(endPos.y); y++)
+            for (int y = Convert.ToInt32(startPos.y); forLoopEndCond(y, startPos.y, endPos.y); y += stepCalculator(startPos.y, endPos.y))
             {
-                for (int z = Convert.ToInt32(startPos.z); z <= Convert.ToInt32(endPos.z); z++)
+                for (int z = Convert.ToInt32(startPos.z); forLoopEndCond(z, startPos.z, endPos.z); z += stepCalculator(startPos.z, endPos.z))
                 {
                     for(int i1 = 0; i1 < material.Count(); i1++)
                     {
@@ -195,6 +216,108 @@ public class building : MonoBehaviour
             windowMaterial
         );
     }
+    
+    int doorSetUp(float startPos, float endPos, double sampleSize)
+    {
+        if(startPos == endPos)
+        {
+            return 3;
+        }
+        return Convert.ToInt32((endPos - startPos) * sampleSize) + 4;
+    }
+
+    private bool doorCheck(int[] pos, int[] max, float[] axis)
+    {
+        int edgeCount = 0;
+        for(int i1 = 0; i1 < 3; i1++)
+        {
+            if (pos[i1] == 0 || pos[i1] == max[i1] - 1)
+            {
+                return true;
+            }
+            else if ((pos[i1] == 1 || pos[i1] == max[i1] - 2) && axis[i1] == 0)
+            {
+                edgeCount++;
+            }
+        }
+        return edgeCount >= 2;
+    }
+    void makeDoor(Vector3 startPos, Vector3 endPos, int wallDepth, Vector3 axis, int rotationAxis, float[] angleRange, Vector3 startAngle, float rotationSpeed)
+    {
+
+        GameObject doorObject = Instantiate
+        (
+            doorTemplate,
+            new Vector3
+            (
+                this.transform.position.x + (convertToMapIndex(startPos.x, samplesPerCell.x) - 1) / samplesPerCell.x * cellDim.x + cellDim.x / samplesPerCell.x,
+                this.transform.position.y + (convertToMapIndex(startPos.y, samplesPerCell.y) - 1) / samplesPerCell.y * cellDim.y + cellDim.y / samplesPerCell.y,
+                this.transform.position.z + (convertToMapIndex(startPos.z, samplesPerCell.z) - 1) / samplesPerCell.z * cellDim.z + cellDim.z / samplesPerCell.z
+            ),
+            Quaternion.identity,
+            this.transform
+        );
+        door doorScript = doorObject.GetComponent<door>();
+
+        doors = doors.Concat(new GameObject[] { doorObject }).ToArray();
+        
+        doorScript.cellDim = cellDim;
+        doorScript.samplesPerCell = samplesPerCell;
+
+        doorScript.rotationAxis = rotationAxis;
+        doorScript.angleRange = angleRange;
+
+        doorObject.transform.localEulerAngles = startAngle;
+
+        float[] angle = new float[3] { doorObject.transform.localEulerAngles.x, doorObject.transform.localEulerAngles.y, doorObject.transform.localEulerAngles.z };
+
+        doorScript.curentAngle = angle[rotationAxis];
+        doorScript.targetAngle = angle[rotationAxis];
+        doorScript.rotationSpeed = rotationSpeed;
+
+
+    doorScript.buildingMap = new buildingPoint[doorSetUp(startPos.x, endPos.x, samplesPerCell.x)][][];
+        for (int x = 0; x < doorScript.buildingMap.Count(); x++)
+        {
+            doorScript.buildingMap[x] = new buildingPoint[doorSetUp(startPos.y, endPos.y, samplesPerCell.y)][];
+            for (int y = 0; y < doorScript.buildingMap[x].Count(); y++)
+            {
+                doorScript.buildingMap[x][y] = new buildingPoint[doorSetUp(startPos.z, endPos.z, samplesPerCell.z)];
+                for (int z = 0; z < doorScript.buildingMap[x][y].Count(); z++)
+                {
+                    if (doorCheck(new int[] { x, y, z }, new int[] { doorScript.buildingMap.Count(), doorScript.buildingMap[x].Count(), doorScript.buildingMap[x][y].Count() }, new float[] { axis.x, axis.y, axis.z }))
+                    {
+                        doorScript.buildingMap[x][y][z] = new buildingPoint(-5);
+                    }
+                    else
+                    {
+                        doorScript.buildingMap[x][y][z] = new buildingPoint(1);
+                        doorScript.buildingMap[x][y][z].addMaterial("door");
+                    }
+                }
+            }
+        }
+        //doorScript.Start();
+
+        removeSurface
+       (
+           new Vector3
+            (
+                convertToMapIndex(startPos.x, samplesPerCell.x) - wallDepth * windowOffsetStart(axis.x),
+                convertToMapIndex(startPos.y, samplesPerCell.y) - wallDepth * windowOffsetStart(axis.y),
+                convertToMapIndex(startPos.z, samplesPerCell.z) - wallDepth * windowOffsetStart(axis.z)
+            ),
+            new Vector3
+            (
+                convertToMapIndex(endPos.x, samplesPerCell.x) + wallDepth * windowOffsetEnd(axis.x),
+                convertToMapIndex(endPos.y, samplesPerCell.y) + wallDepth * windowOffsetEnd(axis.y),
+                convertToMapIndex(endPos.z, samplesPerCell.z) + wallDepth * windowOffsetEnd(axis.z)
+            ),
+            new string[] { "wall" }
+       );
+
+    }
+
     void makeRoom(Vector3 startPos, Vector3 roomSpec, int wallDepth, string floorMaterialId, string wallMaterialId)
     {
         for (int i1 = 0; i1 < 2; i1++)
@@ -367,6 +490,47 @@ public class building : MonoBehaviour
             {
                 for (int z = 0; z < buildingMap[x][y].Length - 1; z++)
                 {
+
+                    cubeMaterials = new List<string> { };
+                    for (int x1 = 0; x1 < 2; x1++)
+                    {
+                        for (int y1 = 0; y1 < 2; y1++)
+                        {
+                            for (int z1 = 0; z1 < 2; z1++)
+                            {
+                                p = buildingMap[x + x1][y + y1][z + z1];
+                                pMaterialTemp = p.pointMaterial.AsEnumerable().ToList();
+
+                                if (pMaterialTemp.Contains("floor/ceilling"))
+                                {
+                                    pMaterialTemp.Remove("floor/ceilling");
+                                    if (y1 == 0)
+                                    {
+                                        pMaterialTemp.Add("floor");
+                                    }
+                                    else
+                                    {
+                                        pMaterialTemp.Add("ceilling");
+                                    }
+                                }
+
+                                for (int i1 = 0; i1 < pMaterialTemp.Count(); i1++)
+                                {
+                                    if (cubeMaterials.Contains(pMaterialTemp[i1]) == false)
+                                    {
+                                        cubeMaterials.Add(pMaterialTemp[i1]);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    if(cubeMaterials.Count() == 0)
+                    {
+                        continue;
+                    }
+
+
+
                     cubeVerticesShadow = new double[2][][];
                     for (int x1 = 0; x1 < 2; x1++)
                     {
@@ -377,9 +541,6 @@ public class building : MonoBehaviour
                             for (int z1 = 0; z1 < 2; z1++)
                             {
                                 cubeVerticesShadow[x1][y1][z1] = pointCalc("shadow", buildingMap[x + x1][y + y1][z + z1].pointMaterial, buildingMap[x + x1][y + y1][z + z1].val);
-                                if(buildingMap[x + x1][y + y1][z + z1].val == 1)
-                                {
-                                }
                             }
                         }
                     }
@@ -416,56 +577,13 @@ public class building : MonoBehaviour
                     }
 
                     cubeVertices = new List<double[][][]>();
-                    cubeMaterials = new List<string> {};
                     if (y < level * samplesPerCell.y)
                     {
-                        for (int x1 = 0; x1 < 2; x1++)
-                        {
-                            for (int y1 = 0; y1 < 2; y1++)
-                            {
-                                for (int z1 = 0; z1 < 2; z1++)
-                                {
-                                    p = buildingMap[x + x1][y + y1][z + z1];
-                                    pMaterialTemp = p.pointMaterial.AsEnumerable().ToList();
-                                    
-                                    if (pMaterialTemp.Contains("floor/ceilling"))
-                                    {
-                                        pMaterialTemp.Remove("floor/ceilling");
-                                        if (y1 == 0)
-                                        {
-                                            pMaterialTemp.Add("floor");
-                                        }
-                                        else
-                                        {
-                                            pMaterialTemp.Add("ceilling");
-                                        }
-                                    }
-
-                                    for (int i1 = 0; i1 < pMaterialTemp.Count(); i1++)
-                                    {
-                                        if (cubeMaterials.Contains(pMaterialTemp[i1]) == false)
-                                        {
-                                            cubeMaterials.Add(pMaterialTemp[i1]);
-                                        }
-                                    }
-                                }
-                            }
-                        }
-
                         //Debug.Log(cubeMaterials.Count);
                         for (int m = 0; m < cubeMaterials.Count; m++)
                         {
-
-                            
                             cubeVertices.Add(new double[2][][]);
-                            /*if (cubeMaterials[m] == "window" && cubeMaterials.Contains("wall"))
-                            {
-                                continue;
-                            }
-                            if (cubeMaterials[m] == "skyLight" && cubeMaterials.Any(m1 => new List<string> { "floor", "ceilling", "floor/ceilling"}.Any(m2 => m1 == m2)))
-                            {
-                                continue;
-                            }*/
+
                             for (int x1 = 0; x1 < 2; x1++)
                             {
                                 
