@@ -336,8 +336,6 @@ public class door : MonoBehaviour
 
             this.transform.localEulerAngles = new Vector3(newAngle[0], newAngle[1], newAngle[2]);
         }
-        
-
     }
 
     // Update is called once per frame

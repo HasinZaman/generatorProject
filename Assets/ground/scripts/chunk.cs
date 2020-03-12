@@ -200,7 +200,7 @@ public class chunk
         List<int> trianglesTemp = new List<int>();
 
 
-        //marching.lerpCond = true;
+        marching.lerpCond = true;
 
         //distPerSamples get the distance between samples inorder to ensure chunk has a width, lenght and height that is exactly dist
         Vector3 distPerSample = new Vector3

@@ -33,9 +33,13 @@ public class groundGen : MonoBehaviour
     public Mesh mesh;
     public List<Vector2> uv = new List<Vector2>();
 
+    public MeshCollider collider;
+
     public double threshold;
 
     public bool test = true;
+
+
 
     //gets the id of a chunk
     int kewlKewl(double x, double y, float maxX, float maxY)
@@ -55,6 +59,7 @@ public class groundGen : MonoBehaviour
         mf = GetComponent<MeshFilter>();
         mesh = new Mesh();
         mf.mesh = mesh;
+        collider.sharedMesh = mesh;
 
         //creates chunks
         for (double y = 0; y < chunksMaxGenration.y; y++)
@@ -201,5 +206,8 @@ public class groundGen : MonoBehaviour
         mesh.triangles = triangleTemp2;
 
         mesh.RecalculateNormals();
+
+        collider.sharedMesh = mesh;
+
     }
 }

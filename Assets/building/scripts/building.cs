@@ -35,6 +35,7 @@ public class building : MonoBehaviour
     public Vector3 cellDim;
     
     public Vector3[] vertices;
+    public Vector2[] uvs;
     public int[] triangles;
 
     public double level = 0;
@@ -454,6 +455,11 @@ public class building : MonoBehaviour
         return -5;
     }
 
+    double getLength(Vector3 p1, Vector3 p2)
+    {
+        return Math.Pow(Math.Pow(Convert.ToDouble(p2.x - p1.x), 2) + Math.Pow(Convert.ToDouble(p2.y - p1.y), 2) + Math.Pow(Convert.ToDouble(p2.z - p1.z), 2), 0.5);
+    }
+
     void meshUpdate()
     {
         Vector3[] pointsTemp;
@@ -524,13 +530,12 @@ public class building : MonoBehaviour
                             }
                         }
                     }
+
                     if(cubeMaterials.Count() == 0)
                     {
                         continue;
                     }
-
-
-
+                    
                     cubeVerticesShadow = new double[2][][];
                     for (int x1 = 0; x1 < 2; x1++)
                     {
@@ -615,7 +620,6 @@ public class building : MonoBehaviour
                                         }
                                         else
                                         {
-
                                             cubeVertices[m][x1][y1][z1] = pointCalc(cubeMaterials[m], pMaterialTemp, p.val);
                                         }
 
@@ -640,10 +644,17 @@ public class building : MonoBehaviour
 
                                 pointTemp.z = Convert.ToSingle((pointTemp.z + z) * distPerSample[2]);
 
+
+                                //getLength
+
                                 //checks if the vertice exists in the  vertice array
                                 //if the vertice was found then the vertice would be shared rather than a new one being made
                                 if (meshVertices.Contains(pointTemp) == false)
                                 {
+
+                                    Vector2 uv = new Vector2(pointTemp.z / distPerSample[2], pointTemp.y / distPerSample[1]);
+
+                                    uvs = uvs.Concat(new Vector2[] { uv }).ToArray();
                                     meshVertices.Add(pointTemp);
                                     subMeshTriangles[Array.IndexOf(materialId, cubeMaterials[m])].Add(meshVertices.Count - 1);
                                 }
@@ -681,6 +692,7 @@ public class building : MonoBehaviour
 
             }
         }
+        mesh.uv = uvs;
 
         mesh.RecalculateNormals();
 
