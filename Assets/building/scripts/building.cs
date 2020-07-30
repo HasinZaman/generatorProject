@@ -85,7 +85,7 @@ public class building : MonoBehaviour
 
         makeWindow(new Vector3(2, 1, 1), new Vector3(4, 3, 1), new Vector3( 0, 0, 1), 1, new string[] { "wall", "floor/ceilling" }, "window");
 
-        //makeWindow(new Vector3(1, 4, 1), new Vector3(5, 4, 5), new Vector3(0, 1, 0), 1, new string[] { "floor/ceilling" }, "skyLight");
+        makeWindow(new Vector3(1, 4, 1), new Vector3(5, 4, 5), new Vector3(0, 1, 0), 1, new string[] { "floor/ceilling" }, "skyLight");
 
         makeDoor(new Vector3(1, 0, 2), new Vector3(1, 2, 3), 1, new Vector3(1, 0, 0), 1, new float[2] { 270, 90 }, new Vector3(0, 0, 0), 20);
 

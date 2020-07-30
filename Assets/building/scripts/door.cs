@@ -161,8 +161,7 @@ public class door : MonoBehaviour
                             }
                         }
                     }
-
-                    //Debug.Log(cubeMaterials.Count);
+                     
                     for (int m = 0; m < cubeMaterials.Count; m++)
                     {
                         cubeVertices.Add(new double[2][][]);

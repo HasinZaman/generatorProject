@@ -1,0 +1,383 @@
+fileFormatVersion: 2
+guid: db26e878662a2854ca152c9e39684ad8
+ModelImporter:
+  serializedVersion: 23
+  fileIDToRecycleName:
+    100000: 25 mm
+    100002: 25 mm shell
+    100004: 25 mm shell normal
+    100006: antena
+    100008: //RootNode
+    100010: Armature
+    100012: barrel
+    100014: Bone
+    100016: Bone.001
+    100018: Bone.002
+    100020: Bone.004
+    100022: Bone.005
+    100024: Bone.006
+    100026: Bone.007
+    100028: Bone.008
+    100030: Bone.009
+    100032: Bone.009_end
+    100034: boxMagazine
+    100036: camera.004
+    100038: camera.005
+    100040: camera.006
+    100042: camera.007
+    100044: chain gun turret
+    100046: chain gun turret  perascope lens.001
+    100048: Cylinder.002
+    100050: Cylinder.003
+    100052: front veiw.001
+    100054: Hemi
+    100056: Hemi.001
+    100058: Hemi.002
+    100060: Hemi.003
+    100062: Hemi.004
+    100064: Hemi.005
+    100066: lav Casse
+    100068: lav Casse door
+    100070: lav Casse.001
+    100072: lav front veiw.001
+    100074: lens.004
+    100076: lens.005
+    100078: lens.006
+    100080: lens.007
+    100082: low poly wheel.005
+    100084: machine gun mount
+    100086: Machine gun.001
+    100088: wheel rim
+    100090: wheel rim.001
+    100092: wheel rim.002
+    100094: wheel rim.003
+    100096: wheel rim.004
+    100098: wheel rim.005
+    100100: wheel rim.006
+    100102: wheel rim.007
+    100104: wheel rim.008
+    100106: wheel tire
+    100108: wheel tire.001
+    100110: wheel tire.002
+    100112: wheel tire.003
+    100114: wheel tire.004
+    100116: wheel tire.005
+    100118: wheel tire.006
+    100120: wheel tire.007
+    100122: wheel tire.008
+    100124: window
+    400000: 25 mm
+    400002: 25 mm shell
+    400004: 25 mm shell normal
+    400006: antena
+    400008: //RootNode
+    400010: Armature
+    400012: barrel
+    400014: Bone
+    400016: Bone.001
+    400018: Bone.002
+    400020: Bone.004
+    400022: Bone.005
+    400024: Bone.006
+    400026: Bone.007
+    400028: Bone.008
+    400030: Bone.009
+    400032: Bone.009_end
+    400034: boxMagazine
+    400036: camera.004
+    400038: camera.005
+    400040: camera.006
+    400042: camera.007
+    400044: chain gun turret
+    400046: chain gun turret  perascope lens.001
+    400048: Cylinder.002
+    400050: Cylinder.003
+    400052: front veiw.001
+    400054: Hemi
+    400056: Hemi.001
+    400058: Hemi.002
+    400060: Hemi.003
+    400062: Hemi.004
+    400064: Hemi.005
+    400066: lav Casse
+    400068: lav Casse door
+    400070: lav Casse.001
+    400072: lav front veiw.001
+    400074: lens.004
+    400076: lens.005
+    400078: lens.006
+    400080: lens.007
+    400082: low poly wheel.005
+    400084: machine gun mount
+    400086: Machine gun.001
+    400088: wheel rim
+    400090: wheel rim.001
+    400092: wheel rim.002
+    400094: wheel rim.003
+    400096: wheel rim.004
+    400098: wheel rim.005
+    400100: wheel rim.006
+    400102: wheel rim.007
+    400104: wheel rim.008
+    400106: wheel tire
+    400108: wheel tire.001
+    400110: wheel tire.002
+    400112: wheel tire.003
+    400114: wheel tire.004
+    400116: wheel tire.005
+    400118: wheel tire.006
+    400120: wheel tire.007
+    400122: wheel tire.008
+    400124: window
+    2100000: machineGunMount
+    2100002: Machine Gun
+    2100004: Camera
+    2100006: lens
+    2100008: No Name
+    2100010: LavCassie
+    2100012: LavCassie.002
+    2100014: wheelTire
+    2100016: wheelRim
+    2100018: door
+    2100020: Lav Turret
+    2100022: turretWindow
+    2100024: gun_Barrel
+    2100026: wheelTire.001
+    2100028: wheelRim.001
+    2100030: wheelTire.002
+    2100032: wheelRim.002
+    2100034: wheelTire.004
+    2100036: wheelRim.004
+    2100038: wheelTire.003
+    2100040: wheelRim.003
+    2100042: wheelTire.008
+    2100044: wheelRim.008
+    2100046: wheelTire.007
+    2100048: wheelRim.007
+    2100050: wheelTire.006
+    2100052: wheelRim.006
+    2100054: wheelTire.005
+    2100056: wheelRim.005
+    2100058: 25mm_shell
+    2100060: 25mm
+    2300000: 25 mm
+    2300002: 25 mm shell
+    2300004: 25 mm shell normal
+    2300006: barrel
+    2300008: boxMagazine
+    2300010: camera.004
+    2300012: camera.005
+    2300014: camera.006
+    2300016: camera.007
+    2300018: chain gun turret
+    2300020: chain gun turret  perascope lens.001
+    2300022: Cylinder.002
+    2300024: Cylinder.003
+    2300026: lav Casse
+    2300028: lav Casse door
+    2300030: lav Casse.001
+    2300032: lens.004
+    2300034: lens.005
+    2300036: lens.006
+    2300038: lens.007
+    2300040: low poly wheel.005
+    2300042: machine gun mount
+    2300044: Machine gun.001
+    2300046: wheel rim
+    2300048: wheel rim.001
+    2300050: wheel rim.002
+    2300052: wheel rim.003
+    2300054: wheel rim.004
+    2300056: wheel rim.005
+    2300058: wheel rim.006
+    2300060: wheel rim.007
+    2300062: wheel rim.008
+    2300064: wheel tire
+    2300066: wheel tire.001
+    2300068: wheel tire.002
+    2300070: wheel tire.003
+    2300072: wheel tire.004
+    2300074: wheel tire.005
+    2300076: wheel tire.006
+    2300078: wheel tire.007
+    2300080: wheel tire.008
+    2300082: window
+    3300000: 25 mm
+    3300002: 25 mm shell
+    3300004: 25 mm shell normal
+    3300006: barrel
+    3300008: boxMagazine
+    3300010: camera.004
+    3300012: camera.005
+    3300014: camera.006
+    3300016: camera.007
+    3300018: chain gun turret
+    3300020: chain gun turret  perascope lens.001
+    3300022: Cylinder.002
+    3300024: Cylinder.003
+    3300026: lav Casse
+    3300028: lav Casse door
+    3300030: lav Casse.001
+    3300032: lens.004
+    3300034: lens.005
+    3300036: lens.006
+    3300038: lens.007
+    3300040: low poly wheel.005
+    3300042: machine gun mount
+    3300044: Machine gun.001
+    3300046: wheel rim
+    3300048: wheel rim.001
+    3300050: wheel rim.002
+    3300052: wheel rim.003
+    3300054: wheel rim.004
+    3300056: wheel rim.005
+    3300058: wheel rim.006
+    3300060: wheel rim.007
+    3300062: wheel rim.008
+    3300064: wheel tire
+    3300066: wheel tire.001
+    3300068: wheel tire.002
+    3300070: wheel tire.003
+    3300072: wheel tire.004
+    3300074: wheel tire.005
+    3300076: wheel tire.006
+    3300078: wheel tire.007
+    3300080: wheel tire.008
+    3300082: window
+    4300000: machine gun mount
+    4300002: Machine gun.001
+    4300004: camera.007
+    4300006: lens.007
+    4300008: camera.004
+    4300010: lens.004
+    4300012: camera.005
+    4300014: lens.005
+    4300016: camera.006
+    4300018: lens.006
+    4300020: boxMagazine
+    4300022: Cylinder.002
+    4300024: Cylinder.003
+    4300026: lav Casse
+    4300028: window
+    4300030: low poly wheel.005
+    4300032: wheel tire
+    4300034: wheel rim
+    4300036: lav Casse.001
+    4300038: lav Casse door
+    4300040: chain gun turret
+    4300042: chain gun turret  perascope lens.001
+    4300044: barrel
+    4300046: wheel tire.001
+    4300048: wheel rim.001
+    4300050: wheel tire.002
+    4300052: wheel rim.002
+    4300054: wheel tire.004
+    4300056: wheel rim.004
+    4300058: wheel tire.003
+    4300060: wheel rim.003
+    4300062: wheel tire.008
+    4300064: wheel rim.008
+    4300066: wheel tire.007
+    4300068: wheel rim.007
+    4300070: wheel tire.006
+    4300072: wheel rim.006
+    4300074: wheel tire.005
+    4300076: wheel rim.005
+    4300078: 25 mm shell
+    4300080: 25 mm
+    4300082: 25 mm shell normal
+    4300084: antena
+    9500000: //RootNode
+    10800000: Hemi
+    10800002: Hemi.001
+    10800004: Hemi.002
+    10800006: Hemi.003
+    10800008: Hemi.004
+    10800010: Hemi.005
+    13700000: antena
+  externalObjects: {}
+  materials:
+    importMaterials: 1
+    materialName: 0
+    materialSearch: 1
+    materialLocation: 1
+  animations:
+    legacyGenerateAnimations: 4
+    bakeSimulation: 0
+    resampleCurves: 1
+    optimizeGameObjects: 0
+    motionNodeName: 
+    rigImportErrors: 
+    rigImportWarnings: 
+    animationImportErrors: 
+    animationImportWarnings: 
+    animationRetargetingWarnings: 
+    animationDoRetargetingWarnings: 0
+    importAnimatedCustomProperties: 0
+    importConstraints: 0
+    animationCompression: 1
+    animationRotationError: 0.5
+    animationPositionError: 0.5
+    animationScaleError: 0.5
+    animationWrapMode: 0
+    extraExposedTransformPaths: []
+    extraUserProperties: []
+    clipAnimations: []
+    isReadable: 1
+  meshes:
+    lODScreenPercentages: []
+    globalScale: 1
+    meshCompression: 0
+    addColliders: 0
+    useSRGBMaterialColor: 1
+    importVisibility: 1
+    importBlendShapes: 1
+    importCameras: 1
+    importLights: 1
+    swapUVChannels: 0
+    generateSecondaryUV: 0
+    useFileUnits: 1
+    optimizeMeshForGPU: 1
+    keepQuads: 0
+    weldVertices: 1
+    preserveHierarchy: 0
+    indexFormat: 0
+    secondaryUVAngleDistortion: 8
+    secondaryUVAreaDistortion: 15.000001
+    secondaryUVHardAngle: 88
+    secondaryUVPackMargin: 4
+    useFileScale: 1
+    previousCalculatedGlobalScale: 0.01
+    hasPreviousCalculatedGlobalScale: 1
+  tangentSpace:
+    normalSmoothAngle: 60
+    normalImportMode: 0
+    tangentImportMode: 3
+    normalCalculationMode: 4
+    legacyComputeAllNormalsFromSmoothingGroupsWhenMeshHasBlendShapes: 0
+    blendShapeNormalImportMode: 1
+    normalSmoothingSource: 0
+  importAnimation: 1
+  copyAvatar: 0
+  humanDescription:
+    serializedVersion: 2
+    human: []
+    skeleton: []
+    armTwist: 0.5
+    foreArmTwist: 0.5
+    upperLegTwist: 0.5
+    legTwist: 0.5
+    armStretch: 0.05
+    legStretch: 0.05
+    feetSpacing: 0
+    rootMotionBoneName: 
+    hasTranslationDoF: 0
+    hasExtraRoot: 0
+    skeletonHasParents: 1
+  lastHumanDescriptionAvatarSource: {instanceID: 0}
+  animationType: 2
+  humanoidOversampling: 1
+  additionalBone: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

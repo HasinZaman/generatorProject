@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 77cd48eb17c356d4288749a4ca52ffc0
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - wheelTemplate: {fileID: 1414048006453872191, guid: 1a9cf388a0fc18a418d44c6e1dec8d9f,
+      type: 3}
+  - turretTemplate: {fileID: 122907199901102594, guid: 050053c03a07b2e4fbd6e42c4cba9eb5,
+      type: 3}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

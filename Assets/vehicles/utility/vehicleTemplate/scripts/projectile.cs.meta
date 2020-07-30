@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 736bde9ca14cdf34c8130c31a93de918
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - projectileExplotion: {fileID: 5257816842645335705, guid: 63e94f7967adcad42af17ea74503892c,
+      type: 3}
+  - collider: {instanceID: 0}
+  - trailRender: {instanceID: 0}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
