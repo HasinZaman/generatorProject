@@ -355,12 +355,27 @@ public class antenna : MonoBehaviour
         }
     }
 
+    int aga = 0;
+
     // Update is called once per frame
     void Update()
     {
+        /*int gag = 1;
+        if(aga % 21 >= 10)
+        {
+            gag = -1;
+        }
+        Vector3 bitch = this.transform.position;
+
+        bitch += this.transform.forward * 30 * Time.deltaTime * gag;
+
+        this.transform.position = bitch;
+
+        aga += 1;*/
+        
         //get the kinomatic values at the current frame
-        Vector2 newVelocity = velocity(forwardDirection(transform.position), forwardDirection(lastPosition[0]));
-        Vector2 newAcceleration = acceleration(forwardDirection(transform.position), forwardDirection(lastPosition[0]), lastVelocity[0]);
+        Vector2 newVelocity = velocity(Vector3.zero, forwardDirection(lastPosition[0] - transform.position));
+        Vector2 newAcceleration = acceleration(Vector3.zero, forwardDirection(lastPosition[0] - transform.position), lastVelocity[0]);
         
         //gets the time/bend factor value
         updateJoint(ref bendFactor.x, ref t[0], ref springDirection[0], ref restCond[0], newVelocity.x, newAcceleration.x, ref velocityTriggerX);
@@ -558,23 +573,71 @@ public class antenna : MonoBehaviour
     //roates the axies inorder to get the x, y & z position values relative to the forward direction
     Vector3 forwardDirection(Vector3 vector)
     {
-        Vector3 newVector = vector;
+        float yaw, pitch, roll;
 
-        Vector3 rotation = this.transform.eulerAngles;
-
-        //converts euler angles into radian angles
-        rotation.x *= Mathf.PI / 180;
-        rotation.y *= Mathf.PI / 180;
-        rotation.z *= Mathf.PI / 180;
+        yaw = this.transform.localEulerAngles.y * Mathf.PI / 180;
+        pitch = this.transform.localEulerAngles.x * Mathf.PI / 180;
+        roll = this.transform.localEulerAngles.z * Mathf.PI / 180;
         
-        //using rotation matrix inorder to get the relative x, y & z relative to the forward direction
-        vector.x *= ((Mathf.Cos(rotation.x) * Mathf.Cos(rotation.y)) + (Mathf.Cos(rotation.x) * Mathf.Sin(rotation.y) * Mathf.Sin(rotation.z) - Mathf.Sin(rotation.x) * Mathf.Cos(rotation.z)) + (Mathf.Cos(rotation.x) * Mathf.Sin(rotation.y) * Mathf.Cos(rotation.z) + Mathf.Sin(rotation.x) * Mathf.Sin(rotation.x)));
+        float[] temp = new float[3] { vector.z, vector.x, vector.y};
 
-        vector.y *= ((Mathf.Sin(rotation.z) * Mathf.Cos(rotation.y)) + (Mathf.Sin(rotation.x) * Mathf.Sin(rotation.y) * Mathf.Sin(rotation.z) + Mathf.Cos(rotation.x) * Mathf.Cos(rotation.z)) + (Mathf.Sin(rotation.x) * Mathf.Sin(rotation.x) * Mathf.Sin(rotation.y) * Mathf.Cos(rotation.z) - Mathf.Cos(rotation.x) * Mathf.Sin(rotation.z)));
+        float cy, sy, cp, sp, cr, sr;
 
-        vector.z *= ((-1 * Mathf.Sin(rotation.y)) + (Mathf.Cos(rotation.y) * Mathf.Sin(rotation.z)) + (Mathf.Cos(rotation.y) + Mathf.Cos(rotation.z)));
+        cy = Mathf.Cos(yaw);
+        sy = Mathf.Sin(yaw);
 
-        return vector;
+        cp = Mathf.Cos(pitch);
+        sp = Mathf.Sin(pitch);
+
+        cr = Mathf.Cos(roll);
+        sr = Mathf.Sin(roll);
+
+        float[][] temp3 = new float[][]
+        {
+            new float[]{ cy * cp, cy * sp * sr - sy * cr, cy * sp * cr + sy * sr },
+            new float[]{ sy * cp, sy * sp * sr + cy * cr, sy * sp * cr - cy * sr },
+            new float[]{ -1 * sp, cp * sr, cp * cr}
+        };
+
+        //gets position
+        temp = dotProduct
+        (
+            temp3,
+            temp
+        );
+
+        return new Vector3(temp[1], temp[2], temp[0]);
     }
     
+    float[][] dotProduct(float[][] matrix1, float[][] matrix2)
+    {
+        float[][] temp = new float[Mathf.Min(matrix2.Length, matrix1.Length)][];
+        for(int y = 0; y < temp.Length; y++)
+        {
+            temp[y] = new float[Mathf.Min(matrix2[y].Length, matrix1[y].Length)];
+            for (int x = 0; x < temp[y].Length; x++)
+            {
+                temp[y][x] = 0;
+
+                for(int i1 = 0; i1 < matrix1[y].Length; i1++)
+                {
+                    temp[y][x] += matrix1[y][i1] * matrix2[i1][x];
+                }
+
+            }
+        }
+        return temp;
+    }
+
+    float[] dotProduct(float[][] trigMatrix, float[] position)
+    {
+        float[] temp = new float[3];
+
+        for(int i1 = 0; i1 < 3; i1++)
+        {
+            temp[i1] = trigMatrix[0][i1] * position[0] + trigMatrix[1][i1] * position[1] + trigMatrix[2][i1] * position[2];
+        }
+
+        return temp;
+    }
 }
