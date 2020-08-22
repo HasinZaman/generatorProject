@@ -22,8 +22,10 @@ public class vehicleEditor : Editor
 
     private SerializedProperty miscSerialized;
 
+    private SerializedProperty WheelsSerialized;
+
     //engine settings
-    private SerializedProperty centerOfMass, gearSpeeds, gearHorsePower, gearJerks, gear;
+    private SerializedProperty centerOfMass, gearPos, speeds, horsePowers, brakeCond, moveCond;
 
     //wheel settings    
     public GameObject wheelTemplate;
@@ -61,12 +63,16 @@ public class vehicleEditor : Editor
 
         steeringMethod = targetObject.FindProperty("steeringMethod");
         miscSerialized = targetObject.FindProperty("misc");
-        
+        WheelsSerialized = targetObject.FindProperty("wheels");
+
         centerOfMass = targetObject.FindProperty("centerOfMass");
-        gearSpeeds = targetObject.FindProperty("gearSpeeds");
-        gearHorsePower = targetObject.FindProperty("gearHorsePower");
-        gearJerks = targetObject.FindProperty("gearJerks");
-        gear = targetObject.FindProperty("gear");
+        
+        speeds = targetObject.FindProperty("speeds");
+        horsePowers = targetObject.FindProperty("horsePowers");
+        gearPos = targetObject.FindProperty("gearPos");
+        
+        brakeCond = targetObject.FindProperty("brakeCond");
+        moveCond = targetObject.FindProperty("moveCond");
 
     }
 
@@ -211,58 +217,76 @@ public class vehicleEditor : Editor
     //gets vehicle engine information
     private void getVehicleValue()
     {
+
         //draws the feild to input the center of mass
-        label("center of mass");
         centerOfMass.vector3Value = EditorGUILayout.Vector3Field("Center of Mass", centerOfMass.vector3Value);
 
+        label("state");
+        brakeCond.boolValue = EditorGUILayout.Toggle("Brake Cond", brakeCond.boolValue);
+        moveCond.boolValue = EditorGUILayout.Toggle("Move Cond", moveCond.boolValue);
+        
         //draws the feilds for the gears
+        List<float> speedsTemp = new List<float> { };
+        List<float> horsePowersTemp = new List<float> { };
+        
+        List<int> removeAtIndex = new List<int> { };
+
         label("Gears");
-        for(int i1 = 0; i1 < gearSpeeds.arraySize; i1++)
+        gearPos.intValue = EditorGUILayout.IntField("Current Gear", gearPos.intValue);
+
+        for (int i1 = 0; i1 < speeds.arraySize; i1++)
         {
+            speedsTemp.Add(speeds.GetArrayElementAtIndex(i1).floatValue);
+            horsePowersTemp.Add(horsePowers.GetArrayElementAtIndex(i1).floatValue);
+
             GUILayout.BeginHorizontal();
 
             GUILayout.Label(i1.ToString());
-            
-            GUILayout.Label("Max Speed");
 
-            gearSpeeds.GetArrayElementAtIndex(i1).floatValue = EditorGUILayout.FloatField(gearSpeeds.GetArrayElementAtIndex(i1).floatValue/2);
-            gearSpeeds.GetArrayElementAtIndex(i1).floatValue *= 2;
-
+            GUILayout.Label("Speed");
+            speedsTemp[i1] = EditorGUILayout.FloatField(speedsTemp[i1]);
 
             GUILayout.Label("Horse Power");
 
-            gearHorsePower.GetArrayElementAtIndex(i1).floatValue = EditorGUILayout.FloatField(gearHorsePower.GetArrayElementAtIndex(i1).floatValue/2);
-            gearHorsePower.GetArrayElementAtIndex(i1).floatValue *= 2;
-
-            GUILayout.Label("Jerk");
-
-            gearJerks.GetArrayElementAtIndex(i1).floatValue = EditorGUILayout.FloatField(gearJerks.GetArrayElementAtIndex(i1).floatValue/2);
-            gearJerks.GetArrayElementAtIndex(i1).floatValue *= 2;
+            horsePowersTemp[i1] = EditorGUILayout.FloatField(horsePowersTemp[i1]);
 
             if (GUILayout.Button("Remove"))
             {
-                gearSpeeds.DeleteArrayElementAtIndex(i1);
-                gearHorsePower.DeleteArrayElementAtIndex(i1);
-                gearJerks.DeleteArrayElementAtIndex(i1);
-                break;
+                removeAtIndex.Add(i1);
             }
-
             GUILayout.EndHorizontal();
         }
-
         //adds another gear
         if (GUILayout.Button("Add"))
         {
-            gearSpeeds.InsertArrayElementAtIndex(gearSpeeds.arraySize);
-            gearSpeeds.GetArrayElementAtIndex(gearSpeeds.arraySize - 1).floatValue = 0;
-
-            gearHorsePower.InsertArrayElementAtIndex(gearHorsePower.arraySize);
-            gearHorsePower.GetArrayElementAtIndex(gearHorsePower.arraySize - 1).floatValue = 0;
-
-            gearJerks.InsertArrayElementAtIndex(gearJerks.arraySize);
-            gearJerks.GetArrayElementAtIndex(gearJerks.arraySize - 1).floatValue = 0;
+            speedsTemp.Add(0);
+            horsePowersTemp.Add(0);
         }
 
+        removeAtIndex.Reverse();
+
+        for (int i1 = 0; i1 < removeAtIndex.Count; i1++)
+        {
+            speedsTemp.RemoveAt(removeAtIndex[i1]);
+            horsePowersTemp.RemoveAt(removeAtIndex[i1]);
+        }
+
+        float[] speedsOutput = speedsTemp.ToArray();
+        float[] horsePowersTempOutput = horsePowersTemp.ToArray();
+        Array.Sort(speedsOutput, horsePowersTempOutput);
+
+        
+        speeds.ClearArray();
+        horsePowers.ClearArray();
+
+        for (int i1 = 0; i1 < speedsOutput.Length; i1++)
+        {
+            speeds.InsertArrayElementAtIndex(speeds.arraySize);
+            horsePowers.InsertArrayElementAtIndex(horsePowers.arraySize);
+
+            speeds.GetArrayElementAtIndex(speeds.arraySize - 1).floatValue = speedsOutput[i1];
+            horsePowers.GetArrayElementAtIndex(horsePowers.arraySize - 1).floatValue = horsePowersTempOutput[i1];
+        }
     }
 
     //mirror a certian object
@@ -336,7 +360,10 @@ public class vehicleEditor : Editor
         
         //draws a wheel's settings for gui
         Transform wheelTemp;
+
+        WheelsSerialized.ClearArray();
         
+        int wheelCount = 0;
         for (int i1 = 0; i1 < v.transform.childCount; i1++)
         {
             wheelTemp = v.transform.GetChild(i1);
@@ -347,6 +374,11 @@ public class vehicleEditor : Editor
                 {
                     drawWheelGUI(wheelTemp.gameObject);
                 }
+
+                WheelsSerialized.InsertArrayElementAtIndex(wheelCount);
+                WheelsSerialized.GetArrayElementAtIndex(wheelCount).objectReferenceValue = v.transform.GetChild(i1).gameObject;
+
+                wheelCount += 1;
             }
         }
     }
@@ -378,14 +410,14 @@ public class vehicleEditor : Editor
     {
         //wheel Object
         SerializedObject wheelTemp = new UnityEditor.SerializedObject(wheelObj.GetComponent<wheel>());
-        SerializedProperty steerable, steeringRange, wheelAngle, targetAngle, rotationSpeed, motor, breakForce;
+        SerializedProperty steerable, steeringRange, wheelAngle, targetAngle, rotationSpeed, motor, brakeTorque;
 
         steerable = wheelTemp.FindProperty("steerable");
         steeringRange = wheelTemp.FindProperty("steeringRange");
         wheelAngle = wheelTemp.FindProperty("wheelAngle");
         targetAngle = wheelTemp.FindProperty("targetAngle");
         rotationSpeed = wheelTemp.FindProperty("rotationSpeed");
-        breakForce = wheelTemp.FindProperty("breakForce");
+        brakeTorque = wheelTemp.FindProperty("brakeTorque");
 
         motor = wheelTemp.FindProperty("motor");
 
@@ -416,7 +448,7 @@ public class vehicleEditor : Editor
 
         wheelColliderTemp.suspensionDistance = EditorGUILayout.FloatField("suspension Distance", wheelColliderTemp.suspensionDistance);
 
-        label("spring");
+        label("Spring");
 
         suspensionSpring.spring = EditorGUILayout.FloatField("spring", suspensionSpring.spring);
 
@@ -427,8 +459,8 @@ public class vehicleEditor : Editor
         wheelColliderTemp.suspensionSpring = suspensionSpring;
 
         wheelTemp.FindProperty("wheelCollider").objectReferenceValue = wheelColliderTemp;
-
-        breakForce.floatValue = EditorGUILayout.Slider("Break Force", breakForce.floatValue, 0, 100);
+        
+        brakeTorque.floatValue = EditorGUILayout.FloatField("Brake Force", brakeTorque.floatValue);
 
         header("Wheel Tags");
 

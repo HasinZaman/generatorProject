@@ -19,7 +19,9 @@ public class wheel : MonoBehaviour
 
     [Header("movement")]
     public bool motor;
-    public float breakForce = 0;
+
+    [Header("brakes")]
+    public float brakeTorque = 1;
     
     [Header("wheel")]
     Vector3 pos;
@@ -28,50 +30,67 @@ public class wheel : MonoBehaviour
     //sets a target angle that doesn't lie outside the wheels minimum and maximum angle 
     public void setTargetWheelAngle(float newTarget)
     {
-        if (newTarget < steeringRange[0])
-        {
-            targetAngle = steeringRange[0];
-        }
-        else if (newTarget > steeringRange[1])
-        {
-            targetAngle = steeringRange[1];
-        }
-        else
-        {
-            targetAngle = newTarget;
-        }
+        targetAngle = Mathf.Min(Mathf.Max(steeringRange[0], newTarget), steeringRange[1]);
     }
     
     //updates the wheel angle
-    private void steer()
+    private void steer()//replace with the limitedRotation class
     {
         //if the wheel is already pointed in the target angle then the funtion is pre maturely ended
         if (targetAngle == wheelAngle)
         {
             return;
         }
-
-        float deltaRotation = rotationSpeed * Time.deltaTime;
         
-        if (deltaRotation < targetAngle)
+        float deltaRotation = rotationSpeed * Time.deltaTime;
+
+        if (Math.Abs(targetAngle - wheelAngle) > deltaRotation)
         {
-            wheelAngle = Math.Min(wheelAngle + deltaRotation, targetAngle);
+            if (steeringRange[0] <= targetAngle && targetAngle <= wheelAngle)
+            {
+                wheelAngle -= deltaRotation;
+            }
+            else if (wheelAngle <= targetAngle && targetAngle <= steeringRange[1])
+            {
+                wheelAngle += deltaRotation;
+            }
         }
         else
         {
-            wheelAngle = Math.Max(wheelAngle - deltaRotation, targetAngle);
+            wheelAngle = targetAngle;
         }
 
         wheelCollider.steerAngle = wheelAngle;
     }
 
+    //calculats the torque inroder to achive a target velocity
+    public float move(float targetSpeed, float currentSpeed, float horsePower)
+    {
+        float torque, RPM;
+        float speedDiffrence = targetSpeed - currentSpeed;
+        float mod = 1;
+
+        if(speedDiffrence == 0)
+        {
+            return 0f;
+        }
+        else if(targetSpeed < 0)
+        {
+            mod = -1;
+            speedDiffrence *= -1;
+        }
+
+        RPM = speedDiffrence / wheelCollider.radius * 9.5488f;
+
+
+        torque = horsePower * 0.75f * RPM * mod;
+
+        return torque;
+    }
+
     // Update is called once per frame
     void Update()
     {
-        if (motor)
-        {
-            
-        }
         if (steerable)
         {
             steer();

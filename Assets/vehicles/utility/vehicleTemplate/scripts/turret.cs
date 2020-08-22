@@ -28,18 +28,7 @@ public class limitedRotation
     //sets target angle and checks if it's a valid target angle
     public void targetAngleSet(float newTarget)
     {
-        if (newTarget < angleRange[0])
-        {
-            targetAngle = angleRange[0];
-        }
-        else if (newTarget > angleRange[1])
-        {
-            targetAngle = angleRange[1];
-        }
-        else
-        {
-            targetAngle = newTarget;
-        }
+        targetAngle = Mathf.Min(Mathf.Max(angleRange[0], newTarget), angleRange[1]);
     }
 
     //updates angle
@@ -84,6 +73,19 @@ public class fullRotation
         this.curentAngle = curentAngle;
         this.targetAngle = targetAngle;
         this.rotationSpeed = rotationSpeed;
+    }
+
+    //sets target angle
+    public void targetAngleSet(float newTarget)
+    {
+        float temp = newTarget;
+        if(newTarget < 0)
+        {
+            temp = Mathf.Abs(360 + temp);
+        }
+        
+        targetAngle = temp % 360;
+
     }
 
     //calculates the clock wise distance
@@ -497,12 +499,6 @@ public class turret : MonoBehaviour
     public float loadingTime;
     private float loadingTimeLeft = 0;
     
-    // Start is called before the first frame update
-    void Start()
-    {
-
-    }
-
     // Update is called once per frame
     void Update()
     {
