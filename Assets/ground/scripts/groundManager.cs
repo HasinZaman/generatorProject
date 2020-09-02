@@ -2,17 +2,12 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class chunk : MonoBehaviour
+public class groundManager : MonoBehaviour
 {
-    //mesh
-    public MeshFilter mf;
-    public Mesh mesh;
-    public List<Vector2> uv = new List<Vector2>();
 
-    public MeshCollider collider;
+    public float threshold;
 
-    groundManager manager;
-    
+    public bool test = true;
 
     // Start is called before the first frame update
     void Start()

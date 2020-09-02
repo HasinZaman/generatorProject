@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.15627736, g: 0.17895104, b: 0.19278076, a: 1}
+  m_IndirectSpecularColor: {r: 0.007568543, g: 0.0068478994, b: 0.0047876197, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -283,7 +283,7 @@ Light:
   m_Type: 1
   m_Shape: 0
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_Intensity: 1
+  m_Intensity: 0
   m_Range: 10
   m_SpotAngle: 30
   m_InnerSpotAngle: 21.80208
@@ -339,13 +339,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1117354529}
-  m_LocalRotation: {x: 0.64382035, y: -0.76395136, z: 0.022110168, w: 0.03721444}
+  m_LocalRotation: {x: -0.08190542, y: 0.07519357, z: 0.76056325, w: 0.6396726}
   m_LocalPosition: {x: 12.292181, y: 81.1, z: -14.2004175}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 1
-  m_LocalEulerAnglesHint: {x: 175.314, y: 1081.632, z: -260.178}
+  m_LocalEulerAnglesHint: {x: -12.660001, y: 1078.333, z: -259.94598}
 --- !u!1 &1140144769
 GameObject:
   m_ObjectHideFlags: 0
@@ -633,13 +633,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1923268101}
-  m_LocalRotation: {x: 0.115403675, y: -0.697626, z: 0.115403675, w: 0.697626}
-  m_LocalPosition: {x: 16.3, y: 4.76, z: -0.25}
+  m_LocalRotation: {x: 0.17374858, y: -0, z: -0, w: 0.9847901}
+  m_LocalPosition: {x: 0, y: 11.97, z: -16.129997}
   m_LocalScale: {x: 0.66666675, y: 0.6666667, z: 0.6666668}
   m_Children: []
   m_Father: {fileID: 5612843787495888402}
   m_RootOrder: 14
-  m_LocalEulerAnglesHint: {x: 18.786001, y: -90.00001, z: 0}
+  m_LocalEulerAnglesHint: {x: 20.012001, y: 0, z: 0}
 --- !u!114 &1923268105
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -717,7 +717,7 @@ Light:
   m_Type: 0
   m_Shape: 0
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_Intensity: 3
+  m_Intensity: 50
   m_Range: 100
   m_SpotAngle: 78.76698
   m_InnerSpotAngle: 44.378494
@@ -3640,7 +3640,7 @@ Light:
   m_Type: 0
   m_Shape: 0
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_Intensity: 3
+  m_Intensity: 50
   m_Range: 100
   m_SpotAngle: 78.76698
   m_InnerSpotAngle: 44.378494
