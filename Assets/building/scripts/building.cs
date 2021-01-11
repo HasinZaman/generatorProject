@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-
+/*
 public class buildingPoint : point
 {
     public List<string> pointMaterial = new List<string> { };
@@ -21,9 +21,9 @@ public class buildingPoint : point
         }
     }
 }
-
+*/
 public class building : MonoBehaviour
-{
+{/*
     //declare object variables
     public buildingPoint[][][] buildingMap;
 
@@ -710,5 +710,5 @@ public class building : MonoBehaviour
     {
 
         //meshUpdate();
-    }
+    }*/
 }

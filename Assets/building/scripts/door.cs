@@ -6,6 +6,7 @@ using UnityEngine;
 
 public class door : MonoBehaviour
 {
+    /*
     public buildingPoint[][][] buildingMap;
 
     public Vector3 samplesPerCell;
@@ -341,5 +342,5 @@ public class door : MonoBehaviour
     void Update()
     {
         updateAngle();
-    }
+    }*/
 }
