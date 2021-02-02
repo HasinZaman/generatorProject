@@ -61,24 +61,24 @@ public class chunkInput : Editor
     void drawNode()
     {
         GUILayout.BeginHorizontal();
-        for (int x = 0; x < c.nodes.Length; x++)
+        for (int x = 0; x < c.manager.dim[0]; x++)
         {
             GUILayout.BeginVertical();
-            for(int y = 0; y < c.nodes[x].Length; y++)
+            for(int y = 0; y < c.manager.dim[1]; y++)
             {
                 if(layerMode)
                 {
-                    c.nodes[x][y][layer] = EditorGUILayout.FloatField(c.nodes[x][y][layer]);
+                    c.nodes[x + (y + layer * c.manager.dim[1]) * c.manager.dim[0]] = EditorGUILayout.FloatField(c.nodes[x + (y + layer * c.manager.dim[1]) * c.manager.dim[0]]);
                 }
                 else
                 {
-                    EditorGUILayout.Toggle(c.nodes[x][y][layer] > c.manager.threshold);
+                    EditorGUILayout.Toggle(c.nodes[x + (y + layer * c.manager.dim[1]) * c.manager.dim[0]] > c.manager.threshold);
                 }
             }
             GUILayout.EndVertical();
         }
         GUILayout.EndHorizontal();
-        layer = EditorGUILayout.IntSlider("Layer", layer, 0, c.nodes[0][0].Length - 1);
+        layer = EditorGUILayout.IntSlider("Layer", layer, 0, c.manager.dim[2] - 1);
     }
 }
 public class chunk : MonoBehaviour
@@ -87,7 +87,7 @@ public class chunk : MonoBehaviour
     public groundManager manager;
 
     //cube information
-    public float[][][] nodes;
+    public float[] nodes;
 
     public Vector3Int pos;
     //shaders
@@ -134,7 +134,6 @@ public class chunk : MonoBehaviour
         //declaring output variables
         Triangle[] trianglesTemp;
         int[] triangleCountArray = { 0 };
-        float[] nodesTemp = nodeConverter();
 
         //setting up shader variables
         shader.SetBuffer(kernelHandle, "triangles", trianglesBuffer);
@@ -148,7 +147,7 @@ public class chunk : MonoBehaviour
         nodeBuffer = new ComputeBuffer(manager.dim[0] * manager.dim[1] * manager.dim[2], sizeof(float), ComputeBufferType.Default);
         shader.SetBuffer(kernelHandle, "nodes", nodeBuffer);
         nodeBuffer.SetCounterValue(0);
-        nodeBuffer.SetData(nodesTemp);
+        nodeBuffer.SetData(nodes);
 
         //starting computeBuffer
         shader.Dispatch(kernelHandle, (int) Math.Ceiling((float) manager.dim[0] / 10), (int) Math.Ceiling((float)manager.dim[1] / 10), (int) Math.Ceiling((float)manager.dim[2] / 10));
@@ -197,23 +196,6 @@ public class chunk : MonoBehaviour
         collider.sharedMesh = mesh;
     }
 
-    //converts 3d array into 1d array for computeShader
-    float[] nodeConverter()
-    {
-        float[] temp = new float[manager.dim[0] * manager.dim[1] * manager.dim[2]];
-        for (int x = 0; x < manager.dim[0]; x++)
-        {
-            for(int y = 0; y < manager.dim[1]; y++)
-            {
-                for(int z = 0; z < manager.dim[2]; z++)
-                {
-                    temp[x + (y + z * manager.dim[1]) * manager.dim[0]] = nodes[x][y][z];
-                }
-            }
-        }
-        return temp;
-    }
-
     //toString turns instances into a string
     public string toString()
     {
@@ -229,7 +211,7 @@ public class chunk : MonoBehaviour
             {
                 for (int x = 0; x < manager.dim[0]; x++)
                 {
-                    temp += $"{nodes[x][y][z]},";
+                    temp += $"{nodes[x + (y + z * manager.dim[1]) * manager.dim[0]]},";
                 }
             }    
         }

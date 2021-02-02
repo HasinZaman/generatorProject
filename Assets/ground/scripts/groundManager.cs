@@ -150,9 +150,9 @@ public class groundManager : MonoBehaviour
     public noise n;
     public GameObject[] chunks = new GameObject[] { };
 
-   public float[][][] generateNodes(int[] chunkOffset)
+   public float[] generateNodes(int[] chunkOffset)
     {
-        float[][][] temp = new float[dim[0]][][];
+        float[] temp = new float[dim[0] * dim[1] * dim[2]];
         float[] offset = new float[3];
 
         for(int i1 = 0; i1 < 3; i1++)
@@ -162,18 +162,14 @@ public class groundManager : MonoBehaviour
 
         float sample;
 
-        for (int x = 0; x < temp.Length; x++)
+        for (int x = 0; x < dim[0]; x++)
         {
-            temp[x] = new float[dim[1]][];
-
-            for (int y = 0; y < temp[x].Length; y++)
+            for (int y = 0; y < dim[1]; y++)
             {
-                temp[x][y] = new float[dim[2]];
-
                 sample = Convert.ToSingle(n.sample(Convert.ToDouble((x + offset[0]) / dim[0] + translation.x), Convert.ToDouble((y + offset[1]) / dim[1]) + translation.y)) *  amplitude + translation.z;
-                for(int z = 0; z < temp[x][y].Length; z++)
+                for(int z = 0; z < dim[2]; z++)
                 {
-                    temp[x][y][z] = sample  - z;
+                    temp[x + (y + z * dim[1]) * dim[0]] = sample  - z;
                 }
             }
         }
@@ -339,17 +335,7 @@ public class groundManager : MonoBehaviour
                     maxSize.y = Math.Max(minSize.y, chunkTemp.pos.y);
                     maxSize.z = Math.Max(minSize.z, chunkTemp.pos.z);
 
-                    chunkTemp.nodes = new float[dim[0]][][];
-
-                    //sets up nodes array
-                    for (int x = 0; x < dim[0]; x++)
-                    {
-                        chunkTemp.nodes[x] = new float[dim[1]][];
-                        for (int y = 0; y < dim[1]; y++)
-                        {
-                            chunkTemp.nodes[x][y] = new float[dim[2]];
-                        }
-                    }
+                    chunkTemp.nodes = new float[dim[0]*dim[1]*dim[2]];
 
                     //fills node array with values
                     i1 = 0;
@@ -359,7 +345,7 @@ public class groundManager : MonoBehaviour
                         {
                             for (int x = 0; x < dim[0]; x++)
                             {
-                                chunkTemp.nodes[x][y][z] = float.Parse(chunkNodesRaw[i1]);
+                                chunkTemp.nodes[x + (y + z * dim[1]) * dim[0]] = float.Parse(chunkNodesRaw[i1]);
                                 i1++;
                             }
                         }
