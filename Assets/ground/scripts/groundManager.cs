@@ -164,12 +164,12 @@ public class groundManager : MonoBehaviour
 
         for (int x = 0; x < dim[0]; x++)
         {
-            for (int y = 0; y < dim[1]; y++)
+            for (int z = 0; z < dim[2]; z++)
             {
-                sample = Convert.ToSingle(n.sample(Convert.ToDouble((x + offset[0]) / dim[0] + translation.x), Convert.ToDouble((y + offset[1]) / dim[1]) + translation.y)) *  amplitude + translation.z;
-                for(int z = 0; z < dim[2]; z++)
+                sample = Convert.ToSingle(n.sample(Convert.ToDouble((x + offset[0]) / dim[0] + translation.x), Convert.ToDouble((z + offset[1]) / dim[2]) + translation.z)) *  amplitude + translation.y;
+                for(int y = 0; y < dim[1]; y++)
                 {
-                    temp[x + (y + z * dim[1]) * dim[0]] = sample  - z;
+                    temp[x + (y + z * dim[1]) * dim[0]] = sample  - y;
                 }
             }
         }
@@ -219,7 +219,7 @@ public class groundManager : MonoBehaviour
                     temp2 = temp1.GetComponent<chunk>();
                     temp2.pos = new Vector3Int(x, y, z);
 
-                    temp2.nodes = generateNodes(new int[] { x, y, z });
+                    temp2.nodes = generateNodes(new int[] { x, z, y });
 
                     temp2.manager = this;
                     

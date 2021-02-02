@@ -102,6 +102,7 @@ public class chunk : MonoBehaviour
     public int[] triangles;
     public List<Vector2> uv = new List<Vector2>();
 
+
     struct Triangle
     {
         public Vector3 p1;
@@ -124,7 +125,7 @@ public class chunk : MonoBehaviour
 
     public void updateMesh()
     {
-        int kernelHandle = shader.FindKernel("getVertices");
+        int kernelHandle = shader.FindKernel("getVerticesLerp");
 
         //declaring Compute Buffers
         ComputeBuffer trianglesBuffer = new ComputeBuffer(manager.dim[0] * manager.dim[1] * manager.dim[2] * 15, sizeof(float) * 3 * 3, ComputeBufferType.Append);
