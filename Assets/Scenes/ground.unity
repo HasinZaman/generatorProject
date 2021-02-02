@@ -244,16 +244,17 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   threshold: 0
   seed: 0
-  chunkDim: {x: 1, y: 1, z: 1}
+  chunkDim: {x: 2, y: 2, z: 1}
   distPerNode:
   - 1
   - 1
   - 1
-  dim: 320000003200000032000000
+  dim: 140000001400000014000000
   amplitude: 7
   translation: {x: 0, y: 0, z: 10}
   chunkPrefab: {fileID: 342980952259536631, guid: d93c1d60f96ff9e4c96fb6df1acf4a0a,
     type: 3}
+  saveFile: ground1.world
   chunks: []
 --- !u!4 &932946826
 Transform:

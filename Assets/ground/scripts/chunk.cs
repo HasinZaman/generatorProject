@@ -213,4 +213,29 @@ public class chunk : MonoBehaviour
         }
         return temp;
     }
+
+    //toString turns instances into a string
+    public string toString()
+    {
+        //format
+        //Chunk value|Node value
+        //           ^ Line seperatoes chunk values and node values
+        string temp = $"{this.transform.position.x},{this.transform.position.y},{this.transform.position.z},{this.pos.x},{this.pos.y},{this.pos.z}|";
+
+        //for loop gets the nodes value
+        for (int z = 0; z < manager.dim[2]; z++)
+        {
+            for (int y = 0; y < manager.dim[1]; y++)
+            {
+                for (int x = 0; x < manager.dim[0]; x++)
+                {
+                    temp += $"{nodes[x][y][z]},";
+                }
+            }    
+        }
+        //gets rid of last comma
+        temp = temp.Remove(temp.Length - 1);
+
+        return temp;
+    }
 }

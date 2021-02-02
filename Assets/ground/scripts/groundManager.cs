@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using UnityEditor;
 using UnityEngine;
 
@@ -11,7 +12,7 @@ public class groundInput : Editor
 
     SerializedObject targetObject;
 
-    SerializedProperty serializedThreshold, serializedSeed, serializedChunkDim, serializedDistPerNode, serializedDim, serializedChunkPrefab, serializedChunks, serializedAmplitude, serializedTranslation;
+    SerializedProperty serializedThreshold, serializedSeed, serializedChunkDim, serializedDistPerNode, serializedDim, serializedChunkPrefab, serializedChunks, serializedAmplitude, serializedTranslation, serializedSaveFile;
     public void OnEnable()
     {
         g = (groundManager) target;
@@ -28,6 +29,7 @@ public class groundInput : Editor
         serializedChunks = targetObject.FindProperty("chunks");
         serializedAmplitude = targetObject.FindProperty("amplitude");
         serializedTranslation = targetObject.FindProperty("translation");
+        serializedSaveFile = targetObject.FindProperty("saveFile");
     }
 
     public override void OnInspectorGUI()
@@ -61,13 +63,10 @@ public class groundInput : Editor
         
         EditorGUILayout.LabelField("Total Nodes per Chunk");
 
-        //EditorGUILayout.LabelField("x");
         serializedDim.GetArrayElementAtIndex(0).intValue = EditorGUILayout.IntField("x", serializedDim.GetArrayElementAtIndex(0).intValue);
 
-        //EditorGUILayout.LabelField("y");
         serializedDim.GetArrayElementAtIndex(1).intValue = EditorGUILayout.IntField("y", serializedDim.GetArrayElementAtIndex(1).intValue);
 
-        //EditorGUILayout.LabelField("z");
         serializedDim.GetArrayElementAtIndex(2).intValue = EditorGUILayout.IntField("z", serializedDim.GetArrayElementAtIndex(2).intValue);
 
         serializedAmplitude.floatValue = EditorGUILayout.FloatField("Amplitude", serializedAmplitude.floatValue);
@@ -102,6 +101,18 @@ public class groundInput : Editor
         {
             g.randomizeNodes();
         }
+
+        serializedSaveFile.stringValue = EditorGUILayout.TextField("Save File Name:", serializedSaveFile.stringValue);
+        GUILayout.BeginHorizontal();
+        if(GUILayout.Button("Save Ground"))
+        {
+            g.saveMesh();
+        }
+        if(GUILayout.Button("Load Ground"))
+        {
+            g.loadMesh();
+        }
+        GUILayout.EndHorizontal();
         targetObject.ApplyModifiedProperties();
     }
 
@@ -131,6 +142,10 @@ public class groundManager : MonoBehaviour
     public float amplitude = 1;
     public Vector3 translation = Vector3.zero;
     public GameObject chunkPrefab;
+    public string saveFile = "ground.world";
+
+    private Dictionary<Vector3Int, int> chunkLine = new Dictionary<Vector3Int, int>();
+
 
     public noise n;
     public GameObject[] chunks = new GameObject[] { };
@@ -204,7 +219,7 @@ public class groundManager : MonoBehaviour
 
                     temp1 = Instantiate(chunkPrefab, this.transform);
 
-                    temp1.GetComponent<Transform>().localPosition = pos;
+                    temp1.GetComponent<Transform>().position = pos;
                     temp2 = temp1.GetComponent<chunk>();
                     temp2.pos = new Vector3Int(x, y, z);
 
@@ -226,5 +241,143 @@ public class groundManager : MonoBehaviour
             temp = chunks[i1].GetComponent<chunk>();
             temp.nodes = generateNodes(new int[] { temp.pos.x, temp.pos.y, temp.pos.z });
         }
+    }
+
+    //method saves ground
+    public bool saveMesh()
+    {
+        bool errorCond = false;
+
+        //checks if the worlds folder exists
+        if(!Directory.Exists("worlds"))
+        {
+            Directory.CreateDirectory("worlds");
+        }
+
+        using (StreamWriter temp = File.CreateText($"worlds\\{saveFile}"))
+        {
+            //writes groundManager instances
+            temp.WriteLine($"{threshold},{seed},{distPerNode[0]},{distPerNode[1]},{distPerNode[2]},{dim[0]},{dim[1]},{dim[2]}");
+        
+            //writes chunk instances
+            for(int i1 = 0; i1 < chunks.Length; i1++)
+            {
+                temp.WriteLine(chunks[i1].GetComponent<chunk>().toString());
+            }
+        }
+        return errorCond;
+    }
+
+    public bool loadMesh()
+    {
+        string s1;
+        string[] s2;
+        string[] chunkInstancesRaw;
+        string[] chunkNodesRaw;
+
+        List<chunk> chunksTemp = new List<chunk> { };
+
+        GameObject gameObjectTemp;
+        chunk chunkTemp;
+
+        Vector3Int minSize = Vector3Int.zero;
+        Vector3Int maxSize = Vector3Int.zero;
+
+        //checks if file exists
+        bool errorCond = File.Exists($"worlds\\{saveFile}");
+
+        if (errorCond)
+        {
+            chunkLine.Clear();
+            using (StreamReader temp = File.OpenText($"worlds\\{saveFile}"))
+            {
+                //setting up ground manager
+                s1 = temp.ReadLine();
+                s2 = s1.Split(',');
+
+                int i1 = 0;
+                int i2 = 0;
+
+                threshold = float.Parse(s2[0]);
+
+                seed = Int32.Parse(s2[1]);
+
+                distPerNode = new float[3] { float.Parse(s2[2]), float.Parse(s2[3]), float.Parse(s2[4]) };
+                dim = new int[3] { Int32.Parse(s2[5]), Int32.Parse(s2[6]), Int32.Parse(s2[7]) };
+
+                //re-initialize chunks
+                for (int i = 0; i < chunks.Length; i++)
+                {
+                    Destroy(chunks[i]);
+                }
+
+                chunks = new GameObject[File.ReadAllLines($"worlds\\{saveFile}").Length - 1];
+
+                //setting up chunks
+                s1 = temp.ReadLine();
+                while (s1 != null)
+                {
+                    s2 = s1.Split('|');
+
+                    chunkInstancesRaw = s2[0].Split(',');
+                    chunkNodesRaw = s2[1].Split(',');
+
+                    gameObjectTemp = Instantiate(chunkPrefab, this.transform);
+                    chunkTemp = gameObjectTemp.GetComponent<chunk>();
+                    chunkTemp.manager = this;
+
+                    gameObjectTemp.transform.position = new Vector3(float.Parse(chunkInstancesRaw[0]), float.Parse(chunkInstancesRaw[1]), float.Parse(chunkInstancesRaw[2]));
+
+
+                    chunkTemp.pos = new Vector3Int(Int32.Parse(chunkInstancesRaw[3]), Int32.Parse(chunkInstancesRaw[4]), Int32.Parse(chunkInstancesRaw[5]));
+
+                    minSize.x = Math.Min(minSize.x, chunkTemp.pos.x);
+                    minSize.y = Math.Min(minSize.y, chunkTemp.pos.y);
+                    minSize.z = Math.Min(minSize.z, chunkTemp.pos.z);
+
+                    maxSize.x = Math.Max(minSize.x, chunkTemp.pos.x);
+                    maxSize.y = Math.Max(minSize.y, chunkTemp.pos.y);
+                    maxSize.z = Math.Max(minSize.z, chunkTemp.pos.z);
+
+                    chunkTemp.nodes = new float[dim[0]][][];
+
+                    //sets up nodes array
+                    for (int x = 0; x < dim[0]; x++)
+                    {
+                        chunkTemp.nodes[x] = new float[dim[1]][];
+                        for (int y = 0; y < dim[1]; y++)
+                        {
+                            chunkTemp.nodes[x][y] = new float[dim[2]];
+                        }
+                    }
+
+                    //fills node array with values
+                    i1 = 0;
+                    for (int z = 0; z < dim[2]; z++)
+                    {
+                        for (int y = 0; y < dim[1]; y++)
+                        {
+                            for (int x = 0; x < dim[0]; x++)
+                            {
+                                chunkTemp.nodes[x][y][z] = float.Parse(chunkNodesRaw[i1]);
+                                i1++;
+                            }
+                        }
+                    }
+
+                    chunks[i2] = gameObjectTemp;
+                    i2++;
+
+                    chunkLine.Add(chunkTemp.pos, i2 + 1);
+
+                    s1 = temp.ReadLine();
+                }
+            }
+        }
+
+        //gets chunkDim
+        this.chunkDim = maxSize - minSize + Vector3Int.one;
+
+        return false;
     }
 }
