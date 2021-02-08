@@ -56,8 +56,14 @@ void getVerticesLerp(uint3 id : SV_DispatchThreadID)
     };
     
     //finding index of cube based on active points
-	for (int i1 = 0; i1 < 8; i1++)
-	{
+	
+    //finding index of cube based on active points
+    for (int i1 = 0; i1 < 8; i1++)
+    {
+        if (verticesTemp[i1] <= -3.402823466e+38F + 10)
+        {
+            return;
+        }
         index += (verticesTemp[i1] > threshold) * pow(2, i1);
     }
 
@@ -145,6 +151,10 @@ void getVertices(uint3 id : SV_DispatchThreadID)
     //finding index of cube based on active points
     for (int i1 = 0; i1 < 8; i1++)
     {
+        if (verticesTemp[i1] <= -3.402823466e+38F + 10)
+        {
+            return;
+        }
         index += (verticesTemp[i1] > threshold) * pow(2, i1);
     }
 
