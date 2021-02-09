@@ -12,19 +12,21 @@ I made a kewl kewl marching cubes alorthim to be the building block fully destru
 flying cameras are pretty boring ngl. Vehicles allow users to explore the world in a fun and exciting manner.
 
 ### Controls
-The user can move the vehicles with WASD.
+**W** to move forward
+
+**A** and **D** to steer
 
 
-Shift and Control to raise and lower the gear of the vehicle
+**Shift** and **Ctrl** to raise and lower the gear of the vehicle
 
 
-Space to brake
+**Space** to brake
 
 
-Q and E to switch between turrets
+**Q** and **E** to switch between turrets
 
 
-Left click to fire
+**Left click** to fire
 
 
 
