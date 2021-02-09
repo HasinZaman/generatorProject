@@ -13,10 +13,20 @@ flying cameras are pretty boring ngl. Vehicles allow users to explore the world 
 
 ### Controls
 The user can move the vehicles with WASD.
+
+
 Shift and Control to raise and lower the gear of the vehicle
+
+
 Space to brake
+
+
 Q and E to switch between turrets
+
+
 Left click to fire
+
+
 
 # 3. Installation
 Just down load the project and open it in unity dummy. ;)
