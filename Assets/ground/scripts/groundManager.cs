@@ -113,13 +113,13 @@ public class groundInput : Editor
             g.generateChunks();
         }
 
-        if (GUILayout.Button("Reset nodes"))
+        if (GUILayout.Button("Reset Chunks"))
         {
             for (int i1 = serializedChunks.arraySize - 1; i1 >= 0 ; i1--)
             {
                 DestroyImmediate((GameObject)serializedChunks.GetArrayElementAtIndex(i1).objectReferenceValue);
-                serializedChunks.DeleteArrayElementAtIndex(i1);
             }
+            serializedChunks.ClearArray();
         }
         if(GUILayout.Button("Randomize Nodes"))
         {
