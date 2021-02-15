@@ -55,6 +55,7 @@ MonoBehaviour:
   vertices: []
   triangles: 
   uv: []
+  m: {fileID: 2100000, guid: f81e0001b91f17b44849459406ff675f, type: 2}
 --- !u!33 &1291178683192955406
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -78,6 +79,7 @@ MeshRenderer:
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -102,6 +104,7 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+  m_AdditionalVertexStreams: {fileID: 0}
 --- !u!64 &2086536152217467297
 MeshCollider:
   m_ObjectHideFlags: 0

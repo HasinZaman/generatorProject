@@ -11,7 +11,7 @@ public class chunkInput : Editor
 
     SerializedObject targetObject;
     
-    SerializedProperty serializedNodes, serializedPos, serializedMesh, serializedCollider, serializedVertices, serializedComputerShader, serializedManager;
+    SerializedProperty serializedNodes, serializedPos, serializedMesh, serializedCollider, serializedVertices, serializedComputerShader, serializedManager, serializedm;
 
     int layer = 0;
     bool layerMode = false;
@@ -39,6 +39,8 @@ public class chunkInput : Editor
 
         serializedManager = targetObject.FindProperty("manager");
 
+        serializedm = targetObject.FindProperty("m");
+
         nullVal = new GUIStyle();
         nullVal.normal.background = textureMaker(1, 1, Color.yellow);
         passVal = new GUIStyle();
@@ -50,6 +52,7 @@ public class chunkInput : Editor
     public override void OnInspectorGUI()
     {
         targetObject.Update();
+
         EditorGUILayout.Vector3IntField("Pos", serializedPos.vector3IntValue);
         serializedComputerShader.objectReferenceValue = EditorGUILayout.ObjectField("Shader", serializedComputerShader.objectReferenceValue, typeof(ComputeShader));
         EditorGUILayout.ObjectField("Shader", serializedManager.objectReferenceValue, typeof(groundManager));
@@ -122,6 +125,7 @@ public class chunkInput : Editor
         layer = EditorGUILayout.IntSlider("Layer", layer, 0, dim[1] - 1);
     }
 
+
     private int indexCreator(int mode, int i1, int i2,int layer, int[] dim)
     {
         switch(mode)
@@ -174,6 +178,10 @@ public class chunk : MonoBehaviour
     public int[] triangles;
     public List<Vector2> uv = new List<Vector2>();
 
+
+    public Texture3D[] chunkTextureDetails;
+    public Material m;
+
     struct Triangle
     {
         public Vector3 p1;
@@ -190,11 +198,24 @@ public class chunk : MonoBehaviour
         mf.mesh = mesh;
         collider.sharedMesh = mesh;
 
+        m = this.GetComponent<Renderer>().material;
+        this.GetComponent<Renderer>().material = m;
+
+
         //creating mesh
         //even pos
-        
+        setMaterialNoise();
 
         updateMesh();
+    }
+    private void setMaterialNoise()
+    {
+
+        m.SetTexture("Texture3D_NoisePrimary", chunkTextureDetails[0]);
+        m.SetTexture("Texture3D_NoiseSecondary", chunkTextureDetails[1]);
+        
+        m.SetVector($"Vector3_NodesDim", new Vector3(manager.dim[0], manager.dim[1], manager.dim[2]));
+        this.GetComponent<Renderer>().material = m;
     }
 
     public void updateMesh()
@@ -287,12 +308,46 @@ public class chunk : MonoBehaviour
     public string toString()
     {
         //format
-        //Chunk value|Node value
+        //Chunk value|Node value|chunkTextureDetails
         //           ^ Line seperatoes chunk values and node values
-        string temp = $"{this.transform.position.x},{this.transform.position.y},{this.transform.position.z},{this.pos.x},{this.pos.y},{this.pos.z}|{n.ToString()}";
+        string temp = $"{this.transform.position.x},{this.transform.position.y},{this.transform.position.z},{this.pos.x},{this.pos.y},{this.pos.z}|{n.ToString()}|{chunkTextureDetailsToString()}";
 
         return temp;
     }
+
+    private string chunkTextureDetailsToString()
+    {
+        string temp = "";
+
+        int u, v, d;
+
+        for(int i1 = 0; i1 < chunkTextureDetails.Length; i1++)
+        {
+            u = chunkTextureDetails[i1].width;
+            v = chunkTextureDetails[i1].height;
+            d = chunkTextureDetails[i1].depth;
+
+            temp += $"{u},{v},{d},";
+
+            for (int x = 0; x < u; x++)
+            {
+                for (int y = 0; y < v; y++)
+                {
+                    for (int z = 0; z < d; z++)
+                    {
+                        temp += $"{chunkTextureDetails[i1].GetPixel(x,y,z).r},{chunkTextureDetails[i1].GetPixel(x, y, z).g},{chunkTextureDetails[i1].GetPixel(x, y, z).b},";
+                    }
+                }
+            }
+            
+            temp = temp.Remove(temp.Length - 1);
+            temp += "|";
+
+        }
+
+        return temp;
+    }
+
 }
 
 public class nodes
@@ -765,6 +820,6 @@ public class nodes
 
     public override string ToString()
     {
-        return String.Join(",", core);
+        return string.Join(",", core);
     }
 }

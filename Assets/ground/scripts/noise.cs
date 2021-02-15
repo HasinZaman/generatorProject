@@ -7,6 +7,53 @@ public class noise
 {
     //declaring object variables
 
+    public static double[][] SET1 = new double[][] {
+        new double[2] { 0, 1},
+        new double[2] { 1, 1 },
+        new double[2] { 1, 0 },
+        new double[2] { 1, -1 },
+        new double[2] { 0, -1 },
+        new double[2] { -1, -1 },
+        new double[2] { -1, 0 },
+        new double[2] { -1, 1 }
+    };
+    public static float[][] SET2 = new float[][] {
+        new float[3] { 1,  1,  0},
+        new float[3] {-1,  1,  0},
+        new float[3] { 1, -1,  0},
+        new float[3] {-1, -1,  0},
+        new float[3] { 1,  0,  1},
+        new float[3] {-1,  0,  1},
+        new float[3] { 1,  0, -1},
+        new float[3] {-1,  0, -1},
+        new float[3] { 0,  1,  1},
+        new float[3] { 0, -1,  1},
+        new float[3] { 0,  1, -1},
+        new float[3] { 1, -1, -1}
+    };
+
+
+    public static double[][] SET3 = new double[][] {
+        new double[3] { 1,  1,  0},
+        new double[3] {-1,  1,  0},
+        new double[3] { 1, -1,  0},
+        new double[3] {-1, -1,  0},
+        new double[3] { 1,  0,  1},
+        new double[3] {-1,  0,  1},
+        new double[3] { 1,  0, -1},
+        new double[3] {-1,  0, -1},
+        new double[3] { 0,  1,  1},
+        new double[3] { 0, -1,  1},
+        new double[3] { 0,  1, -1},
+        new double[3] { 1, -1, -1},
+
+        new double[3] { 1,  1,  0},
+        new double[3] {-1, -1,  0},
+        new double[3] { 0, -1, 1},
+        new double[3] { 0, -1, -1}
+    };
+
+
     //grid variable holds the vectors used inorder to generate perlin noise
     public List<List<List<double[]>>> grid = new List<List<List<double[]>>>();
 
