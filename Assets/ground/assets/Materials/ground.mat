@@ -21,7 +21,7 @@ Material:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: ground
-  m_Shader: {fileID: -6465566751694194690, guid: a44873744c856574ab3b39d73a7ade42,
+  m_Shader: {fileID: -6465566751694194690, guid: 2e9ce4a0a472d344db844eadd8ffa0ac,
     type: 3}
   m_ShaderKeywords: 
   m_LightmapFlags: 4
@@ -85,6 +85,18 @@ Material:
         m_Texture: {fileID: 2800000, guid: 099b53c2d4878d84bbc3ff713294852b, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
+    - Texture2D_SidePrimaryColour_1:
+        m_Texture: {fileID: 2800000, guid: 0a85b829250447b459ddc122b9180b53, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - Texture2D_SidePrimaryColour_2:
+        m_Texture: {fileID: 2800000, guid: 7ea8be0fe3d5fc642ac5041b2384c5b1, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - Texture2D_SidePrimaryColour_3:
+        m_Texture: {fileID: 2800000, guid: f9309e5b06450704a8970a57a6e4d219, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     - Texture2D_SidePrimaryNormal:
         m_Texture: {fileID: 2800000, guid: 914565fb13be65c479733f0644e813e1, type: 3}
         m_Scale: {x: 1, y: 1}
@@ -115,6 +127,18 @@ Material:
         m_Offset: {x: 0, y: 0}
     - Texture2D_TopPrimaryColour:
         m_Texture: {fileID: 2800000, guid: 099b53c2d4878d84bbc3ff713294852b, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - Texture2D_TopPrimaryColour_1:
+        m_Texture: {fileID: 2800000, guid: 0a85b829250447b459ddc122b9180b53, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - Texture2D_TopPrimaryColour_2:
+        m_Texture: {fileID: 2800000, guid: 7ea8be0fe3d5fc642ac5041b2384c5b1, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - Texture2D_TopPrimaryColour_3:
+        m_Texture: {fileID: 2800000, guid: f9309e5b06450704a8970a57a6e4d219, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - Texture2D_TopPrimaryNormal:
@@ -377,9 +401,14 @@ Material:
         m_Texture: {fileID: 2800000, guid: 125dda6639ef3734eaf4f56e8cf7671e, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
+    - _Texture3DAsset_B5ACCBE5_Out_0:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     m_Floats:
     - Vector1_199BC900: 10
-    - Vector1_BlendSharpness: 0.5
+    - Vector1_5BDA505: 3
+    - Vector1_BlendSharpness: 2.44
     - _AlphaClip: 0
     - _Blend: 0
     - _BumpScale: 1

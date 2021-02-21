@@ -360,19 +360,6 @@ public class antenna : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        /*int gag = 1;
-        if(aga % 21 >= 10)
-        {
-            gag = -1;
-        }
-        Vector3 bitch = this.transform.position;
-
-        bitch += this.transform.forward * 30 * Time.deltaTime * gag;
-
-        this.transform.position = bitch;
-
-        aga += 1;*/
-        
         //get the kinomatic values at the current frame
         Vector2 newVelocity = velocity(Vector3.zero, forwardDirection(lastPosition[0] - transform.position));
         Vector2 newAcceleration = acceleration(Vector3.zero, forwardDirection(lastPosition[0] - transform.position), lastVelocity[0]);

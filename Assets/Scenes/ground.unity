@@ -197,7 +197,7 @@ Light:
   m_BounceIntensity: 1
   m_ColorTemperature: 6570
   m_UseColorTemperature: 0
-  m_BoundingSphereOverride: {x: 0, y: 4.4399e-41, z: 0, w: -22.875}
+  m_BoundingSphereOverride: {x: 0, y: 0, z: 0, w: 0}
   m_UseBoundingSphereOverride: 0
   m_ShadowRadius: 0
   m_ShadowAngle: 0
@@ -307,7 +307,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   threshold: 0
   seed: 0
-  chunkDim: {x: 10, y: 1, z: 10}
+  chunkDim: {x: 3, y: 1, z: 3}
   distPerNode:
   - 1
   - 1

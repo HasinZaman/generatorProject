@@ -204,7 +204,7 @@ public class groundManager : MonoBehaviour
     private System.Random r;
     private static int textureNoiseLevels = 2;
     public float[][][][][] textureNoise;
-    public int[][] chunkDetail = new int[2][] { new int[3] { 2, 2, 2 }, new int[3] { 10, 10, 10 }};
+    public int[][] chunkDetail = new int[2][] { new int[3] { 30, 30, 30 }, new int[3] { 10, 10, 10 }};
     public float blendSharpness = 0.5f;
 
 
