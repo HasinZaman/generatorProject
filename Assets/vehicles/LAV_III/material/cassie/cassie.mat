@@ -124,7 +124,7 @@ Material:
     - _ZWrite: 1
     m_Colors:
     - Color_409CBEEA: {r: 0, g: 0, b: 0, a: 0}
-    - Color_46009B74: {r: 1, g: 0.83979195, b: 0.4669811, a: 0}
+    - Color_46009B74: {r: 0.32941177, g: 0.3764706, b: 0.27058825, a: 0}
     - Color_6BD042C: {r: 0.0010039806, g: 1, b: 0, a: 0}
     - Color_80B15137: {r: 1, g: 1, b: 1, a: 0}
     - Vector3_93109D57: {r: 0, g: 0, b: 0, a: 0}
@@ -132,6 +132,7 @@ Material:
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _SpecColor: {r: 0.2, g: 0.2, b: 0.2, a: 1}
+  m_BuildTextureStacks: []
 --- !u!114 &5388876952535082587
 MonoBehaviour:
   m_ObjectHideFlags: 11

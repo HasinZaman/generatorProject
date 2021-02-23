@@ -18,11 +18,11 @@ public class groundInput : Editor
     SerializedProperty serializedChunkPrefab;
     SerializedProperty serializedChunkDim, serializedDistPerNode, serializedDim, serializedAmplitude, serializedTranslation, serializedSeed;
 
-    //SerializedProperty serializedChunkDetail;
-
     //managing chunks
     SerializedProperty serializedChunks;
     SerializedProperty serializedThreshold, serializedSaveFile, serializedComputeAlgorthim;
+
+    SerializedProperty serializedBorderNoise;
 
     bool lerpCond = false;
 
@@ -45,7 +45,8 @@ public class groundInput : Editor
         serializedTranslation = targetObject.FindProperty("translation");
         serializedSaveFile = targetObject.FindProperty("saveFile");
         serializedComputeAlgorthim = targetObject.FindProperty("computeAlgorthim");
-        //serializedChunkDetail= targetObject.FindProperty("chunkDetail");
+        serializedBorderNoise = targetObject.FindProperty("borderNoise");
+
 
         switch (serializedComputeAlgorthim.stringValue)
         {
@@ -60,6 +61,7 @@ public class groundInput : Editor
 
     public override void OnInspectorGUI()
     {
+        g.borderNoise = new int[3] { 30, 30, 30 };
         targetObject.Update();
 
         label("Chunk");
@@ -86,45 +88,34 @@ public class groundInput : Editor
         
 
         EditorGUILayout.LabelField("Distance Per Nodes");
+        EditorGUILayout.BeginHorizontal();
+        for (int i1 = 0; i1 < 3; i1++)
+        {
+            serializedDistPerNode.GetArrayElementAtIndex(i1).floatValue = EditorGUILayout.FloatField(serializedDistPerNode.GetArrayElementAtIndex(i1).floatValue);
+        }
+        EditorGUILayout.EndHorizontal();
 
-        serializedDistPerNode.GetArrayElementAtIndex(0).floatValue = EditorGUILayout.FloatField("x", serializedDistPerNode.GetArrayElementAtIndex(0).floatValue);
-
-        serializedDistPerNode.GetArrayElementAtIndex(1).floatValue = EditorGUILayout.FloatField("y", serializedDistPerNode.GetArrayElementAtIndex(1).floatValue);
-
-        serializedDistPerNode.GetArrayElementAtIndex(2).floatValue = EditorGUILayout.FloatField("z", serializedDistPerNode.GetArrayElementAtIndex(2).floatValue);
-
-
-
-        
         EditorGUILayout.LabelField("Total Nodes per Chunk");
-
-        serializedDim.GetArrayElementAtIndex(0).intValue = EditorGUILayout.IntField("x", serializedDim.GetArrayElementAtIndex(0).intValue);
-
-        serializedDim.GetArrayElementAtIndex(1).intValue = EditorGUILayout.IntField("y", serializedDim.GetArrayElementAtIndex(1).intValue);
-
-        serializedDim.GetArrayElementAtIndex(2).intValue = EditorGUILayout.IntField("z", serializedDim.GetArrayElementAtIndex(2).intValue);
+        EditorGUILayout.BeginHorizontal();
+        for(int i1 = 0; i1 < 3; i1++)
+        {
+            serializedDim.GetArrayElementAtIndex(i1).intValue = EditorGUILayout.IntField(serializedDim.GetArrayElementAtIndex(i1).intValue);
+        }
+        EditorGUILayout.EndHorizontal();
 
         serializedAmplitude.floatValue = EditorGUILayout.FloatField("Amplitude", serializedAmplitude.floatValue);
 
         serializedThreshold.floatValue = EditorGUILayout.Slider("Threshold", serializedThreshold.floatValue, 0, 10);
         serializedTranslation.vector3Value = EditorGUILayout.Vector3Field("Translation", serializedTranslation.vector3Value);
-        /*
-        EditorGUILayout.LabelField("Noise Texture");
         
-        for (int i1 = 0; i1 < serializedChunkDetail.arraySize; i1++)
+        EditorGUILayout.LabelField("Noise Texture");
+        EditorGUILayout.BeginHorizontal();
+        for (int i1 = 0; i1 < 3; i1++)
         {
-            if(serializedChunkDetail.GetArrayElementAtIndex(i1).arraySize < 3)
-            {
-                serializedChunkDetail.GetArrayElementAtIndex(i1).InsertArrayElementAtIndex(0);
-            }
-            EditorGUILayout.BeginHorizontal();
-            for (int i2 = 0; i2 < 3; i2++)
-            {
-                serializedChunkDetail.GetArrayElementAtIndex(i1).GetArrayElementAtIndex(i2).intValue = EditorGUILayout.IntField(serializedChunkDetail.GetArrayElementAtIndex(i1).GetArrayElementAtIndex(i2).intValue);
-            }
-            EditorGUILayout.EndHorizontal();
+            serializedBorderNoise.GetArrayElementAtIndex(i1).intValue = EditorGUILayout.IntField(serializedBorderNoise.GetArrayElementAtIndex(i1).intValue);
         }
-        */
+        EditorGUILayout.EndHorizontal();
+        
         EditorGUILayout.LabelField("Chunks");
         GUILayout.BeginVertical("box");
         for (int i1 = 0; i1 < serializedChunks.arraySize; i1++)
@@ -203,8 +194,8 @@ public class groundManager : MonoBehaviour
 
     private System.Random r;
     private static int textureNoiseLevels = 2;
-    public float[][][][][] textureNoise;
-    public int[][] chunkDetail = new int[2][] { new int[3] { 30, 30, 30 }, new int[3] { 10, 10, 10 }};
+    public float[][][][] textureNoise;
+    public int[] borderNoise = new int[3] { 30, 30, 30 };
     public float blendSharpness = 0.5f;
 
 
@@ -256,22 +247,18 @@ public class groundManager : MonoBehaviour
 
         r = new System.Random(seed);
         
-        textureNoise = new float[textureNoiseLevels][][][][];
-        for (int i2 = 0; i2 < textureNoiseLevels; i2++)
+        textureNoise = new float[chunkDim.x * borderNoise[0] + 1][][][];
+
+        for (int x = 0; x < textureNoise.Length; x++)
         {
-            textureNoise[i2] = new float[chunkDim.x * chunkDetail[i2][0] + 1][][][];
-
-            for (int x = 0; x < textureNoise[i2].Length; x++)
+            textureNoise[x] = new float[chunkDim.y * borderNoise[1] + 1][][];
+            for (int y = 0; y < textureNoise[x].Length; y++)
             {
-                textureNoise[i2][x] = new float[chunkDim.y * chunkDetail[i2][1] + 1][][];
-                for (int y = 0; y < textureNoise[i2][x].Length; y++)
-                {
-                    textureNoise[i2][x][y] = new float[chunkDim.z * chunkDetail[i2][2] + 1][];
+                textureNoise[x][y] = new float[chunkDim.z * borderNoise[2] + 1][];
 
-                    for (int z = 0; z < textureNoise[i2][x][y].Length; z++)
-                    {
-                        textureNoise[i2][x][y][z] = noise.SET2[r.Next(noise.SET2.Length)];
-                    }
+                for (int z = 0; z < textureNoise[x][y].Length; z++)
+                {
+                    textureNoise[x][y][z] = noise.SET2[r.Next(noise.SET2.Length)];
                 }
             }
         }
@@ -319,16 +306,16 @@ public class groundManager : MonoBehaviour
                     temp2.chunkTextureDetails = new Texture3D[textureNoiseLevels];
                     for(int i2 = 0; i2 < textureNoiseLevels; i2++)
                     {
-                        temp2.chunkTextureDetails[i2] = new Texture3D(chunkDetail[i2][0], chunkDetail[i2][1], chunkDetail[i2][2], TextureFormat.RGB24, false);
+                        temp2.chunkTextureDetails[i2] = new Texture3D(borderNoise[0], borderNoise[1], borderNoise[2], TextureFormat.RGB24, false);
                         temp2.chunkTextureDetails[i2].filterMode = FilterMode.Point;
 
-                        for (int x1 = 0; x1 < chunkDetail[i2][0]; x1++)
+                        for (int x1 = 0; x1 < borderNoise[0]; x1++)
                         {
-                            for (int y1 = 0; y1 < chunkDetail[i2][1]; y1++)
+                            for (int y1 = 0; y1 < borderNoise[1]; y1++)
                             {
-                                for (int z1 = 0; z1 < chunkDetail[i2][2]; z1++)
+                                for (int z1 = 0; z1 < borderNoise[2]; z1++)
                                 {
-                                    colourTemp = textureNoise[i2][x * (chunkDetail[i2][0] - 1) + x1][y * (chunkDetail[i2][1] - 1) + y1][z * (chunkDetail[i2][2] - 1) + z1];
+                                    colourTemp = textureNoise[x * (borderNoise[0] - 1) + x1][y * (borderNoise[1] - 1) + y1][z * (borderNoise[2] - 1) + z1];
                                     temp2.chunkTextureDetails[i2].SetPixel(x1, y1, z1, new Color((colourTemp[0] + 1) / 2, (colourTemp[1] + 1) / 2, (colourTemp[2] + 1) / 2));
                                 }
                             }
@@ -336,6 +323,14 @@ public class groundManager : MonoBehaviour
                         temp2.chunkTextureDetails[i2].Apply();
                     }
 
+                    temp2.m = temp1.GetComponent<Renderer>().material;
+                    for (int i2 = 0; i2 < 4; i2++)
+                    {
+                        temp2.groundTextures[i2] = (Texture2D) temp2.m.GetTexture($"Texture2D_TopPrimaryColour_{i2}");
+                    }
+                    temp2.groundTextures[4] = (Texture2D) temp2.m.GetTexture($"Texture2D_TopCenterColour");
+                    //Texture2D_SidePrimaryColour_
+                    //Texture2D_TopPrimaryColour_0
                     temp2.manager = this;
                     chunks[Convert.ToInt32(x + y * chunkDim.x + z * chunkDim.x * chunkDim.y)] = temp1;
                 }

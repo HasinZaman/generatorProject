@@ -11,7 +11,7 @@ public class chunkInput : Editor
 
     SerializedObject targetObject;
     
-    SerializedProperty serializedNodes, serializedPos, serializedMesh, serializedCollider, serializedVertices, serializedComputerShader, serializedManager, serializedm;
+    SerializedProperty serializedNodes, serializedPos, serializedMesh, serializedCollider, serializedVertices, serializedComputerShader, serializedManager, serializedm, serializedGroundTextures;
 
     int layer = 0;
     bool layerMode = false;
@@ -41,6 +41,8 @@ public class chunkInput : Editor
 
         serializedm = targetObject.FindProperty("m");
 
+        serializedGroundTextures = targetObject.FindProperty("groundTextures");
+
         nullVal = new GUIStyle();
         nullVal.normal.background = textureMaker(1, 1, Color.yellow);
         passVal = new GUIStyle();
@@ -61,6 +63,34 @@ public class chunkInput : Editor
         neighborMode = EditorGUILayout.Toggle("show neighbor Nodes", neighborMode);
         plane = EditorGUILayout.Popup("Display Mode", plane, planes);
 
+        EditorGUILayout.LabelField("Chunk Texture");
+
+        EditorGUILayout.BeginHorizontal();
+        textureInput(serializedGroundTextures.GetArrayElementAtIndex(Convert.ToInt32("01", 2)), EditorGUIUtility.currentViewWidth / 3);
+        GUILayout.FlexibleSpace();
+        textureInput(serializedGroundTextures.GetArrayElementAtIndex(Convert.ToInt32("11", 2)), EditorGUIUtility.currentViewWidth / 3);
+        EditorGUILayout.EndHorizontal();
+
+        EditorGUILayout.BeginHorizontal();
+        GUILayout.FlexibleSpace();
+        textureInput(serializedGroundTextures.GetArrayElementAtIndex(4), EditorGUIUtility.currentViewWidth / 3);
+        GUILayout.FlexibleSpace();
+        EditorGUILayout.EndHorizontal();
+
+        EditorGUILayout.BeginHorizontal();
+        textureInput(serializedGroundTextures.GetArrayElementAtIndex(Convert.ToInt32("00", 2)), EditorGUIUtility.currentViewWidth / 3);
+        GUILayout.FlexibleSpace();
+        textureInput(serializedGroundTextures.GetArrayElementAtIndex(Convert.ToInt32("10", 2)), EditorGUIUtility.currentViewWidth / 3);
+        EditorGUILayout.EndHorizontal();
+
+        if(GUILayout.Button("Update Textures"))
+        {
+            for(int i1 = 0; i1 < 4; i1++)
+            {
+                c.m.SetTexture($"Texture2D_TopPrimaryColour_{i1}", (Texture2D)serializedGroundTextures.GetArrayElementAtIndex(i1).objectReferenceValue);
+            }
+            c.m.SetTexture($"Texture2D_TopCenterColour", (Texture2D)serializedGroundTextures.GetArrayElementAtIndex(4).objectReferenceValue);
+        }
 
         if (c.n != null)
         {
@@ -76,6 +106,30 @@ public class chunkInput : Editor
         }
     }
 
+    void drawTexture(Texture2D t, Vector2 size)
+    {
+        GUIStyle s = new GUIStyle();
+        s.fixedWidth = size.x;
+        s.fixedHeight = size.y;
+        EditorGUILayout.BeginVertical(s);
+        GUILayout.BeginVertical(t, s);
+        GUILayout.EndVertical();
+        EditorGUILayout.EndVertical();
+    }
+    void textureInput(SerializedProperty s, float width)
+    {
+        EditorGUILayout.BeginVertical();
+        drawTexture((Texture2D)s.objectReferenceValue, new Vector2(100, 100));
+        s.objectReferenceValue = (Texture2D) EditorGUILayout.ObjectField((Texture2D) s.objectReferenceValue, typeof(Texture2D), false, GUILayout.Width(100));
+        EditorGUILayout.EndVertical();
+    }
+    void textureInput(Texture2D t, float width)
+    {
+        EditorGUILayout.BeginVertical();
+        drawTexture(t, new Vector2(100, 100));
+        t = (Texture2D) EditorGUILayout.ObjectField(t, typeof(Texture2D), false, GUILayout.Width(100));
+        EditorGUILayout.EndVertical();
+    }
     void drawNode()
     {
         int[] dim;
@@ -124,7 +178,6 @@ public class chunkInput : Editor
         GUILayout.EndHorizontal();
         layer = EditorGUILayout.IntSlider("Layer", layer, 0, dim[1] - 1);
     }
-
 
     private int indexCreator(int mode, int i1, int i2,int layer, int[] dim)
     {
@@ -178,9 +231,10 @@ public class chunk : MonoBehaviour
     public int[] triangles;
     public List<Vector2> uv = new List<Vector2>();
 
-
     public Texture3D[] chunkTextureDetails;
     public Material m;
+
+    public Texture2D[] groundTextures = new Texture2D[5];
 
     struct Triangle
     {
@@ -196,6 +250,7 @@ public class chunk : MonoBehaviour
         mesh = new Mesh();
 
         mf.mesh = mesh;
+        collider = this.GetComponent<MeshCollider>();
         collider.sharedMesh = mesh;
 
         m = this.GetComponent<Renderer>().material;

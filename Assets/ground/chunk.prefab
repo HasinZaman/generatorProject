@@ -49,13 +49,20 @@ MonoBehaviour:
   manager: {fileID: 0}
   pos: {x: 0, y: 0, z: 0}
   shader: {fileID: 7200000, guid: 3a7f756eb0efa2545afa7dbb96dc21db, type: 3}
-  mf: {fileID: 1291178683192955406}
+  mf: {fileID: 0}
   mesh: {fileID: 0}
-  collider: {fileID: 2086536152217467297}
+  collider: {fileID: 0}
   vertices: []
   triangles: 
   uv: []
-  m: {fileID: 2100000, guid: f81e0001b91f17b44849459406ff675f, type: 2}
+  chunkTextureDetails: []
+  m: {fileID: 0}
+  groundTextures:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
 --- !u!33 &1291178683192955406
 MeshFilter:
   m_ObjectHideFlags: 0

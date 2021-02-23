@@ -102,27 +102,3 @@ void noiseSample_float(Texture3D vectors, float3 pos, float3 dim, out float samp
     
     //sample = float4(sampleTemp, sampleTemp, sampleTemp, sampleTemp);
 }
-
-void biomeChooser_float(float1 r1, float1 r2, float1 r3, float1 r4, float4 c1, float4 c2, float4 c3, float4 c4, float4 cDefault, out float4 output)
-{
-    if (r1 > r2 && r1 > r3 && r1 > r4 && r1 > 0)
-    {
-        output = c1;
-    }
-    else if (r2 > r1 && r2 > r3 && r2 > r4 && r2 > 0)
-    {
-        output = c2;
-    }
-    else if (r3 > r1 && r3 > r2 && r3 > r4 && r3 > 0)
-    {
-        output = c3;
-    }
-    else if (r4 > r1 && r4 > r2 && r4 > r3 && r4 > 0)
-    {
-        output = c4;
-    }
-    else
-    {
-        output = cDefault;
-    }
-}
