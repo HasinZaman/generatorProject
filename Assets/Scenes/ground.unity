@@ -197,7 +197,7 @@ Light:
   m_BounceIntensity: 1
   m_ColorTemperature: 6570
   m_UseColorTemperature: 0
-  m_BoundingSphereOverride: {x: 0, y: 0, z: 0, w: 2.3509887e-38}
+  m_BoundingSphereOverride: {x: 0, y: 4.2723e-41, z: 0, w: -19.5}
   m_UseBoundingSphereOverride: 0
   m_ShadowRadius: 0
   m_ShadowAngle: 0
@@ -307,7 +307,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   threshold: 0
   seed: 0
-  chunkDim: {x: 3, y: 1, z: 3}
+  chunkDim: {x: 10, y: 1, z: 10}
   distPerNode:
   - 1
   - 1
@@ -321,6 +321,7 @@ MonoBehaviour:
   computeAlgorthim: getVerticesLerp
   chunks: []
   borderNoise: 1e0000001e0000001e000000
+  macroNoise: 0f0000000f0000000f000000
   blendSharpness: 0.5
 --- !u!4 &932946826
 Transform:

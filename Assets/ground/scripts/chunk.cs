@@ -11,7 +11,9 @@ public class chunkInput : Editor
 
     SerializedObject targetObject;
     
-    SerializedProperty serializedNodes, serializedPos, serializedMesh, serializedCollider, serializedVertices, serializedComputerShader, serializedManager, serializedm, serializedGroundTextures;
+    SerializedProperty serializedNodes, serializedPos, serializedMesh, serializedCollider, serializedVertices, serializedComputerShader, serializedManager, serializedm;
+
+    SerializedProperty[] serializedGroundTextures = new SerializedProperty[2];
 
     int layer = 0;
     bool layerMode = false;
@@ -22,6 +24,8 @@ public class chunkInput : Editor
     bool neighborMode = false;
     GUIStyle nullVal, passVal, failVal;
 
+    string[] textureDirections = new string[2] {"side", "top" };
+    int textureDirection = 0;
 
     public void OnEnable()
     {
@@ -41,7 +45,8 @@ public class chunkInput : Editor
 
         serializedm = targetObject.FindProperty("m");
 
-        serializedGroundTextures = targetObject.FindProperty("groundTextures");
+        serializedGroundTextures[0] = targetObject.FindProperty("groundTopTextures");
+        serializedGroundTextures[1] = targetObject.FindProperty("groundSideTextures");
 
         nullVal = new GUIStyle();
         nullVal.normal.background = textureMaker(1, 1, Color.yellow);
@@ -64,33 +69,10 @@ public class chunkInput : Editor
         plane = EditorGUILayout.Popup("Display Mode", plane, planes);
 
         EditorGUILayout.LabelField("Chunk Texture");
+        textureDirection = EditorGUILayout.Popup("Direction", textureDirection, textureDirections);
+        chunkTextues(serializedGroundTextures[textureDirection]);
+        //textureDirections;
 
-        EditorGUILayout.BeginHorizontal();
-        textureInput(serializedGroundTextures.GetArrayElementAtIndex(Convert.ToInt32("01", 2)), EditorGUIUtility.currentViewWidth / 3);
-        GUILayout.FlexibleSpace();
-        textureInput(serializedGroundTextures.GetArrayElementAtIndex(Convert.ToInt32("11", 2)), EditorGUIUtility.currentViewWidth / 3);
-        EditorGUILayout.EndHorizontal();
-
-        EditorGUILayout.BeginHorizontal();
-        GUILayout.FlexibleSpace();
-        textureInput(serializedGroundTextures.GetArrayElementAtIndex(4), EditorGUIUtility.currentViewWidth / 3);
-        GUILayout.FlexibleSpace();
-        EditorGUILayout.EndHorizontal();
-
-        EditorGUILayout.BeginHorizontal();
-        textureInput(serializedGroundTextures.GetArrayElementAtIndex(Convert.ToInt32("00", 2)), EditorGUIUtility.currentViewWidth / 3);
-        GUILayout.FlexibleSpace();
-        textureInput(serializedGroundTextures.GetArrayElementAtIndex(Convert.ToInt32("10", 2)), EditorGUIUtility.currentViewWidth / 3);
-        EditorGUILayout.EndHorizontal();
-
-        if(GUILayout.Button("Update Textures"))
-        {
-            for(int i1 = 0; i1 < 4; i1++)
-            {
-                c.m.SetTexture($"Texture2D_TopPrimaryColour_{i1}", (Texture2D)serializedGroundTextures.GetArrayElementAtIndex(i1).objectReferenceValue);
-            }
-            c.m.SetTexture($"Texture2D_TopCenterColour", (Texture2D)serializedGroundTextures.GetArrayElementAtIndex(4).objectReferenceValue);
-        }
 
         if (c.n != null)
         {
@@ -104,6 +86,37 @@ public class chunkInput : Editor
         {
             c.updateMesh();
         }
+    }
+    
+    private void chunkTextues(SerializedProperty direction)
+    {
+        EditorGUILayout.BeginHorizontal();
+        textureInput(direction.GetArrayElementAtIndex(Convert.ToInt32("01", 2)), EditorGUIUtility.currentViewWidth / 3);
+        GUILayout.FlexibleSpace();
+        textureInput(direction.GetArrayElementAtIndex(Convert.ToInt32("11", 2)), EditorGUIUtility.currentViewWidth / 3);
+        EditorGUILayout.EndHorizontal();
+
+        EditorGUILayout.BeginHorizontal();
+        GUILayout.FlexibleSpace();
+        textureInput(direction.GetArrayElementAtIndex(4), EditorGUIUtility.currentViewWidth / 3);
+        GUILayout.FlexibleSpace();
+        EditorGUILayout.EndHorizontal();
+
+        EditorGUILayout.BeginHorizontal();
+        textureInput(direction.GetArrayElementAtIndex(Convert.ToInt32("00", 2)), EditorGUIUtility.currentViewWidth / 3);
+        GUILayout.FlexibleSpace();
+        textureInput(direction.GetArrayElementAtIndex(Convert.ToInt32("10", 2)), EditorGUIUtility.currentViewWidth / 3);
+        EditorGUILayout.EndHorizontal();
+
+        if (GUILayout.Button("Update Textures"))
+        {
+            for (int i1 = 0; i1 < 4; i1++)
+            {
+                c.m.SetTexture($"Texture2D_TopPrimaryColour_{i1}", (Texture2D) direction.GetArrayElementAtIndex(i1).objectReferenceValue);
+            }
+            c.m.SetTexture($"Texture2D_TopCenterColour", (Texture2D) direction.GetArrayElementAtIndex(4).objectReferenceValue);
+        }
+
     }
 
     void drawTexture(Texture2D t, Vector2 size)
@@ -231,10 +244,13 @@ public class chunk : MonoBehaviour
     public int[] triangles;
     public List<Vector2> uv = new List<Vector2>();
 
-    public Texture3D[] chunkTextureDetails;
+    public Texture3D edgeNoise;
+    public Texture3D macroNoiseTexture;
     public Material m;
 
-    public Texture2D[] groundTextures = new Texture2D[5];
+    public Texture2D[] groundTopTextures = new Texture2D[5];
+    public Texture2D[] groundSideTextures = new Texture2D[5];
+
 
     struct Triangle
     {
@@ -266,8 +282,7 @@ public class chunk : MonoBehaviour
     private void setMaterialNoise()
     {
 
-        m.SetTexture("Texture3D_edgeNoise", chunkTextureDetails[0]);
-        m.SetTexture("Texture3D_NoiseSecondary", chunkTextureDetails[1]);
+        m.SetTexture("Texture3D_edgeNoise", edgeNoise);
         
         m.SetVector($"Vector3_NodesDim", new Vector3(manager.dim[0], manager.dim[1], manager.dim[2]));
         this.GetComponent<Renderer>().material = m;
@@ -376,29 +391,27 @@ public class chunk : MonoBehaviour
 
         int u, v, d;
 
-        for(int i1 = 0; i1 < chunkTextureDetails.Length; i1++)
+        u = edgeNoise.width;
+        v = edgeNoise.height;
+        d = edgeNoise.depth;
+
+        temp += $"{u},{v},{d},";
+
+        for (int x = 0; x < u; x++)
         {
-            u = chunkTextureDetails[i1].width;
-            v = chunkTextureDetails[i1].height;
-            d = chunkTextureDetails[i1].depth;
-
-            temp += $"{u},{v},{d},";
-
-            for (int x = 0; x < u; x++)
+            for (int y = 0; y < v; y++)
             {
-                for (int y = 0; y < v; y++)
+                for (int z = 0; z < d; z++)
                 {
-                    for (int z = 0; z < d; z++)
-                    {
-                        temp += $"{chunkTextureDetails[i1].GetPixel(x,y,z).r},{chunkTextureDetails[i1].GetPixel(x, y, z).g},{chunkTextureDetails[i1].GetPixel(x, y, z).b},";
-                    }
+                    temp += $"{edgeNoise.GetPixel(x,y,z).r},{edgeNoise.GetPixel(x, y, z).g},{edgeNoise.GetPixel(x, y, z).b},";
                 }
             }
-            
-            temp = temp.Remove(temp.Length - 1);
-            temp += "|";
-
         }
+            
+        temp = temp.Remove(temp.Length - 1);
+        temp += "|";
+
+        
 
         return temp;
     }

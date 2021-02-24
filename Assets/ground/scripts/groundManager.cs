@@ -22,7 +22,7 @@ public class groundInput : Editor
     SerializedProperty serializedChunks;
     SerializedProperty serializedThreshold, serializedSaveFile, serializedComputeAlgorthim;
 
-    SerializedProperty serializedBorderNoise;
+    SerializedProperty serializedBorderNoise, serializedMacroNoise;
 
     bool lerpCond = false;
 
@@ -46,6 +46,7 @@ public class groundInput : Editor
         serializedSaveFile = targetObject.FindProperty("saveFile");
         serializedComputeAlgorthim = targetObject.FindProperty("computeAlgorthim");
         serializedBorderNoise = targetObject.FindProperty("borderNoise");
+        serializedMacroNoise = targetObject.FindProperty("macroNoise");
 
 
         switch (serializedComputeAlgorthim.stringValue)
@@ -61,7 +62,6 @@ public class groundInput : Editor
 
     public override void OnInspectorGUI()
     {
-        g.borderNoise = new int[3] { 30, 30, 30 };
         targetObject.Update();
 
         label("Chunk");
@@ -115,6 +115,14 @@ public class groundInput : Editor
             serializedBorderNoise.GetArrayElementAtIndex(i1).intValue = EditorGUILayout.IntField(serializedBorderNoise.GetArrayElementAtIndex(i1).intValue);
         }
         EditorGUILayout.EndHorizontal();
+
+        EditorGUILayout.LabelField("Noise Macro Texture");
+        EditorGUILayout.BeginHorizontal();
+        for (int i1 = 0; i1 < 3; i1++)
+        {
+            serializedMacroNoise.GetArrayElementAtIndex(i1).intValue = EditorGUILayout.IntField(serializedMacroNoise.GetArrayElementAtIndex(i1).intValue);
+        }
+        EditorGUILayout.EndHorizontal();
         
         EditorGUILayout.LabelField("Chunks");
         GUILayout.BeginVertical("box");
@@ -156,12 +164,6 @@ public class groundInput : Editor
         targetObject.ApplyModifiedProperties();
     }
 
-    private void randomizeNodes()
-    {
-        chunk c;
-        SerializedObject chunkObj;
-    }
-
     private void label(string label)
     {
         EditorGUILayout.Space();
@@ -194,8 +196,12 @@ public class groundManager : MonoBehaviour
 
     private System.Random r;
     private static int textureNoiseLevels = 2;
-    public float[][][][] textureNoise;
+
+    public float[][][][] textureBorderNoise;
     public int[] borderNoise = new int[3] { 30, 30, 30 };
+
+    public float[][][][] textureMacroNoise;
+    public int[] macroNoise = new int[3] { 3, 3, 3 };
     public float blendSharpness = 0.5f;
 
 
@@ -246,29 +252,46 @@ public class groundManager : MonoBehaviour
             );
 
         r = new System.Random(seed);
-        
-        textureNoise = new float[chunkDim.x * borderNoise[0] + 1][][][];
 
-        for (int x = 0; x < textureNoise.Length; x++)
+        textureBorderNoise = new float[chunkDim.x * borderNoise[0]][][][];
+
+        for (int x = 0; x < textureBorderNoise.Length; x++)
         {
-            textureNoise[x] = new float[chunkDim.y * borderNoise[1] + 1][][];
-            for (int y = 0; y < textureNoise[x].Length; y++)
+            textureBorderNoise[x] = new float[chunkDim.y * borderNoise[1]][][];
+            for (int y = 0; y < textureBorderNoise[x].Length; y++)
             {
-                textureNoise[x][y] = new float[chunkDim.z * borderNoise[2] + 1][];
+                textureBorderNoise[x][y] = new float[chunkDim.z * borderNoise[2]][];
 
-                for (int z = 0; z < textureNoise[x][y].Length; z++)
+                for (int z = 0; z < textureBorderNoise[x][y].Length; z++)
                 {
-                    textureNoise[x][y][z] = noise.SET2[r.Next(noise.SET2.Length)];
+                    textureBorderNoise[x][y][z] = noise.SET2[r.Next(noise.SET2.Length)];
                 }
             }
         }
-        
+
+        textureMacroNoise = new float[chunkDim.x * macroNoise[0]][][][];
+
+        for (int x = 0; x < textureMacroNoise.Length; x++)
+        {
+            textureMacroNoise[x] = new float[chunkDim.y * macroNoise[1]][][];
+            for (int y = 0; y < textureMacroNoise[x].Length; y++)
+            {
+                textureMacroNoise[x][y] = new float[chunkDim.z * macroNoise[2]][];
+
+                for (int z = 0; z < textureMacroNoise[x][y].Length; z++)
+                {
+                    textureMacroNoise[x][y][z] = noise.SET2[r.Next(noise.SET2.Length)];
+                }
+            }
+        }
+
         for (int x = 0; x < chunkDim.x; x++)
         {
             for (int y = 0; y < chunkDim.y; y++)
             {
                 for (int z = 0; z < chunkDim.z; z++)
                 {
+
                     pos = Vector3.zero;
                     pos.x = dim[0] * distPerNode[0] * x;
                     pos.y = dim[1] * distPerNode[1] * y;
@@ -289,7 +312,6 @@ public class groundManager : MonoBehaviour
                     if (i1 != -1)
                     {
                         temp2.n.setNeighbor(chunks[i1].GetComponent<chunk>().n, 12);
-
                     }
 
                     i1 = findChunk(new Vector3(x, y, z - 1));
@@ -303,34 +325,63 @@ public class groundManager : MonoBehaviour
                         temp2.n.setNeighbor(chunks[i1].GetComponent<chunk>().n, 9);
                     }
                     
-                    temp2.chunkTextureDetails = new Texture3D[textureNoiseLevels];
-                    for(int i2 = 0; i2 < textureNoiseLevels; i2++)
-                    {
-                        temp2.chunkTextureDetails[i2] = new Texture3D(borderNoise[0], borderNoise[1], borderNoise[2], TextureFormat.RGB24, false);
-                        temp2.chunkTextureDetails[i2].filterMode = FilterMode.Point;
+                    temp2.macroNoiseTexture = new Texture3D(macroNoise[0], macroNoise[1], macroNoise[2], TextureFormat.RGB24, false);
 
-                        for (int x1 = 0; x1 < borderNoise[0]; x1++)
+                    for (int x1 = 0; x1 < macroNoise[0]; x1++)
+                    {
+                        for (int y1 = 0; y1 < macroNoise[1]; y1++)
                         {
-                            for (int y1 = 0; y1 < borderNoise[1]; y1++)
+                            for (int z1 = 0; z1 < macroNoise[2]; z1++)
                             {
-                                for (int z1 = 0; z1 < borderNoise[2]; z1++)
+                                colourTemp =(float[]) textureMacroNoise[x * (macroNoise[0] - 1) + x1][y * (macroNoise[1] - 1) + y1][z * (macroNoise[2] - 1) + z1].Clone();
+                                for (int i3 = 0; i3 < 3; i3++)
                                 {
-                                    colourTemp = textureNoise[x * (borderNoise[0] - 1) + x1][y * (borderNoise[1] - 1) + y1][z * (borderNoise[2] - 1) + z1];
-                                    temp2.chunkTextureDetails[i2].SetPixel(x1, y1, z1, new Color((colourTemp[0] + 1) / 2, (colourTemp[1] + 1) / 2, (colourTemp[2] + 1) / 2));
+                                    colourTemp[i3] = (colourTemp[i3] + 1) / 2;
                                 }
+                                temp2.macroNoiseTexture.SetPixel(x1, y1, z1, new Color(colourTemp[0], colourTemp[1], colourTemp[2]));
                             }
                         }
-                        temp2.chunkTextureDetails[i2].Apply();
                     }
+                    temp2.macroNoiseTexture.Apply();
+                    
 
+                    temp2.edgeNoise = new Texture3D(borderNoise[0], borderNoise[1], borderNoise[2], TextureFormat.RGB24, false);
+                    temp2.edgeNoise.filterMode = FilterMode.Point;
+
+                    for (int x1 = 0; x1 < borderNoise[0]; x1++)
+                    {
+                        for (int y1 = 0; y1 < borderNoise[1]; y1++)
+                        {
+                            for (int z1 = 0; z1 < borderNoise[2]; z1++)
+                            {
+                                colourTemp = (float[]) textureBorderNoise[x * (borderNoise[0] - 1) + x1][y * (borderNoise[1] - 1) + y1][z * (borderNoise[2] - 1) + z1].Clone();
+                                for (int i3 = 0; i3 < 3; i3++)
+                                {
+                                    colourTemp[i3] = (colourTemp[i3] + 1) / 2;
+                                }
+
+
+                                temp2.edgeNoise.SetPixel(x1, y1, z1, new Color(colourTemp[0], colourTemp[1], colourTemp[2]));
+                            }
+                        }
+                    }
+                    temp2.edgeNoise.Apply();
+                    //Texture3D_edgeNoise
                     temp2.m = temp1.GetComponent<Renderer>().material;
+
+                    temp2.m.SetTexture("Texture3D_MacroNoise", temp2.macroNoiseTexture);
+
                     for (int i2 = 0; i2 < 4; i2++)
                     {
-                        temp2.groundTextures[i2] = (Texture2D) temp2.m.GetTexture($"Texture2D_TopPrimaryColour_{i2}");
+                        temp2.groundTopTextures[i2] = (Texture2D) temp2.m.GetTexture($"Texture2D_TopPrimaryColour_{i2}");
                     }
-                    temp2.groundTextures[4] = (Texture2D) temp2.m.GetTexture($"Texture2D_TopCenterColour");
-                    //Texture2D_SidePrimaryColour_
-                    //Texture2D_TopPrimaryColour_0
+                    temp2.groundTopTextures[4] = (Texture2D) temp2.m.GetTexture($"Texture2D_TopCenterColour");
+
+                    for (int i2 = 0; i2 < 4; i2++)
+                    {
+                        temp2.groundSideTextures[i2] = (Texture2D)temp2.m.GetTexture($"Texture2D_SidePrimaryColour_{i2}");
+                    }
+                    temp2.groundSideTextures[4] = (Texture2D)temp2.m.GetTexture($"Texture2D_SideCenterColour");
                     temp2.manager = this;
                     chunks[Convert.ToInt32(x + y * chunkDim.x + z * chunkDim.x * chunkDim.y)] = temp1;
                 }
@@ -493,34 +544,32 @@ public class groundManager : MonoBehaviour
                     }
 
                     int counter = 0;
-                    chunkTemp.chunkTextureDetails = new Texture3D[2];
                     int i3;
-                    for (i1 = 0; i1 < 2; i1++)
+                    counter = 0;
+                    i3 = 3;
+
+                    texture3DTemp = new Texture3D(int.Parse(chunkTextureDetailsRaw[i1][0]), int.Parse(chunkTextureDetailsRaw[i1][1]), int.Parse(chunkTextureDetailsRaw[i1][2]), TextureFormat.RGB24, false);
+                    texture3DTemp.filterMode = FilterMode.Point;
+                    for (int x = 0; x < int.Parse(chunkTextureDetailsRaw[i1][0]); x++)
                     {
-                        counter = 0;
-                        i3 = 3;
-                        texture3DTemp = new Texture3D(int.Parse(chunkTextureDetailsRaw[i1][0]), int.Parse(chunkTextureDetailsRaw[i1][1]), int.Parse(chunkTextureDetailsRaw[i1][2]), TextureFormat.RGB24, false);
-                        texture3DTemp.filterMode = FilterMode.Point;
-                        for (int x = 0; x < int.Parse(chunkTextureDetailsRaw[i1][0]); x++)
+                        for(int y = 0; y < int.Parse(chunkTextureDetailsRaw[i1][1]); y++)
                         {
-                            for(int y = 0; y < int.Parse(chunkTextureDetailsRaw[i1][1]); y++)
+                            for(int z = 0; z < int.Parse(chunkTextureDetailsRaw[i1][2]); z++)
                             {
-                                for(int z = 0; z < int.Parse(chunkTextureDetailsRaw[i1][2]); z++)
-                                {
-                                    colorTemp = new Color();
-                                    colorTemp.r = float.Parse(chunkTextureDetailsRaw[i1][0+i3]);
-                                    colorTemp.g = float.Parse(chunkTextureDetailsRaw[i1][1+i3]);
-                                    colorTemp.b = float.Parse(chunkTextureDetailsRaw[i1][2+i3]);
+                                colorTemp = new Color();
+                                colorTemp.r = float.Parse(chunkTextureDetailsRaw[i1][0+i3]);
+                                colorTemp.g = float.Parse(chunkTextureDetailsRaw[i1][1+i3]);
+                                colorTemp.b = float.Parse(chunkTextureDetailsRaw[i1][2+i3]);
                                     
-                                    texture3DTemp.SetPixel(x, y, z, colorTemp);
-                                    i3+=3;
-                                    counter++;
-                                }
+                                texture3DTemp.SetPixel(x, y, z, colorTemp);
+                                i3+=3;
+                                counter++;
                             }
                         }
-                        texture3DTemp.Apply();
-                        chunkTemp.chunkTextureDetails[i1] = texture3DTemp;
                     }
+                    texture3DTemp.Apply();
+                    chunkTemp.edgeNoise = texture3DTemp;
+                    
 
                     chunkTemp.n = new nodes(nodesTemp, dim);
 
