@@ -307,11 +307,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   threshold: 0
   seed: 0
-  chunkDim: {x: 10, y: 1, z: 10}
+  chunkDim: {x: 1, y: 1, z: 1}
   distPerNode:
-  - 1
-  - 1
-  - 1
+  - 2
+  - 2
+  - 2
   dim: 140000001400000014000000
   amplitude: 10
   translation: {x: 0, y: 10, z: 0}
