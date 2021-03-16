@@ -309,9 +309,9 @@ MonoBehaviour:
   seed: 0
   chunkDim: {x: 1, y: 1, z: 1}
   distPerNode:
-  - 2
-  - 2
-  - 2
+  - 1
+  - 1
+  - 1
   dim: 140000001400000014000000
   amplitude: 10
   translation: {x: 0, y: 10, z: 0}

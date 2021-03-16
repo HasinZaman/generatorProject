@@ -147,8 +147,8 @@ void sort(float values[4], int key[4])
 void biomeDecoder_float(Texture2D biomeBorders, float3 pos, out float4 corner0, out float4 corner1, out float4 corner2, out float4 corner3)
 {
     corner0 = biomeBorders.Load(uint3(  floor(pos.x),   floor(pos.z),   0));
-    corner1 = biomeBorders.Load(uint3(  ceil(pos.x),    floor(pos.z),    0));
-    corner2 = biomeBorders.Load(uint3(  floor(pos.x),   ceil(pos.z),   0));
+    corner1 = biomeBorders.Load(uint3(  ceil(pos.x),    floor(pos.z),   0));
+    corner2 = biomeBorders.Load(uint3(  floor(pos.x),   ceil(pos.z),    0));
     corner3 = biomeBorders.Load(uint3(  ceil(pos.x),    ceil(pos.z),    0));
 }
 
@@ -182,29 +182,11 @@ void biomeMeshVal_float(float4 corner0, float4 corner1, float4 corner2, float4 c
         cosineInterpolate(x1.r, x2.r, pos.z),
         cosineInterpolate(x1.g, x2.g, pos.z),
         cosineInterpolate(x1.b, x2.b, pos.z),
-        cosineInterpolate(x1.a, x2.a, pos.z)
+        0//cosineInterpolate(x1.a, x2.a, pos.z)
     );
 }
 
-void cornerVal_float(Texture2D biomeBorders, float3 pos, out float4 sample)
-{
-    sample = biomeBorders.Load(uint3(floor(pos.x), floor(pos.z), 0));
-}
-
-
-//biomeTextureExtraction
-void biomeBlendingAtPoint1_float(float4 biomeBlendFactor, out float4 sample)
-{
-    float max = biomeBlendFactor.r + biomeBlendFactor.g + biomeBlendFactor.b;
-    
-    sample.r = biomeBlendFactor.r / max;
-    sample.g = biomeBlendFactor.g / max;
-    sample.b = biomeBlendFactor.b / max;
-    sample.a = 0;
-
-}
-
-void biomeColourPicker_float(float4 biomeBlendFactor, float4 colour0, float4 colour1, float4 colour2, float4 colour3, out float4 colour0Out, out float4 colour1Out, out float4 colour2Out, out float4 colour3Out)
+void textureSorter_float(float4 biomeBlendFactor, float4 colour0, float4 colour1, float4 colour2, float4 colour3, out float4 biomeBlendFactorSorted, out float4 colour0Out, out float4 colour1Out, out float4 colour2Out, out float4 colour3Out)
 {
     float4 colourOut[4] =
     {
@@ -221,6 +203,7 @@ void biomeColourPicker_float(float4 biomeBlendFactor, float4 colour0, float4 col
         biomeBlendFactor.b,
         biomeBlendFactor.a
     };
+    
     int biomeBlendFactorIndex[4] =
     {
         0,
@@ -230,7 +213,6 @@ void biomeColourPicker_float(float4 biomeBlendFactor, float4 colour0, float4 col
     };
     
     bool sortCond = false;
-    float valuesTemp;
     int keyTemp;
     int i2 = 0;
     
@@ -239,15 +221,12 @@ void biomeColourPicker_float(float4 biomeBlendFactor, float4 colour0, float4 col
         sortCond = true;
         for (int i1 = 0; i1 < 3 - i2; i1++)
         {
-            if (biomeBlendFactorValue[i1] > biomeBlendFactorValue[i1 + 1])
+            if (biomeBlendFactorValue[biomeBlendFactorIndex[i1]] < biomeBlendFactorValue[biomeBlendFactorIndex[i1 + 1]])
             {
-                valuesTemp = biomeBlendFactorValue[i1];
                 keyTemp = biomeBlendFactorIndex[i1];
                 
-                biomeBlendFactorValue[i1] = biomeBlendFactorValue[i1 + 1];
                 biomeBlendFactorIndex[i1] = biomeBlendFactorIndex[i1 + 1];
                 
-                biomeBlendFactorValue[i1 + 1] = valuesTemp;
                 biomeBlendFactorIndex[i1 + 1] = keyTemp;
                 
                 sortCond = false;
@@ -256,24 +235,28 @@ void biomeColourPicker_float(float4 biomeBlendFactor, float4 colour0, float4 col
         i2 += 1;
     }
     
-    //sort(biomeBlendFactorValue, biomeBlendFactorIndex);
+    biomeBlendFactorSorted =
+        float4(
+            biomeBlendFactorValue[biomeBlendFactorIndex[0]],
+            biomeBlendFactorValue[biomeBlendFactorIndex[1]],
+            biomeBlendFactorValue[biomeBlendFactorIndex[2]],
+            biomeBlendFactorValue[biomeBlendFactorIndex[3]]
+            );
     
     colour0Out = colourOut[biomeBlendFactorIndex[0]];
     colour1Out = colourOut[biomeBlendFactorIndex[1]];
     colour2Out = colourOut[biomeBlendFactorIndex[2]];
     colour3Out = colourOut[biomeBlendFactorIndex[3]];
-
 }
 
 //biomeTextureExtraction
-void biomeBlendingAtPoint_float(Texture2D biomeBorders, float3 pos, out float4 sample)
+void biomeBlendingAtPoint_float(float4 val, out float4 valOut)
 {
-    float4 pointValue = biomeBorders.Load(uint3(floor(pos.x), floor(pos.z), 0));
-    
-    float max = pointValue.r + pointValue.g + pointValue.b;
-    
-    sample.r = pointValue.r / max;
-    sample.g = pointValue.g / max;
-    sample.b = pointValue.b / max;
-    sample.a = 0;
+    float max = val.r + val.g + val.b;
+    valOut = float4(val.r / max * max, val.g / max * max, val.b / max * max, 0);
+    /*
+    valOut.r = val.r / max;
+    valOut.g = val.g / max;
+    valOut.b = val.b / max;
+    valOut.a = 0;*/
 }
