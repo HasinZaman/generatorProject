@@ -5,9 +5,14 @@
 /// </summary>
 public class Node : IComparable
 {
-    //val needs to be a value between 0 - 1
+    /// <summary>
+    ///     val stores the float value of the Node
+    /// </summary>
     private float val;
 
+    /// <summary>
+    ///     minVal and maxVal define the range in which val can reside within
+    /// </summary>
     private const float minVal = 0, maxVal = 1;
 
     /// <summary>
