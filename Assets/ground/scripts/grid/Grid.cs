@@ -498,4 +498,15 @@ public class Grid
 
         return nodes[coordToIndex(x, y, z)];
     }
+
+    /// <summary>
+    ///     getDim returns a clone of dim
+    /// </summary>
+    /// <returns>
+    ///     a clone of dim
+    /// </returns>
+    public int[] getDim()
+    {
+        return (int[]) dim.Clone();
+    }
 }
