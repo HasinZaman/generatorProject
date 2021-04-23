@@ -1,6 +1,6 @@
-enum PlaneCode : ushort
+public enum PlaneCode : ushort
 {
-    xy = 0;
-    xz = 1;
-    yz = 2;
+    xy = 0,
+    xz = 1,
+    yz = 2,
 }

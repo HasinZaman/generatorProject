@@ -90,7 +90,20 @@ public class Grid
     }
 
     /// <summary>
-    ///     Constructor Creates a Grid object.
+    ///     coordToIndex converts (x,y,z) into index in nodes
+    /// </summary>
+    /// <param name="dim">dim is the range of values which could exist within a certian axis</param>
+    /// <param name="x">x is an int pos along the x axis</param>
+    /// <param name="y">y is an int pos along the y axis</param>
+    /// <param name="z">z is an int pos along the z axis</param>
+    /// <returns></returns>
+    private static int coordToIndex(int[] dim, int x, int y, int z)
+    {
+        return x + (y + z * dim[1]) * dim[0];
+    }
+
+    /// <summary>
+    ///     Constructor creates a Grid object.
     /// </summary>
     /// <param name="nodes">The nodes paramater is a Node array that is used to initalize nodes instance</param>
     /// <param name="dim">The dim paramater is a int array that is used to initalize dim instance</param>
@@ -100,7 +113,11 @@ public class Grid
         setNodes(nodes);
     }
 
-    public Grid(float defaultVal, int[] dim)
+    /// <summary>
+    ///     Constructor creates a Grid Object with a default node value
+    /// </summary>
+    /// <param name="dim">The dim paramater is a int array that is used to initalize dim instance</param>
+    public Grid(int[] dim)
     {
         setDim(dim);
         setNodes(new Node[0] { });
@@ -253,6 +270,53 @@ public class Grid
     }
 
     /// <summary>
+    ///     getNodes gets the nodes within a the grids
+    /// </summary>
+    /// <param name="rangeX">rangeX defines the nodes selected within the x axis</param>
+    /// <param name="rangeY">rangeY defines the nodes selected within the y axis</param>
+    /// <param name="rangeZ">rangeZ defines the nodes selected within the z axis</param>
+    /// <returns>
+    ///     A sub grid that contains the nodes defined within a given range
+    /// </returns>
+    private Grid getNodes(Range rangeX, Range rangeY, Range rangeZ)
+    {
+        int[] dimTemp = new int[3] { rangeX.end - rangeX.start, rangeY.end - rangeY.start, rangeZ.end - rangeZ.start };
+        Node[] nodesTemp = new Node[dimTemp[0] * dimTemp[1] * dimTemp[2]];
+
+        for(int x = rangeX.start; x < rangeX.end; x++)
+        {
+            for(int y = rangeY.start; y < rangeY.end; y++)
+            {
+                for(int z = rangeZ.start; z < rangeZ.end; z++)
+                {
+                    nodesTemp[coordToIndex(dimTemp, x, y, z)] = nodes[coordToIndex(x, y, z)];
+                }
+            }
+        }
+
+        return new Grid(nodesTemp, dimTemp);
+
+    }
+
+    /// <summary>
+    ///     getNodes gets the nodes within a the grids
+    /// </summary>
+    /// <param name="rangeX">rangeX defines the nodes selected within the x axis</param>
+    /// <param name="rangeY">rangeY defines the nodes selected within the y axis</param>
+    /// <param name="rangeZ">rangeZ defines the nodes selected within the z axis</param>
+    /// <returns>
+    ///     A sub grid that contains the nodes defined within a given range
+    /// </returns>
+    public Grid getNodes(int[] rangeX, int[] rangeY, int[] rangeZ)
+    {
+        Range rangeXTemp = new Range(dim[0], rangeX);
+        Range rangeYTemp = new Range(dim[1], rangeY);
+        Range rangeZTemp = new Range(dim[2], rangeZ);
+
+        return getNodes(rangeXTemp, rangeYTemp, rangeZTemp);
+    }
+
+    /// <summary>
     ///     getFace return a grid that contains the face that is parrel to the plane
     /// </summary>
     /// <param name="planeCode">planeCode is ushort that refers to a plane which nodes will be selected from</param>
@@ -260,22 +324,79 @@ public class Grid
     /// <returns>
     ///     Grid that stores a face from grid
     /// </returns>
-    public Grid getFace(ushort planeCode, int layer)
+    public Grid getFace(PlaneCode planeCode, int layer)
     {
-        throw new NotImplementedException();
+        Range rangeX, rangeY, rangeZ;
+
+        switch(planeCode)
+        {
+            case PlaneCode.xy:
+                rangeX = new Range(dim[0], new int[] { dim[0] });
+                rangeY = new Range(dim[1], new int[] { dim[1] });
+                rangeZ = new Range(dim[2], new int[] { layer, layer + 1 });
+
+                return getNodes(rangeX, rangeY, rangeZ);
+                break;
+            case PlaneCode.xz:
+                rangeX = new Range(dim[0], new int[] { dim[0] });
+                rangeY = new Range(dim[1], new int[] { layer, layer + 1 });
+                rangeZ = new Range(dim[2], new int[] { dim[2] });
+
+                return getNodes(rangeX, rangeY, rangeZ);
+                break;
+            case PlaneCode.yz:
+                rangeX = new Range(dim[0], new int[] { layer, layer + 1 });
+                rangeY = new Range(dim[1], new int[] { dim[1] });
+                rangeZ = new Range(dim[2], new int[] { dim[2] });
+
+                return getNodes(rangeX, rangeY, rangeZ);
+                break;
+            default:
+                throw new Exception("Invalid PlaneCode");
+                break;
+        }
+
     }
 
     /// <summary>
-    ///     getFace return a grid that contains a line that is perpendicular to the plane
+    ///     getLine return a grid that contains a line that is perpendicular to the plane
     /// </summary>
     /// <param name="planeCode">planeCode is ushort that refers to a plane which nodes will be selected from</param>
     /// <param name="coord">coord is an array that stores the position on a plane in which a line would be extracted</param>
     /// <returns>
     ///     Grid that stores a line from grid
     /// </returns>
-    public Grid getLine(ushort planeCode, int[] coord)
+    public Grid getLine(PlaneCode planeCode, int[] coord)
     {
-        throw new NotImplementedException();
+        Range rangeX, rangeY, rangeZ;
+
+        switch(planeCode)
+        {
+            case PlaneCode.xy:
+                rangeX = new Range(dim[0], new int[] { coord[0], coord[0] + 1 });
+                rangeY = new Range(dim[1], new int[] { coord[1], coord[1] + 1 });
+                rangeZ = new Range(dim[2], new int[] { dim[2] });
+
+                return getNodes(rangeX, rangeY, rangeZ);
+                break;
+            case PlaneCode.xz:
+                rangeX = new Range(dim[0], new int[] { coord[0], coord[0] + 1 });
+                rangeY = new Range(dim[1], new int[] { dim[1] });
+                rangeZ = new Range(dim[2], new int[] { coord[1], coord[1] + 1 });
+
+                return getNodes(rangeX, rangeY, rangeZ);
+                break;
+            case PlaneCode.yz:
+                rangeX = new Range(dim[0], new int[] { dim[1] });
+                rangeY = new Range(dim[1], new int[] { coord[0], coord[0] + 1 });
+                rangeZ = new Range(dim[2], new int[] { coord[1], coord[1] + 1 });
+
+                return getNodes(rangeX, rangeY, rangeZ);
+                break;
+            default:
+                throw new Exception("Invalid PlaneCode");
+                break;
+        }
     }
 
     /// <summary>
@@ -285,6 +406,96 @@ public class Grid
     /// <returns></returns>
     public Grid getCorner(ushort cornerCode)
     {
-        throw new NotImplementedException();
+        // xyz | Code 
+        // 000 | 0
+        // 001 | 1
+        // 010 | 2
+        // 011 | 3
+        // 100 | 4
+        // 101 | 5
+        // 110 | 6
+        // 111 | 7
+
+        int[] dimTemp = new int[3] { 1, 1, 1 };
+
+        switch(cornerCode)
+        {
+            // 000 | 0
+            case 0:
+                return new Grid(new Node[] { nodes[coordToIndex(0, 0, 0)] }, dimTemp);
+                break;
+            // 001 | 1
+            case 1:
+                return new Grid(new Node[] { nodes[coordToIndex(0, 0, dim[2] - 1)] }, dimTemp);
+                break;
+            // 010 | 2
+            case 2:
+                return new Grid(new Node[] { nodes[coordToIndex(0, dim[1] - 1, 0)] }, dimTemp);
+                break;
+            // 011 | 3
+            case 3:
+                return new Grid(new Node[] { nodes[coordToIndex(0, dim[1] - 1, dim[2] - 1)] }, dimTemp);
+                break;
+            // 100 | 4
+            case 4:
+                return new Grid(new Node[] { nodes[coordToIndex(dim[0] - 1, 0, 0)] }, dimTemp);
+                break;
+            // 101 | 5
+            case 5:
+                return new Grid(new Node[] { nodes[coordToIndex(dim[0] - 1, 0, dim[2] - 1)] }, dimTemp);
+                break;
+            // 110 | 6
+            case 6:
+                return new Grid(new Node[] { nodes[coordToIndex(dim[0] - 1, dim[1] - 1, 0)] }, dimTemp);
+                break;
+            // 111 | 7
+            case 7:
+                return new Grid(new Node[] { nodes[coordToIndex(dim[0] - 1, dim[1] - 1, dim[2] - 1)] }, dimTemp);
+                break;
+            default:
+                throw new Exception("Invaild corner Code");
+                break;
+        }
+    }
+
+    /// <summary>
+    ///     getNode returns the value of a node at a certian coordinate
+    /// </summary>
+    /// <param name="x">x coordinate</param>
+    /// <param name="y">y coordinate</param>
+    /// <param name="z">z coordinate</param>
+    /// <returns>
+    ///     Node is returned at a certian coordinate
+    /// </returns>
+    public Node getNode(int x, int y, int z)
+    {
+        if(x < 0)
+        {
+            throw new ArgumentOutOfRangeException("x needs to be greater than 0");
+        }
+        else if(x >= dim[0])
+        {
+            throw new ArgumentOutOfRangeException($"x needs to be less than {dim[0]}");
+        }
+
+        if (y < 0)
+        {
+            throw new ArgumentOutOfRangeException("y needs to be greater than 0");
+        }
+        else if (y >= dim[1])
+        {
+            throw new OverflowException($"y needs to be less than {dim[1]}");
+        }
+
+        if (z < 0)
+        {
+            throw new ArgumentOutOfRangeException("z needs to be greater than 0");
+        }
+        else if (z >= dim[2])
+        {
+            throw new ArgumentOutOfRangeException($"z needs to be less than {dim[2]}");
+        }
+
+        return nodes[coordToIndex(x, y, z)];
     }
 }
