@@ -97,7 +97,7 @@ public class Grid
     /// <param name="y">y is an int pos along the y axis</param>
     /// <param name="z">z is an int pos along the z axis</param>
     /// <returns></returns>
-    private static int coordToIndex(int[] dim, int x, int y, int z)
+    public static int coordToIndex(int[] dim, int x, int y, int z)
     {
         return x + (y + z * dim[1]) * dim[0];
     }

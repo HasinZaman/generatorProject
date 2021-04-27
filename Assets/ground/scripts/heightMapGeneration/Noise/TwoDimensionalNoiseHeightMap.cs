@@ -1,5 +1,6 @@
 ﻿using System;
 using UnityEngine;
+
 /// <summary>
 ///     TwoDimensionalNoiseHeightMap creates a height map that using 2d perlin noise 
 /// </summary>
@@ -11,19 +12,25 @@ public class TwoDimensionalNoiseHeightMap : NoiseHeightMapGenerator
     Texture2D perlinVector;
 
     /// <summary>
+    ///     shader is stores a computeShader used to calculate the noise
+    /// </summary>
+    ComputeShader shader;
+
+    /// <summary>
     ///     NoiseHeightMapGenerator constructor intializes variables
     /// </summary>
     /// <param name="templateVector">templateVector paramater assigns the template vectors that will be used in calculating perlin noise</param>
     /// <param name="seed">seed paramater is used to intialize random</param>
     /// <param name="nodeSize">nodeSize is an array that stores the dimension of the final height map grid</param>
     /// <param name="perlinVectorDim">perlinVectorDim is an array that defines the size of perlinNoise vector</param>
-    public TwoDimensionalNoiseHeightMap(float[][] templateVector, int seed, int[] nodeSize, int[] perlinVectorDim) : base( templateVector, seed, nodeSize)
+    /// <param name="shader"></param>
+    public TwoDimensionalNoiseHeightMap(float[][] templateVector, int seed, int[] nodeSize, int[] perlinVectorDim, ComputeShader shader) : base( templateVector, seed, nodeSize)
     {
         if(perlinVectorDim.Length != 2)
         {
             throw new ArgumentException();
         }
-        
+        this.shader = shader;
         Color tmpColor = new Color();
         float[] vector;
 
@@ -87,6 +94,38 @@ public class TwoDimensionalNoiseHeightMap : NoiseHeightMapGenerator
     /// </returns>
     public override Grid getHeightMap()
     {
-        throw new NotImplementedException();
+        int kernelHandle = shader.FindKernel("noiseCalc");
+
+        int[] dim = this.grid.getDim();
+
+        Texture2D output = new Texture2D(dim[0], dim[2], TextureFormat.Alpha8, false);
+
+        shader.SetTexture(kernelHandle, "vectors", perlinVector);
+
+        shader.SetTexture(kernelHandle, "noise", output);
+
+        shader.Dispatch(kernelHandle, (int)Math.Ceiling((float)dim[0] / 10), (int)Math.Ceiling((float)dim[1] / 10), 1);
+
+        Node[] noiseVals = new Node[dim[0] * dim[1] * dim[2]];
+
+        for(int x = 0; x < dim[0]; x++)
+        {
+            for(int y = 0; y < dim[1]; y++)
+            {
+                for(int z = 0; z <  dim[2]; z++)
+                if(Math.Abs(output.GetPixel(x, z).a) > 1)
+                {
+                    noiseVals[Grid.coordToIndex(dim,x,y,z)] = new Node(output.GetPixel(x, z).a);
+                }
+                else
+                {
+                    noiseVals[Grid.coordToIndex(dim, x, y, z)] = new Node(output.GetPixel(x, y).a % 1);
+                }
+            }
+        }
+
+        grid.setNodes(noiseVals);
+
+        return grid;
     }
 }

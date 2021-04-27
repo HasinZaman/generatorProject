@@ -1,14 +1,118 @@
-﻿// Each #kernel tells which function to compile; you can have many kernels
-#pragma kernel CSMain
+﻿#pragma kernel noiseCalc
 
-// Create a RenderTexture with enableRandomWrite flag and set it
-// with cs.SetTexture
-RWTexture2D<float4> Result;
+/// <summary>
+///     BINARYPOSTOINDEX turns a binary position into a index
+/// </summary>
+/// <return>
+///     the index of a converted pos
+/// </return>
+#define BINARYPOSTOINDEX(x,y) (x+y*2)
 
-[numthreads(8,8,1)]
-void CSMain (uint3 id : SV_DispatchThreadID)
+/// <summary>
+///     PI is a constant for pi ;)
+/// </summary>
+#define PI 3.1415926535897932384626433832795028841971693993751058209749445923078164062862089986280348253421170679
+
+/// <summary>
+///     perlinVector is a texture that contains the vectors used to generate perlin noise
+/// </summary>
+RWTexture2D<float3> perlinVector;
+/// <summary>
+///     output is the texture that will store the final noise
+/// </summary>
+RWTexture2D<float> output;
+
+/// <summary>
+///     cosineInterpolate gets the interoplated value between two numbers points
+/// </summary>
+/// <return>
+///     float of the interpolated value between two points
+/// </return>
+float cosineInterpolate(float y1, float y2, float intermediaryPoint)
 {
-    // TODO: insert actual code here!
+    float mu = (1 - cos(intermediaryPoint * PI)) / 2;
 
-    Result[id.xy] = float4(id.x & id.y, (id.x & 15)/15.0, (id.y & 15)/15.0, 0.0);
+    return y1 * (1 - mu) + y2 * mu;
+}
+
+/// <summary>
+///     dotProduct calculates the dotproduct of two vectors
+/// </summary>
+/// <return>
+///     dotproduct of two vectors
+/// </return>
+float dotProduct(float2 vectors, float2 dist)
+{
+    return vectors.x * dist.x + vectors.y * dist.y;
+}
+
+/// <summary>
+///     noiseCalc calculates the noise value a numerious points by modifing noise texture
+/// </summary>
+[numthreads(10, 10, 1)]
+void noiseCalc (uint3 id : SV_DispatchThreadID)
+{
+    float2 pointDist[4];
+    float2 pointVector[4];
+    float pointValue[4];
+    
+    float sample;
+    
+    uint2 vectorDim = uint2(0,0);
+    perlinVector.GetDimensions(vectorDim.x, vectorDim.y);
+    
+    uint2 noiseDim = uint2(0, 0);
+    output.GetDimensions(noiseDim.x, noiseDim.y);
+    
+    float2 pos = float2((float) id.x / (float) noiseDim.x * (float) vectorDim.x, (float) id.y / (float) noiseDim.y * (float) vectorDim.y);
+    
+    pointDist[BINARYPOSTOINDEX(0, 0)] = float2(pos.x % 1, pos.y % 1);
+    pointDist[BINARYPOSTOINDEX(1, 0)] = float2(pos.x % 1 - 1, pos.y % 1);
+    pointDist[BINARYPOSTOINDEX(0, 1)] = float2(pos.x % 1, pos.y % 1 - 1);
+    pointDist[BINARYPOSTOINDEX(1, 1)] = float2(pos.x % 1 - 1, pos.y % 1 - 1);
+    
+    //gets the dot product for every corner
+    pointVector[BINARYPOSTOINDEX(0, 0)] = float2(perlinVector[uint2(floor(pos.x), floor(pos.y))].r, perlinVector[uint2(floor(pos.x), floor(pos.y))].g);
+    pointVector[BINARYPOSTOINDEX(1, 0)] = float2(perlinVector[uint2(ceil(pos.x), floor(pos.y))].r, perlinVector[uint2(ceil(pos.x), floor(pos.y))].g);
+    pointVector[BINARYPOSTOINDEX(0, 1)] = float2(perlinVector[uint2(floor(pos.x), ceil(pos.y))].r, perlinVector[uint2(floor(pos.x), ceil(pos.y))].g);
+    pointVector[BINARYPOSTOINDEX(1, 1)] = float2(perlinVector[uint2(ceil(pos.x), ceil(pos.y))].r, perlinVector[uint2(ceil(pos.x), ceil(pos.y))].g);
+    
+    for (int i1 = 0; i1 < 4; i1++)
+    {
+        pointVector[i1] = pointVector[i1] * 2 - float2(1, 1);
+    }
+    
+    for (int x = 0; x < 2; x++)
+    {
+        for (int y = 0; y < 2; y++)
+        {
+            pointValue[BINARYPOSTOINDEX(x, y)] = dotProduct(pointVector[BINARYPOSTOINDEX(x, y)], pointDist[BINARYPOSTOINDEX(x, y)]);
+        }
+    }
+    // gets the interpolated value using the dot products
+    
+    // p(0,1) --- Line 1 --- P(1,1)
+    //              |
+    //            line 2
+    //              |
+    // p(0,0) --- Line 0 --- P(1,0)
+    float line0Val = cosineInterpolate(
+            pointValue[BINARYPOSTOINDEX(0, 0)],
+            pointValue[BINARYPOSTOINDEX(0, 1)],
+            pos.x % 1
+        );
+
+    float line1Val = cosineInterpolate(
+            pointValue[BINARYPOSTOINDEX(0, 1)],
+            pointValue[BINARYPOSTOINDEX(1, 1)],
+            pos.x % 1
+        );
+
+    float line2Val = cosineInterpolate(
+            line0Val,
+            line1Val,
+            pos.y % 1
+        );
+
+    output[id.xy] = line2Val;
 }

@@ -281,7 +281,6 @@ public class chunk : MonoBehaviour
     }
     private void setMaterialNoise()
     {
-
         m.SetTexture("Texture3D_edgeNoise", edgeNoise);
         
         m.SetVector($"Vector3_NodesDim", new Vector3(manager.dim[0], manager.dim[1], manager.dim[2]));
