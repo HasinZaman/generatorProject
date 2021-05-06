@@ -130,7 +130,7 @@ public class TwoDimensionalNoiseHeightMap : NoiseHeightMapGenerator
     /// </summary>
     /// <param name="x"></param>
     /// <param name="y"></param>
-    /// <returns></returns>
+    /// <returns>a perlin noise value is returned at a given nth position</returns>
     private float sample(int x, int y)
     {
         int[] sampleDim = grid.getDim();
@@ -202,6 +202,12 @@ public class TwoDimensionalNoiseHeightMap : NoiseHeightMapGenerator
             );
         return (line2Val + 2) / 4;
     }
+    /// <summary>
+    /// binaryToPositionIndex converts a coord into a index for a one dimensitional 
+    /// </summary>
+    /// <param name="x"></param>
+    /// <param name="y"></param>
+    /// <returns>an int repsenting the index of a coord</returns>
     private int binaryToPositionIndex(int x, int y)
     {
         return x + y * 2;
