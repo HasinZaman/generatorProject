@@ -6,10 +6,16 @@ using UnityEngine;
 /// </summary>
 public class TwoDimensionalNoiseHeightMap : NoiseHeightMapGenerator
 {
+
     /// <summary>
-    ///     vectors is a 2d texture used to store vectors(that are used in calculating perlin noise) and provide as a means of transfering information to the gpu
+    ///     perlinNoiseVectors stores the perlin noise vectors used in generating noise
     /// </summary>
-    Texture2D perlinVector;
+    float[][] perlinNoiseVectors;
+
+    /// <summary>
+    ///     perlinVectorDim stores the dim of perlinNoiseVectors
+    /// </summary>
+    uint[] perlinVectorDim;
 
     /// <summary>
     ///     shader is stores a computeShader used to calculate the noise
@@ -24,28 +30,25 @@ public class TwoDimensionalNoiseHeightMap : NoiseHeightMapGenerator
     /// <param name="nodeSize">nodeSize is an array that stores the dimension of the final height map grid</param>
     /// <param name="perlinVectorDim">perlinVectorDim is an array that defines the size of perlinNoise vector</param>
     /// <param name="shader"></param>
-    public TwoDimensionalNoiseHeightMap(float[][] templateVector, int seed, int[] nodeSize, int[] perlinVectorDim, ComputeShader shader) : base( templateVector, seed, nodeSize)
+    public TwoDimensionalNoiseHeightMap(float[][] templateVector, int seed, int[] nodeSize, uint[] perlinVectorDim, ComputeShader shader) : base( templateVector, seed, nodeSize)
     {
         if(perlinVectorDim.Length != 2)
         {
             throw new ArgumentException();
         }
         this.shader = shader;
-        Color tmpColor = new Color();
         float[] vector;
 
-        perlinVector = new Texture2D(perlinVectorDim[0], perlinVectorDim[1]);
+        perlinNoiseVectors = new float[perlinVectorDim[0] * perlinVectorDim[1]][];
 
-        for(int x = 0; x < perlinVectorDim[0]; x++)
+        this.perlinVectorDim = perlinVectorDim;
+
+        for (int x = 0; x < perlinVectorDim[0]; x++)
         {
-            for(int y = 0; y < perlinVectorDim[1]; y++)
+            for (int y = 0; y < perlinVectorDim[1]; y++)
             {
                 vector = templateVector[random.Next(0, templateVector.Length)];
-
-                tmpColor.r = vectorToPixel(vector[0]);
-                tmpColor.g = vectorToPixel(vector[1]);
-
-                perlinVector.SetPixel(x, y, tmpColor);
+                perlinNoiseVectors[x + y * perlinVectorDim[0]]= vector;
             }
         }
     }
@@ -58,32 +61,32 @@ public class TwoDimensionalNoiseHeightMap : NoiseHeightMapGenerator
     /// <param name="vectorVal">vectorVal is a new vector that will be modified</param>
     public void setVector(int x, int y, float[] vectorVal)
     {
-        if(x < 0 || x > perlinVector.width)
+        if(x < 0 || x > perlinVectorDim[0])
         {
-            throw new ArgumentOutOfRangeException($"x value needs to be between {0} <= x < {perlinVector.width}");
+            throw new ArgumentOutOfRangeException($"x value needs to be between {0} <= x < {perlinVectorDim[0]}");
         }
 
-        if(y < 0 || y > perlinVector.height)
+        if(y < 0 || y > perlinVectorDim[1])
         {
-            throw new ArgumentOutOfRangeException($"y value needs to be between {0} <= y < {perlinVector.height}");
+            throw new ArgumentOutOfRangeException($"y value needs to be between {0} <= y < {perlinVectorDim[1]}");
         }
 
         if(vectorVal.Length != 2)
         {
             throw new ArgumentException("vectorVal cannot must have two values");
         }
-        else if(vectorVal[0] == -1 && vectorVal[0] == 0 && vectorVal[0] == 1)
+
+        for(int i1 = 0; i1 < 2; i1++)
         {
-            throw new ArgumentException("vectorVal[0] must between -1 <= vectorVal[0] <= 1");
-        }
-        else if (vectorVal[1] == -1 && vectorVal[1] == 0 && vectorVal[1] == 1)
-        {
-            throw new ArgumentException("vectorVal[1] must between -1 <= vectorVal[0] <= 1");
+            if(vectorVal[i1] < -1 || vectorVal[i1] > 1)
+            {
+                throw new ArgumentException($"vectorVal[{i1}] must between -1 <= vectorVal[{i1}] <= 1");
+            }
         }
 
         Color tmpColor = new Color(vectorToPixel(vectorVal[0]), vectorToPixel(vectorVal[1]), 0);
 
-        perlinVector.SetPixel(x, y, tmpColor);
+        perlinNoiseVectors[x * y] = vectorVal;
     }
 
     /// <summary>
@@ -98,34 +101,109 @@ public class TwoDimensionalNoiseHeightMap : NoiseHeightMapGenerator
 
         int[] dim = this.grid.getDim();
 
-        Texture2D output = new Texture2D(dim[0], dim[2], TextureFormat.Alpha8, false);
+        Node[] nodes = new Node[dim[0] * dim[1] * dim[2]];
+        float sampleTemp;
 
-        shader.SetTexture(kernelHandle, "vectors", perlinVector);
-
-        shader.SetTexture(kernelHandle, "noise", output);
-
-        shader.Dispatch(kernelHandle, (int)Math.Ceiling((float)dim[0] / 10), (int)Math.Ceiling((float)dim[1] / 10), 1);
-
-        Node[] noiseVals = new Node[dim[0] * dim[1] * dim[2]];
-
-        for(int x = 0; x < dim[0]; x++)
+        for (int x = 0; x < dim[0]; x++)
         {
-            for(int y = 0; y < dim[1]; y++)
+            for(int z = 0; z < dim[2]; z++)
             {
-                for(int z = 0; z <  dim[2]; z++)
-                if(Math.Abs(output.GetPixel(x, z).a) > 1)
+                sampleTemp = sample(x, z);
+
+                sampleTemp *= (float)dim[1];
+                
+                for(int y = 0; y < dim[1]; y++)
                 {
-                    noiseVals[Grid.coordToIndex(dim,x,y,z)] = new Node(output.GetPixel(x, z).a);
-                }
-                else
-                {
-                    noiseVals[Grid.coordToIndex(dim, x, y, z)] = new Node(output.GetPixel(x, y).a % 1);
+                    nodes[x + (y + z * dim[1]) * dim[0]] = new Node(Mathf.Clamp(sampleTemp - y, 0, 1));
                 }
             }
         }
 
-        grid.setNodes(noiseVals);
+
+        grid.setNodes(nodes);
 
         return grid;
+    }
+
+    /// <summary>
+    ///     Sample gets a noise value at x and y position
+    /// </summary>
+    /// <param name="x"></param>
+    /// <param name="y"></param>
+    /// <returns></returns>
+    private float sample(int x, int y)
+    {
+        int[] sampleDim = grid.getDim();
+
+        float[][] pointDist = new float[4][];
+        float[][] pointVector = new float[4][];
+        float[] pointValue = new float[4];
+
+        uint[] perlinVectorDimTemp = new uint[2] { perlinVectorDim[0] - 1, perlinVectorDim[1] - 1 };
+
+        float[] pos = new float[2] {
+            (float)x / (float)sampleDim[0] * (float)perlinVectorDimTemp[0],
+            (float)y / (float)sampleDim[2] * (float)perlinVectorDimTemp[1]
+        };
+
+        for (int x1 = 0; x1 < 2; x1++)
+        {
+            for (int y1 = 0; y1 < 2; y1++)
+            {
+                pointDist[binaryToPositionIndex(x1, y1)] = new float[2] {(pos[0] % 1) - x1, (pos[1] % 1) - y1 };
+            }
+        }
+
+        int[][] posRounded = new int[2][] {
+            new int[] { (int)Math.Floor(pos[0]), (int)Math.Ceiling(pos[0]) },
+            new int[] { (int)Math.Floor(pos[1]), (int)Math.Ceiling(pos[1]) }
+        };
+
+        //gets the dot product for every corner
+        for (int x1 = 0; x1 < 2; x1++)
+        {
+            for(int y1 = 0; y1 < 2; y1++)
+            {
+                pointVector[binaryToPositionIndex(x1, y1)] = perlinNoiseVectors[posRounded[0][x1] + posRounded[1][y1] * perlinVectorDimTemp[0]];
+            }
+        }
+
+        for (int x1 = 0; x1 < 2; x1++)
+        {
+            for (int y1 = 0; y1 < 2; y1++)
+            {
+                pointValue[binaryToPositionIndex(x1, y1)] = dotProduct(pointVector[binaryToPositionIndex(x1, y1)], pointDist[binaryToPositionIndex(x1, y1)]);
+                
+            }
+        }
+        // gets the interpolated value using the dot products
+
+        // p(0,1) --- Line 1 --- P(1,1)
+        //              |
+        //            line 2
+        //              |
+        // p(0,0) --- Line 0 --- P(1,0)
+        float line0Val = cosineInterpolate(
+                pointValue[binaryToPositionIndex(0, 0)],
+                pointValue[binaryToPositionIndex(1, 0)],
+                x % 1
+            );
+
+        float line1Val = cosineInterpolate(
+                pointValue[binaryToPositionIndex(0, 1)],
+                pointValue[binaryToPositionIndex(1, 1)],
+                x % 1
+            );
+
+        float line2Val = cosineInterpolate(
+                line0Val,
+                line1Val,
+                y % 1
+            );
+        return (line2Val + 2) / 4;
+    }
+    private int binaryToPositionIndex(int x, int y)
+    {
+        return x + y * 2;
     }
 }

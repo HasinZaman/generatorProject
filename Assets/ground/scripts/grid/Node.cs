@@ -83,7 +83,7 @@ public class Node : IComparable
     {
         if(val < Node.minVal || val > Node.maxVal)
         {
-            throw new ArgumentException($"val is outside range of vaild values. Required Range: {Node.minVal} < val < {Node.maxVal}");
+            throw new ArgumentException($"val is outside range of vaild values. Required Range: {Node.minVal} < val < {Node.maxVal}| val = {val}");
         }
 
         this.val = val;

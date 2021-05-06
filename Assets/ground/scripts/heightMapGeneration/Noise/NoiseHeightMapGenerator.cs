@@ -46,7 +46,43 @@ public abstract class NoiseHeightMapGenerator : HeightMapGenerator
     /// </returns>
     protected float vectorToPixel(float f)
     {
-        return (f + 1) / 3;
+        return (f + 1) / 2;
+    }
+
+    /// <summary>
+    ///     dotProduct returns the dotProduct of two vectors
+    /// </summary>
+    /// <param name="v1">v1 is a vector of n length</param>
+    /// <param name="v2">v2 is a vector of n length</param>
+    /// <returns>
+    ///     float of the dotProduct of v1 and v2
+    /// </returns>
+    protected float dotProduct(float[] v1, float[] v2)
+    {
+        if (v1.Length != v2.Length)
+        {
+            throw new ArgumentException($"vector 1 and vector need to be the same size. v1.length={v1.Length} v2.length={v2.Length}");
+        }
+        float temp = 0;
+        for (int i1 = 0; i1 < v1.Length; i1++)
+        {
+            temp += v1[i1] * v2[i1];
+        }
+        return temp;
+    }
+
+    /// <summary>
+    ///     cosineInterpolate interpolates between y1 and y2
+    /// </summary>
+    /// <param name="y1">y1 is the first value</param>
+    /// <param name="y2">y2 is the second value</param>
+    /// <param name="intermediaryPoint">intermediaryPoint is the x position which an interpolated value will be extracted at</param>
+    /// <returns>float of the interpolated value between y1 and y2</returns>
+    protected float cosineInterpolate(float y1, float y2, float intermediaryPoint)
+    {
+        float mu = (float)(1 - Math.Cos(intermediaryPoint * Math.PI)) / 2;
+
+        return y1 * (1 - mu) + y2 * mu;
     }
 
     /// <summary>

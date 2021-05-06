@@ -378,7 +378,7 @@ public class chunk : MonoBehaviour
     {
         //format
         //Chunk value|Node value|chunkTextureDetails
-        //           ^ Line seperatoes chunk values and node values
+        //           ^ Line seperates chunk values and node values
         string temp = $"{this.transform.position.x},{this.transform.position.y},{this.transform.position.z},{this.pos.x},{this.pos.y},{this.pos.z}|{n.ToString()}|{chunkTextureDetailsToString()}";
 
         return temp;

@@ -77,9 +77,9 @@ public class Grid
             {
                 throw new ArgumentOutOfRangeException();
             }
-            else if(end > start)
+            else if(end < start)
             {
-                throw new ArgumentOutOfRangeException("The end point needs to be greater than start");
+                throw new ArgumentOutOfRangeException($"The end point needs to be greater than start. {end} > {start}");
             }
 
             if (step <= 0)
