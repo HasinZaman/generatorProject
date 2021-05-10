@@ -16,7 +16,7 @@ public class GroundManager : MonoBehaviour
         Chunk chunkTemp;
 
         chunks = new Chunk[chunkDim[0] * chunkDim[1]];
-        TwoDimensionalNoiseHeightMap n = new TwoDimensionalNoiseHeightMap(NoiseVectors.TwoDimensionSet1, 25, new int[3] { 10,10,10 }, new uint[] { 3, 3 }, shaderList.Noise);
+        TwoDimensionalNoiseHeightMap n = new TwoDimensionalNoiseHeightMap(NoiseVectors.TwoDimensionSet1, 25, new int[3] { 50, 50, 50 }, new uint[] { 5, 5 }, shaderList.Noise);
         
         for (int x = 0; x < chunkDim[0]; x++)
         {
@@ -30,10 +30,8 @@ public class GroundManager : MonoBehaviour
                 chunks[x + y * chunkDim[0]] = chunkTemp;
             }
         }
-        
     }
 
-    private bool start = false;
     private int count = 0;
 
     private void Update()
@@ -42,7 +40,7 @@ public class GroundManager : MonoBehaviour
         {
             for (int i1 = 0; i1 < chunks.Length; i1++)
             {
-                chunks[i1].updateMesh();
+                chunks[i1].updateMesh(1);
             }
             count++;
         }

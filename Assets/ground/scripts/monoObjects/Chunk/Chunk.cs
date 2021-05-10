@@ -37,7 +37,22 @@ public class Chunk : MonoBehaviour
             throw new InvalidOperationException("meshGenerator not defined");
         }
         meshData = meshGenerator.getMesh();
+        mesh.Clear();
 
+        mesh.vertices = meshData.vertices;
+        mesh.triangles = meshData.triangles;
+
+        mesh.RecalculateNormals();
+
+        collider.sharedMesh = mesh;
+    }
+    public void updateMesh(int n)
+    {
+        if (meshGenerator == null)
+        {
+            throw new InvalidOperationException("meshGenerator not defined");
+        }
+        meshData = meshGenerator.getMesh(n);
         mesh.Clear();
 
         mesh.vertices = meshData.vertices;

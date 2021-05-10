@@ -101,14 +101,21 @@ public class TwoDimensionalNoiseHeightMap : NoiseHeightMapGenerator
 
         int[] dim = this.grid.getDim();
 
+        float[] samplePosDetla = new float[2] {(float) (perlinVectorDim[0] - 1) / (float)dim[0], (float)(perlinVectorDim[1] - 1) / (float)dim[2]};
+
+        float[] samplePos = new float[2] { samplePosDetla[0] * 0.5f, samplePosDetla[1] * 0.5f };
+
         Node[] nodes = new Node[dim[0] * dim[1] * dim[2]];
         float sampleTemp;
 
         for (int x = 0; x < dim[0]; x++)
         {
-            for(int z = 0; z < dim[2]; z++)
+            samplePos[0] = samplePosDetla[0] * (0.5f + (float)x);
+            for (int z = 0; z < dim[2]; z++)
             {
-                sampleTemp = sample(x, z);
+                samplePos[1] = samplePosDetla[1] * (0.5f + (float)z);
+                
+                sampleTemp = sample(samplePos);
 
                 sampleTemp *= (float)dim[1];
                 
@@ -119,9 +126,7 @@ public class TwoDimensionalNoiseHeightMap : NoiseHeightMapGenerator
             }
         }
 
-
         grid.setNodes(nodes);
-
         return grid;
     }
 
@@ -130,8 +135,27 @@ public class TwoDimensionalNoiseHeightMap : NoiseHeightMapGenerator
     /// </summary>
     /// <param name="x"></param>
     /// <param name="y"></param>
-    /// <returns>a perlin noise value is returned at a given nth position</returns>
-    private float sample(int x, int y)
+    /// <returns>a perlin noise value is returned at a given coordinate position</returns>
+    public float sample(float x, float y)
+    {
+        if(x > perlinVectorDim[0] - 1)
+        {
+            throw new OverflowException($"x paramater greater than maximum size{perlinVectorDim[0] - 1}");
+        }
+
+        if(y > perlinVectorDim[1] - 1)
+        {
+            throw new OverflowException($"y paramater greater than maximum size{perlinVectorDim[1] - 1}");
+        }
+        return sample(new float[] { x, y });
+    }
+
+    /// <summary>
+    ///     Sample gets a noise value at x and y position
+    /// </summary>
+    /// <param name="pos">float array containing x and y position</param>
+    /// <returns>a perlin noise value is returned at a given coordinate position</returns>
+    private float sample(float[] pos)
     {
         int[] sampleDim = grid.getDim();
 
@@ -141,16 +165,11 @@ public class TwoDimensionalNoiseHeightMap : NoiseHeightMapGenerator
 
         uint[] perlinVectorDimTemp = new uint[2] { perlinVectorDim[0] - 1, perlinVectorDim[1] - 1 };
 
-        float[] pos = new float[2] {
-            (float)x / (float)sampleDim[0] * (float)perlinVectorDimTemp[0],
-            (float)y / (float)sampleDim[2] * (float)perlinVectorDimTemp[1]
-        };
-
         for (int x1 = 0; x1 < 2; x1++)
         {
             for (int y1 = 0; y1 < 2; y1++)
             {
-                pointDist[binaryToPositionIndex(x1, y1)] = new float[2] {(pos[0] % 1) - x1, (pos[1] % 1) - y1 };
+                pointDist[binaryToPositionIndex(x1, y1)] = new float[2] { (pos[0] % 1) - x1, (pos[1] % 1) - y1 };
             }
         }
 
@@ -162,7 +181,7 @@ public class TwoDimensionalNoiseHeightMap : NoiseHeightMapGenerator
         //gets the dot product for every corner
         for (int x1 = 0; x1 < 2; x1++)
         {
-            for(int y1 = 0; y1 < 2; y1++)
+            for (int y1 = 0; y1 < 2; y1++)
             {
                 pointVector[binaryToPositionIndex(x1, y1)] = perlinNoiseVectors[posRounded[0][x1] + posRounded[1][y1] * perlinVectorDimTemp[0]];
             }
@@ -173,7 +192,7 @@ public class TwoDimensionalNoiseHeightMap : NoiseHeightMapGenerator
             for (int y1 = 0; y1 < 2; y1++)
             {
                 pointValue[binaryToPositionIndex(x1, y1)] = dotProduct(pointVector[binaryToPositionIndex(x1, y1)], pointDist[binaryToPositionIndex(x1, y1)]);
-                
+
             }
         }
         // gets the interpolated value using the dot products
@@ -186,22 +205,23 @@ public class TwoDimensionalNoiseHeightMap : NoiseHeightMapGenerator
         float line0Val = cosineInterpolate(
                 pointValue[binaryToPositionIndex(0, 0)],
                 pointValue[binaryToPositionIndex(1, 0)],
-                x % 1
+                pos[0] % 1
             );
 
         float line1Val = cosineInterpolate(
                 pointValue[binaryToPositionIndex(0, 1)],
                 pointValue[binaryToPositionIndex(1, 1)],
-                x % 1
+                pos[0] % 1
             );
 
         float line2Val = cosineInterpolate(
                 line0Val,
                 line1Val,
-                y % 1
+                pos[1] % 1
             );
         return (line2Val + 2) / 4;
     }
+
     /// <summary>
     /// binaryToPositionIndex converts a coord into a index for a one dimensitional 
     /// </summary>

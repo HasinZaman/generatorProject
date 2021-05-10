@@ -102,6 +102,7 @@ public class MeshGenerator
     /// </returns>
     public MeshData getMesh(int n)
     {
+        //Debug.Log(grid.toString());
         int[] dim = grid.getDim();
         
         //declaring Compute Buffers
