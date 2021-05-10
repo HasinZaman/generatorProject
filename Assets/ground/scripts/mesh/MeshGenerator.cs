@@ -26,7 +26,7 @@ public class MeshGenerator
     /// <summary>
     ///     distPerNode is the distance between nodes
     /// </summary>
-    private float distPerNode;
+    private float[] distPerNode;
 
     /// <summary>
     ///     kernelhandle is the id of the algorthim used to generate a mesh
@@ -59,7 +59,7 @@ public class MeshGenerator
         
 
         this.threshold = threshold;
-        this.distPerNode = distPerNode;
+        this.distPerNode = new float[] { distPerNode, distPerNode, distPerNode } ;
     }
 
     /// <summary>
@@ -102,6 +102,7 @@ public class MeshGenerator
     /// </returns>
     public MeshData getMesh(int n)
     {
+        Debug.Log(grid.toString());
         int[] dim = grid.getDim();
         
         //declaring Compute Buffers

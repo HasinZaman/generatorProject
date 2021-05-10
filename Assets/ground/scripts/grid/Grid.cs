@@ -509,4 +509,25 @@ public class Grid
     {
         return (int[]) dim.Clone();
     }
+
+    public string toString()
+    {
+        string str = "";
+
+        for (int y = 0; y < dim[1]; y++)
+        {
+            for (int x = 0; x < dim[0]; x++)
+            {
+                str += $"{getNode(x,y,0).getValue().ToString("0.00")}";
+                for (int z = 1; z < dim[2]; z++)
+                {
+                    str += $"\t{getNode(x, y, z).getValue().ToString("0.00")}";
+                }
+                str += "\n";
+            }
+            str += "\n";
+        }
+
+        return str;
+    }
 }

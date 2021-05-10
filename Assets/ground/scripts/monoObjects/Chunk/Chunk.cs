@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -16,7 +17,7 @@ public class Chunk : MonoBehaviour
     public Mesh mesh;
     public MeshCollider collider;
 
-    private void Start()
+    public void Start()
     {
         meshFilter = GetComponent<MeshFilter>();
         mesh = new Mesh();
@@ -27,13 +28,35 @@ public class Chunk : MonoBehaviour
 
         material = this.GetComponent<Renderer>().material;
         this.GetComponent<Renderer>().material = material;
-
-        updateMesh();
     }
 
-    void updateMesh()
+    public void updateMesh()
     {
+        if(meshGenerator == null)
+        {
+            throw new InvalidOperationException("meshGenerator not defined");
+        }
         meshData = meshGenerator.getMesh();
+
+
+
+        Debug.Log(meshData.vertices.Length);
+
+        string str = $"({meshData.vertices[0].x},{meshData.vertices[0].y},{meshData.vertices[0].z})";
+        for(int i1 = 1; i1 < meshData.vertices.Length; i1++)
+        {
+            if (i1 % 3 == 0)
+            {
+                str += "\n";
+            }
+
+            str += $" ({meshData.vertices[i1].x},{meshData.vertices[i1].y},{meshData.vertices[i1].z})";
+            
+        }
+        Debug.Log(str);
+
+        Debug.Log(meshData.triangles.Length);
+        Debug.Log(String.Join(",", meshData.triangles));
 
         mesh.Clear();
 
@@ -48,6 +71,6 @@ public class Chunk : MonoBehaviour
     public void setChunk(Grid grid, ComputeShader shader)
     {
         this.chunkGrid = grid;
-        this.meshGenerator = new MeshGenerator(grid, shader, "getVertices", 1, 1);
+        this.meshGenerator = new MeshGenerator(grid, shader, "getVertices", 0.5f, 1);
     }
 }
