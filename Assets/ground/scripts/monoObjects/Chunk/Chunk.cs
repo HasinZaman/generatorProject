@@ -38,26 +38,6 @@ public class Chunk : MonoBehaviour
         }
         meshData = meshGenerator.getMesh();
 
-
-
-        Debug.Log(meshData.vertices.Length);
-
-        string str = $"({meshData.vertices[0].x},{meshData.vertices[0].y},{meshData.vertices[0].z})";
-        for(int i1 = 1; i1 < meshData.vertices.Length; i1++)
-        {
-            if (i1 % 3 == 0)
-            {
-                str += "\n";
-            }
-
-            str += $" ({meshData.vertices[i1].x},{meshData.vertices[i1].y},{meshData.vertices[i1].z})";
-            
-        }
-        Debug.Log(str);
-
-        Debug.Log(meshData.triangles.Length);
-        Debug.Log(String.Join(",", meshData.triangles));
-
         mesh.Clear();
 
         mesh.vertices = meshData.vertices;
