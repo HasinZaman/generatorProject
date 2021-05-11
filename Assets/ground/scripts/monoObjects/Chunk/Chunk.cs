@@ -63,9 +63,31 @@ public class Chunk : MonoBehaviour
         collider.sharedMesh = mesh;
     }
 
-    public void setChunk(Grid grid, ComputeShader shader)
+    public void setChunk(Grid grid, ComputeShader shader, float nodeDist)
     {
+        if(nodeDist < 0)
+        {
+            throw new ArgumentException("nodeDist cannot be greater than 0");
+        }
         this.chunkGrid = grid;
         this.meshGenerator = new MeshGenerator(grid, shader, "getVertices", 0.5f, 1);
+    }
+    public void setChunk(Grid grid, ComputeShader shader, float[] nodeDist)
+    {
+        if (nodeDist.Length != 3)
+        {
+            throw new ArgumentException("nodeDist requires 3 values in array");
+        }
+
+        for(int i1 = 0; i1 < 3; i1++)
+        {
+            if (nodeDist[i1] < 0)
+            {
+                throw new ArgumentException("nodeDist cannot be greater than 0");
+            }
+        }
+        
+        this.chunkGrid = grid;
+        this.meshGenerator = new MeshGenerator(grid, shader, "getVertices", 0.5f, nodeDist);
     }
 }

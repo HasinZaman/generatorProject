@@ -25,7 +25,7 @@ public class GroundManager : MonoBehaviour
                 gameObjectTemp = Instantiate(chunkPrefab, new Vector3( x, y, 0), new Quaternion(0,0,0,0), this.transform);
                 chunkTemp = gameObjectTemp.GetComponent<Chunk>();
 
-                chunkTemp.setChunk(n.getHeightMap(), shaderList.MarchingCube);
+                chunkTemp.setChunk(n.getHeightMap(), shaderList.MarchingCube, new float[] { 1, 1, 1 });
 
                 chunks[x + y * chunkDim[0]] = chunkTemp;
             }
@@ -40,8 +40,9 @@ public class GroundManager : MonoBehaviour
         {
             for (int i1 = 0; i1 < chunks.Length; i1++)
             {
-                chunks[i1].updateMesh(1);
+                chunks[i1].updateMesh();
             }
+
             count++;
         }
         else

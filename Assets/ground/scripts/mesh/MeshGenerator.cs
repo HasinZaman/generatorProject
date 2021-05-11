@@ -63,6 +63,26 @@ public class MeshGenerator
     }
 
     /// <summary>
+    ///     Constructor initializes MeshGenerator
+    /// </summary>
+    /// <param name="grid">grid paramater initalizes grid refrence</param>
+    /// <param name="shader">shader paramater initalizes shader instance</param>
+    /// <param name="algorthim">algorthim paramater initalizes computeAlgorthim instance</param>
+    /// <param name="threshold">threshold paramater initalizes threshold instance</param>
+    /// <param name="distPerNode"></param>
+    public MeshGenerator(Grid grid, ComputeShader shader, string algorthim, float threshold, float[] distPerNode)
+    {
+        setGrid(grid);
+        setComputeShader(shader, algorthim);
+
+
+
+        this.threshold = threshold;
+        this.distPerNode = distPerNode;
+    }
+
+
+    /// <summary>
     /// 
     /// </summary>
     /// <param name="grid"></param>
