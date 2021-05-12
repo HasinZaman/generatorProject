@@ -8,28 +8,13 @@ public class GroundManager : MonoBehaviour
     public GameObject chunkPrefab;
 
     Chunk[] chunks;
-    int[] chunkDim = new int[2] { 1, 1 };
+    int[] chunkDim = new int[2] { 2, 2 };
 
+    float[] nodeDistTemplate = new float[] { 1, 1, 1 };
+    int[] gridDim = new int[] { 50, 50, 50 };
     void Start()
     {
-        GameObject gameObjectTemp;
-        Chunk chunkTemp;
-
-        chunks = new Chunk[chunkDim[0] * chunkDim[1]];
-        TwoDimensionalNoiseHeightMap n = new TwoDimensionalNoiseHeightMap(NoiseVectors.TwoDimensionSet1, 25, new int[3] { 50, 50, 50 }, new uint[] { 5, 5 }, shaderList.Noise);
-        
-        for (int x = 0; x < chunkDim[0]; x++)
-        {
-            for(int y = 0; y < chunkDim[1]; y++)
-            {
-                gameObjectTemp = Instantiate(chunkPrefab, new Vector3( x, y, 0), new Quaternion(0,0,0,0), this.transform);
-                chunkTemp = gameObjectTemp.GetComponent<Chunk>();
-
-                chunkTemp.setChunk(n.getHeightMap(), shaderList.MarchingCube, new float[] { 1, 1, 1 });
-
-                chunks[x + y * chunkDim[0]] = chunkTemp;
-            }
-        }
+        generate();
     }
 
     private int count = 0;
@@ -50,4 +35,36 @@ public class GroundManager : MonoBehaviour
             count++;
         }
     }
+
+    public void generate()
+    {
+        GameObject gameObjectTemp;
+        Chunk chunkTemp;
+
+        chunks = new Chunk[chunkDim[0] * chunkDim[1]];
+        TwoDimensionalNoiseHeightMap[] n = new TwoDimensionalNoiseHeightMap[chunkDim[0] * chunkDim[1]];
+
+        Vector3 pos = new Vector3(0, 0, 0);
+
+        for (int x = 0; x < chunkDim[0]; x++)
+        {
+            pos.x = x * gridDim[0] * nodeDistTemplate[0];
+
+            for (int z = 0; z < chunkDim[1]; z++)
+            {
+                n[x + z * chunkDim[0]] = new TwoDimensionalNoiseHeightMap(NoiseVectors.TwoDimensionSet1, 25, gridDim, new uint[] { 5, 5 }, shaderList.Noise);
+
+                pos.z = z * gridDim[2] * nodeDistTemplate[2];
+
+                gameObjectTemp = Instantiate(chunkPrefab, pos, new Quaternion(0, 0, 0, 0), this.transform);
+                chunkTemp = gameObjectTemp.GetComponent<Chunk>();
+
+                chunkTemp.setChunk(n[x + z * chunkDim[0]].getHeightMap(), shaderList.MarchingCube, nodeDistTemplate);
+
+                chunks[x + z * chunkDim[0]] = chunkTemp;
+            }
+        }
+    }
+
+    public void load(string file)
 }

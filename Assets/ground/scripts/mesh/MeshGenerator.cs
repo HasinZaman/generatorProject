@@ -56,8 +56,6 @@ public class MeshGenerator
         setGrid(grid);
         setComputeShader(shader, algorthim);
 
-        
-
         this.threshold = threshold;
         this.distPerNode = new float[] { distPerNode, distPerNode, distPerNode } ;
     }
