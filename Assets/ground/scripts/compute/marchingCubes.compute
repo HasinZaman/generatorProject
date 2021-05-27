@@ -186,9 +186,3 @@ void getVertices(uint3 id : SV_DispatchThreadID)
 
     }
 }
-
-[numthreads(5, 5, 5)]
-void generateNodes(uint3 id : SV_DispatchThreadID)
-{
-
-}

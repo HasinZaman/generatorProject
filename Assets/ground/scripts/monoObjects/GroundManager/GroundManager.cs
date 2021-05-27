@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -8,10 +9,10 @@ public class GroundManager : MonoBehaviour
     public GameObject chunkPrefab;
 
     Chunk[] chunks;
-    int[] chunkDim = new int[2] { 2, 2 };
+    int[] chunkDim = new int[2] { 3, 3 };
 
     float[] nodeDistTemplate = new float[] { 1, 1, 1 };
-    int[] gridDim = new int[] { 50, 50, 50 };
+    int[] gridDim = new int[] { 10, 10, 10 };
     void Start()
     {
         generate();
@@ -36,25 +37,99 @@ public class GroundManager : MonoBehaviour
         }
     }
 
+    /// <summary>
+    ///     generate method creates the chunks required for the ground
+    /// </summary>
     public void generate()
     {
         GameObject gameObjectTemp;
         Chunk chunkTemp;
 
         chunks = new Chunk[chunkDim[0] * chunkDim[1]];
+
         TwoDimensionalNoiseHeightMap[] n = new TwoDimensionalNoiseHeightMap[chunkDim[0] * chunkDim[1]];
+
+        Debug.Log("OG");
+        for (int y = 0; y < chunkDim[1]; y++)
+        {
+            for (int x = 0; x < chunkDim[0]; x++)
+            {
+                n[x + y * chunkDim[0]] = new TwoDimensionalNoiseHeightMap(NoiseVectors.TwoDimensionSet1, x + y * chunkDim[1] + 1, gridDim, new uint[] { 3, 3 }, shaderList.Noise);
+                Debug.Log($"{x},{y}");
+                //n[x + y * chunkDim[1]].gridDebug();
+
+                if (x - 1 >= 0)
+                {
+                    TwoDimensionalNoiseHeightMap.setVerticalEdge(n[(x - 1) + y * chunkDim[0]], n[x + y * chunkDim[0]]);
+                    Debug.Log("SHARING BABEY");
+
+                }
+
+                if(y - 1 >= 0)
+                {
+                    TwoDimensionalNoiseHeightMap.setHorizontalEdge(n[x + y * chunkDim[0]], n[x + (y - 1) * chunkDim[0]]);
+                    Debug.Log("SHARING BABEY 2");
+                }
+
+                if(x - 1 >= 0 && y - 1 >= 0)
+                {
+                    TwoDimensionalNoiseHeightMap.setCorner(n[(x - 1) + (y - 1) * chunkDim[0]], n[(x - 1) + (y) * chunkDim[0]], n[(x) + (y - 1) * chunkDim[0]], n[x + y * chunkDim[0]]);
+                    Debug.Log("SHARING BABEY 3");
+                }
+            }
+        }
+
+        Debug.Log("After Sharing Nodes");
+        for (int y = 0; y < chunkDim[1]; y++)
+        {
+            for (int x = 0; x < chunkDim[0]; x++)
+            {
+                Debug.Log($"{x},{y}");
+                n[x + y * chunkDim[0]].gridDebug();
+            }
+        }
+        Debug.Log("FINAL GRID");
+
+        string tmp = "";
+        TwoDimensionalNoiseHeightMap tmpNoise;
+        for (int chunkY = chunkDim[1] - 1; chunkY >= 0; chunkY--)
+        {
+            for (int y = 2; y >= 0; y--)
+            {
+                for (int chunkX = 0; chunkX < chunkDim[0]; chunkX++)
+                {
+
+                    for (int x = 0; x < 3; x++)
+                    {
+                        tmpNoise = n[chunkX + chunkY * chunkDim[0]];
+                        tmp += $"({tmpNoise.perlinNoiseVectors[x + y * 3][0]},{tmpNoise.perlinNoiseVectors[x + y * 3][1]})\t";
+                    }
+                    tmp += "|\t";
+                }
+                tmp += "\n";
+            }
+            for (int chunkX = 0; chunkX < chunkDim[0]; chunkX++)
+            {
+                for (int x = 0; x < 3; x++)
+                {
+                    tmp += "-----\t";
+                }
+                tmp += "+\t";
+            }
+            tmp += "\n";
+
+        }
+        Debug.Log(tmp);
 
         Vector3 pos = new Vector3(0, 0, 0);
 
         for (int x = 0; x < chunkDim[0]; x++)
         {
-            pos.x = x * gridDim[0] * nodeDistTemplate[0];
+            pos.x = x * (gridDim[0] - 1) * nodeDistTemplate[0];
 
             for (int z = 0; z < chunkDim[1]; z++)
             {
-                n[x + z * chunkDim[0]] = new TwoDimensionalNoiseHeightMap(NoiseVectors.TwoDimensionSet1, 25, gridDim, new uint[] { 5, 5 }, shaderList.Noise);
-
-                pos.z = z * gridDim[2] * nodeDistTemplate[2];
+                pos.z = z * (gridDim[2] - 1) * nodeDistTemplate[2];
 
                 gameObjectTemp = Instantiate(chunkPrefab, pos, new Quaternion(0, 0, 0, 0), this.transform);
                 chunkTemp = gameObjectTemp.GetComponent<Chunk>();
@@ -66,5 +141,12 @@ public class GroundManager : MonoBehaviour
         }
     }
 
+    /// <summary>
+    ///     Load takes a file and generates chunks
+    /// </summary>
+    /// <param name="file"></param>
     public void load(string file)
+    {
+        throw new NotImplementedException();
+    }
 }

@@ -30,6 +30,9 @@ public class Chunk : MonoBehaviour
         this.GetComponent<Renderer>().material = material;
     }
 
+    /// <summary>
+    ///     updatMesh method updates the chunks mesh
+    /// </summary>
     public void updateMesh()
     {
         if(meshGenerator == null)
@@ -46,6 +49,11 @@ public class Chunk : MonoBehaviour
 
         collider.sharedMesh = mesh;
     }
+
+    /// <summary>
+    ///     updatMesh method updates the chunks mesh
+    /// </summary>
+    /// <param name="n">n paramater defines the nodes that will be skipped when generating mesh</param>
     public void updateMesh(int n)
     {
         if (meshGenerator == null)
@@ -63,6 +71,12 @@ public class Chunk : MonoBehaviour
         collider.sharedMesh = mesh;
     }
 
+    /// <summary>
+    ///     setChunk method initates chunk
+    /// </summary>
+    /// <param name="grid"></param>
+    /// <param name="shader"></param>
+    /// <param name="nodeDist"></param>
     public void setChunk(Grid grid, ComputeShader shader, float nodeDist)
     {
         if(nodeDist < 0)
@@ -72,6 +86,13 @@ public class Chunk : MonoBehaviour
         this.chunkGrid = grid;
         this.meshGenerator = new MeshGenerator(grid, shader, "getVertices", 0.5f, 1);
     }
+
+    /// <summary>
+    ///     setChunk method initates chunk
+    /// </summary>
+    /// <param name="grid"></param>
+    /// <param name="shader"></param>
+    /// <param name="nodeDist"></param>
     public void setChunk(Grid grid, ComputeShader shader, float[] nodeDist)
     {
         if (nodeDist.Length != 3)

@@ -92,4 +92,12 @@ public abstract class NoiseHeightMapGenerator : HeightMapGenerator
     ///     Grid that repesents the heightMap created with perlin noise
     /// </returns>
     public abstract Grid getHeightMap();
+
+    /// <summary>
+    ///     getHeightMap returns the final height map grid
+    /// </summary>
+    /// <returns>
+    ///     Grid that repesents the heightMap created with perlin noise
+    /// </returns>
+    public abstract void setNeighbor(NoiseHeightMapGenerator neighbor, int neighborCode);
 }
