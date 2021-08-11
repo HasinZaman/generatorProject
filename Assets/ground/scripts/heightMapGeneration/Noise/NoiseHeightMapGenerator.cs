@@ -6,6 +6,49 @@
 public abstract class NoiseHeightMapGenerator : HeightMapGenerator
 {
     /// <summary>
+    ///     VectorNode stores noise vector
+    /// </summary>
+    protected class VectorNode
+    {
+        /// <summary>
+        ///     vector stores the perlin noise vector
+        /// </summary>
+        protected float[] vector;
+
+        /// <summary>
+        ///     dim stores size of the perlin noise vectors
+        /// </summary>
+        protected int dim;
+
+        public VectorNode()
+        {
+
+        }
+
+        /// <summary>
+        ///     Set method assigns vector value
+        /// </summary>
+        /// <param name="vector">New vector value</param>
+        public void set(float[] vector)
+        {
+            if (dim != vector.Length)
+            {
+                throw new ArgumentException($"vector lenght must have exactly {dim} elements");
+            }
+            this.vector = vector;
+        }
+
+        /// <summary>
+        ///     get method returns vector value
+        /// </summary>
+        /// <returns>A float array of vector</returns>
+        public float[] val()
+        {
+            return this.vector;
+        }
+    }
+
+    /// <summary>
     ///     random is used to create grid using vectors
     /// </summary>
     protected Random random;
