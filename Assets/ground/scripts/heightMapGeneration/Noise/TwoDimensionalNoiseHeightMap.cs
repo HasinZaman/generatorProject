@@ -46,8 +46,6 @@ public class TwoDimensionalNoiseHeightMap : NoiseHeightMapGenerator
     /// <summary>
     ///     
     /// </summary>
-    uint[] perlinVectorDim;
-
     int[] nodeSize;
 
     /// <summary>
