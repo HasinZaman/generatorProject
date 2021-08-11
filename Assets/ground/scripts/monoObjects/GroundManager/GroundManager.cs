@@ -9,10 +9,10 @@ public class GroundManager : MonoBehaviour
     public GameObject chunkPrefab;
 
     Chunk[] chunks;
-    int[] chunkDim = new int[2] { 3, 3 };
+    int[] chunkDim = new int[2] { 2, 2 };
 
     float[] nodeDistTemplate = new float[] { 1, 1, 1 };
-    int[] gridDim = new int[] { 10, 10, 10 };
+    int[] gridDim = new int[] { 4, 4, 4 };
     void Start()
     {
         generate();
@@ -58,23 +58,28 @@ public class GroundManager : MonoBehaviour
                 Debug.Log($"{x},{y}");
                 //n[x + y * chunkDim[1]].gridDebug();
 
+                                            //cornerXY
+                TwoDimensionalNoiseHeightMap corner00 = null;
+                TwoDimensionalNoiseHeightMap corner01 = null;
+                TwoDimensionalNoiseHeightMap corner10 = null;
+                TwoDimensionalNoiseHeightMap corner11 = n[x + y * chunkDim[0]];
+                
                 if (x - 1 >= 0)
                 {
-                    TwoDimensionalNoiseHeightMap.setVerticalEdge(n[(x - 1) + y * chunkDim[0]], n[x + y * chunkDim[0]]);
-                    Debug.Log("SHARING BABEY");
-
+                    corner01 = n[(x - 1) + y * chunkDim[0]];
+                    TwoDimensionalNoiseHeightMap.setVerticalEdge(corner01, corner11);
                 }
 
                 if(y - 1 >= 0)
                 {
-                    TwoDimensionalNoiseHeightMap.setHorizontalEdge(n[x + y * chunkDim[0]], n[x + (y - 1) * chunkDim[0]]);
-                    Debug.Log("SHARING BABEY 2");
+                    corner10 = n[x + (y - 1) * chunkDim[0]];
+                    TwoDimensionalNoiseHeightMap.setHorizontalEdge(corner11, corner10);
                 }
 
-                if(x - 1 >= 0 && y - 1 >= 0)
+                if (x - 1 >= 0 && y - 1 >= 0)
                 {
-                    TwoDimensionalNoiseHeightMap.setCorner(n[(x - 1) + (y - 1) * chunkDim[0]], n[(x - 1) + (y) * chunkDim[0]], n[(x) + (y - 1) * chunkDim[0]], n[x + y * chunkDim[0]]);
-                    Debug.Log("SHARING BABEY 3");
+                    corner00 = n[(x - 1) + (y - 1) * chunkDim[0]];
+                    TwoDimensionalNoiseHeightMap.setCorner(corner00, corner01, corner10, corner11, 0);
                 }
             }
         }
@@ -99,9 +104,9 @@ public class GroundManager : MonoBehaviour
                 for (int chunkX = 0; chunkX < chunkDim[0]; chunkX++)
                 {
 
+                    tmpNoise = n[chunkX + chunkY * chunkDim[0]];
                     for (int x = 0; x < 3; x++)
                     {
-                        tmpNoise = n[chunkX + chunkY * chunkDim[0]];
                         tmp += $"({tmpNoise.perlinNoiseVectors[x + y * 3][0]},{tmpNoise.perlinNoiseVectors[x + y * 3][1]})\t";
                     }
                     tmp += "|\t";
@@ -112,7 +117,14 @@ public class GroundManager : MonoBehaviour
             {
                 for (int x = 0; x < 3; x++)
                 {
-                    tmp += "-----\t";
+                    if(x == 1)
+                    {
+                        tmp += $"[{chunkX},{chunkY}]\t";
+                    }
+                    else
+                    {
+                        tmp += "-----\t";
+                    }
                 }
                 tmp += "+\t";
             }
@@ -132,6 +144,7 @@ public class GroundManager : MonoBehaviour
                 pos.z = z * (gridDim[2] - 1) * nodeDistTemplate[2];
 
                 gameObjectTemp = Instantiate(chunkPrefab, pos, new Quaternion(0, 0, 0, 0), this.transform);
+                gameObjectTemp.name = $"Chunk:{x},{z}";
                 chunkTemp = gameObjectTemp.GetComponent<Chunk>();
 
                 chunkTemp.setChunk(n[x + z * chunkDim[0]].getHeightMap(), shaderList.MarchingCube, nodeDistTemplate);
