@@ -44,11 +44,6 @@ public class TwoDimensionalNoiseHeightMap : NoiseHeightMapGenerator
     }
 
     /// <summary>
-    ///     
-    /// </summary>
-    int[] nodeSize;
-
-    /// <summary>
     ///     shader is stores a computeShader used to calculate the noise
     /// </summary>
     ComputeShader shader;
@@ -57,57 +52,6 @@ public class TwoDimensionalNoiseHeightMap : NoiseHeightMapGenerator
     ///     neighbors is an array that stores neighbor heightMap
     /// </summary>
     TwoDimensionalNoiseHeightMap[] neighbors = new TwoDimensionalNoiseHeightMap[8];
-
-    private class SampleIterator
-    {
-        public float start;
-        public float end;
-        public float delta;
-        public float current;
-
-        public SampleIterator(float start, float end, int samples)
-        {
-            this.start = start;
-            this.current = start;
-            this.end = end;
-
-
-            if(samples < 3)
-            {
-                throw new ArgumentException("samples need to be greater than 2");
-            }
-
-            this.delta = (end - current) / (float)(samples - 1);
-            this.current -= this.delta;
-        }
-
-        public float next()
-        {
-            if(this.current + this.delta > this.end + 0.00001)
-            {
-                throw new InvalidOperationException("Iterator has reached end");
-            }
-            this.current += this.delta;
-
-            return this.current;
-        }
-
-        public bool hasNext()
-        {
-            return !(this.current + this.delta > this.end + 0.00001);
-        }
-
-        public void restart()
-        {
-            this.current = this.start;
-            this.current -= this.delta;
-        }
-
-        public string toString()
-        {
-            return $"start:{this.start}\tend:{this.end}\tdelta:{this.delta}";
-        }
-    }
 
     /// <summary>
     ///     NoiseHeightMapGenerator constructor intializes variables

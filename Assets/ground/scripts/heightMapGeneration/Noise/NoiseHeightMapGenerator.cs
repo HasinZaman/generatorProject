@@ -49,6 +49,95 @@ public abstract class NoiseHeightMapGenerator : HeightMapGenerator
     }
 
     /// <summary>
+    ///     SampleIterator iterates through a range of values
+    /// </summary>
+    protected class SampleIterator
+    {
+        /// <summary>
+        ///     start value of Iterator
+        /// </summary>
+        private float start;
+
+        /// <summary>
+        ///     end value of Iterator
+        /// </summary>
+        private float end;
+
+        /// <summary>
+        ///     delta float step size required to iterate from start to end instance
+        /// </summary>
+        private float delta;
+
+        /// <summary>
+        ///     current value of the iterator
+        /// </summary>
+        public float current;
+
+        /// <summary>
+        ///     Constructor sets up iterator
+        /// </summary>
+        /// <param name="start">start value of iterator</param>
+        /// <param name="end">end value of iterator</param>
+        /// <param name="samples">Number of samples that will be iterated through between start and end</param>
+        public SampleIterator(float start, float end, int samples)
+        {
+            this.start = start;
+            this.current = start;
+            this.end = end;
+
+            if (samples < 3)
+            {
+                throw new ArgumentException("samples need to be greater than 2");
+            }
+
+            this.delta = (end - current) / (float)(samples - 1);
+            this.current -= this.delta;
+        }
+
+        /// <summary>
+        ///     next method updates the current value of the iterator with the next valid value
+        /// </summary>
+        /// <returns>float of the updated value of current</returns>
+        public float next()
+        {
+            if (this.current + this.delta > this.end + 0.00001)
+            {
+                throw new InvalidOperationException("Iterator has reached end");
+            }
+            this.current += this.delta;
+
+            return this.current;
+        }
+
+        /// <summary>
+        ///     hasNext checks if the next value of the iterator exists
+        /// </summary>
+        /// <returns>bool if the next value exists</returns>
+        public bool hasNext()
+        {
+            return !(this.current + this.delta > this.end + 0.00001);
+        }
+
+        /// <summary>
+        ///     restart method returns current value back to the start
+        /// </summary>
+        public void restart()
+        {
+            this.current = this.start;
+            this.current -= this.delta;
+        }
+
+        /// <summary>
+        /// toString method converts iterator into String
+        /// </summary>
+        /// <returns>String representation of iterator</returns>
+        public string toString()
+        {
+            return $"start:{this.start}\tend:{this.end}\tdelta:{this.delta}";
+        }
+    }
+
+    /// <summary>
     ///     random is used to create grid using vectors
     /// </summary>
     protected Random random;
