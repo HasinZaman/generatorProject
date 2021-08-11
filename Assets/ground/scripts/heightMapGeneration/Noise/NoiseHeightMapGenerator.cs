@@ -52,10 +52,12 @@ public abstract class NoiseHeightMapGenerator : HeightMapGenerator
     ///     random is used to create grid using vectors
     /// </summary>
     protected Random random;
+
     /// <summary>
     ///     grid is the output height map
     /// </summary>
     protected Grid grid;
+
     /// <summary>
     ///     templateVector is an arry of vectors that used in calculating perlin noise
     /// </summary>
