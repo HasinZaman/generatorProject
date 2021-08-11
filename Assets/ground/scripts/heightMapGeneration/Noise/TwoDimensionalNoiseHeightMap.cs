@@ -10,7 +10,6 @@ public class TwoDimensionalNoiseHeightMap : NoiseHeightMapGenerator
     /// <summary>
     ///     perlinNoiseVectors stores the perlin noise vectors used in generating noise
     /// </summary>
-    public float[][] perlinNoiseVectors;
 
     /// <summary>
     ///     perlinVectorDim stores the dim of perlinNoiseVectors
