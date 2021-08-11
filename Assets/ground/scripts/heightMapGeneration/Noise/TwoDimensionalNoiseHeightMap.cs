@@ -44,7 +44,7 @@ public class TwoDimensionalNoiseHeightMap : NoiseHeightMapGenerator
     }
 
     /// <summary>
-    ///     perlinVectorDim stores the dim of perlinNoiseVectors
+    ///     
     /// </summary>
     uint[] perlinVectorDim;
 
