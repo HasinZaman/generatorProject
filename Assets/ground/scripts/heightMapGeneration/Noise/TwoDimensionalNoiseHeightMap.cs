@@ -121,9 +121,9 @@ public class TwoDimensionalNoiseHeightMap : NoiseHeightMapGenerator
             throw new ArgumentException();
         }
 
-        for(int x = 0; x < bottom.perlinVectorDim[0]; x++)
+        for(int x = 0; x < bottom.perlinVectorDim[0] - 1; x++)
         {
-            top.perlinNoiseVectors[x] = bottom.perlinNoiseVectors[x + (top.perlinVectorDim[1] - 1) * top.perlinVectorDim[0]];
+            top.perlinNoiseVectors[x] = bottom.perlinNoiseVectors[x + (bottom.perlinVectorDim[1] - 1) * bottom.perlinVectorDim[0]];
         }
     }
 
@@ -133,30 +133,51 @@ public class TwoDimensionalNoiseHeightMap : NoiseHeightMapGenerator
         {
             throw new ArgumentException();
         }
-        for (int y = 0; y < left.perlinVectorDim[1]; y++)
+        for (int y = 0; y < left.perlinVectorDim[1] - 1; y++)
         {
             right.perlinNoiseVectors[y * left.perlinVectorDim[0]] = left.perlinNoiseVectors[right.perlinVectorDim[0] - 1 + y * right.perlinVectorDim[0]];
 
         }
     }
-    
-    public static void setCorner(TwoDimensionalNoiseHeightMap corner00, TwoDimensionalNoiseHeightMap corner01, TwoDimensionalNoiseHeightMap corner10, TwoDimensionalNoiseHeightMap corner11)
+
+    public static void setCorner(TwoDimensionalNoiseHeightMap corner00, TwoDimensionalNoiseHeightMap corner01, TwoDimensionalNoiseHeightMap corner10, TwoDimensionalNoiseHeightMap corner11, int selected)
     {
-        if(corner00 == null)
+        //cornerXY
+        float[] noiseVector;
+        
+        switch(selected)
         {
-            throw new ArgumentNullException();
+            case 0:
+                noiseVector = corner00.perlinNoiseVectors[corner00.perlinVectorDim[0] - 1 + (corner00.perlinVectorDim[1] - 1) * corner00.perlinVectorDim[0]];
+                break;
+            case 1:
+                noiseVector = corner01.perlinNoiseVectors[corner01.perlinVectorDim[0] - 1 + (0) * corner01.perlinVectorDim[0]];
+                break;
+            case 2:
+                noiseVector = corner10.perlinNoiseVectors[0 + (corner01.perlinVectorDim[1] - 1) * corner01.perlinVectorDim[0]];
+                break;
+            case 3:
+                noiseVector = corner11.perlinNoiseVectors[0];
+                break;
+            default:
+                throw new ArgumentNullException();
         }
 
-        float[] noiseVector = corner00.perlinNoiseVectors[corner00.perlinVectorDim[0] - 1 +(corner00.perlinVectorDim[1] - 1) * corner00.perlinVectorDim[0]];
-
+        if (corner00 != null)
+        {
+            corner00.perlinNoiseVectors[corner00.perlinVectorDim[0] - 1 + (corner00.perlinVectorDim[1] - 1) * corner00.perlinVectorDim[0]] = noiseVector;
+        }
+        
         if (corner01 != null)
         {
             corner01.perlinNoiseVectors[corner01.perlinVectorDim[0] - 1 + (0) * corner01.perlinVectorDim[0]] = noiseVector;
         }
+        
         if (corner10 != null)
         {
-            corner10.perlinNoiseVectors[0 + (corner01.perlinVectorDim[1] - 1) * corner01.perlinVectorDim[0]] = noiseVector;
+            corner10.perlinNoiseVectors[0 + (corner10.perlinVectorDim[1] - 1) * corner10.perlinVectorDim[0]] = noiseVector;
         }
+        
         if (corner11 != null)
         {
             corner11.perlinNoiseVectors[0] = noiseVector;
@@ -245,6 +266,8 @@ public class TwoDimensionalNoiseHeightMap : NoiseHeightMapGenerator
         start = 0;
         end = (float) perlinVectorDim[0] - 1;
 
+        /*
+
         if(neighbors[NoiseNeighborCornerCode.edge1] != null)
         {
             start = -0.5f;
@@ -255,8 +278,9 @@ public class TwoDimensionalNoiseHeightMap : NoiseHeightMapGenerator
             end += 0.5f;
             nodeSizeTmp[0] += 1;
         }
+        */
         xPos = new SampleIterator(start, end, nodeSizeTmp[0]) ;
-
+        /*
 
         start = 0;
         end = (float) perlinVectorDim[1] - 1;
@@ -270,7 +294,7 @@ public class TwoDimensionalNoiseHeightMap : NoiseHeightMapGenerator
         {
             end += 0.5f;
             nodeSizeTmp[1] += 1;
-        }
+        }*/
 
         yPos = new SampleIterator(start, end, nodeSizeTmp[1]);
 
@@ -349,12 +373,8 @@ public class TwoDimensionalNoiseHeightMap : NoiseHeightMapGenerator
         }
 
 
-        if(perlinNoisePos[0] == 0 && perlinNoisePos[1] == 0)
-        {
-            return sample(new float[] { x, y });
-        }
-        //Debug.Log($"EDGE {x},{y}");
-        return sampleEdge(new float[] { x, y }, NoiseNeighborCornerCode.getNoiseCode(perlinNoisePos));
+        return sample(new float[] { x, y });
+        
     }
 
     /// <summary>
@@ -375,6 +395,14 @@ public class TwoDimensionalNoiseHeightMap : NoiseHeightMapGenerator
             new int[] { (int)Math.Floor(pos[0]), (int)Math.Ceiling(pos[0]) },
             new int[] { (int)Math.Floor(pos[1]), (int)Math.Ceiling(pos[1]) }
         };
+
+        for (int i1 = 0; i1 < pos.Length; i1++)
+        {
+            if(pos[i1] % 1 == 0)
+            {
+                return 0;
+            }
+        }
 
         //gets the dot product for every corner
         for (int x1 = 0; x1 < 2; x1++)
