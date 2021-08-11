@@ -8,7 +8,7 @@ public class TwoDimensionalNoiseHeightMap : NoiseHeightMapGenerator
 {
 
     /// <summary>
-    ///     perlinNoiseVectors stores the perlin noise vectors used in generating noise
+    ///     Vector2DNode stores perlin vector and neighbor node
     /// </summary>
     private class Vector2DNode : VectorNode
     {
