@@ -10,6 +10,38 @@ public class TwoDimensionalNoiseHeightMap : NoiseHeightMapGenerator
     /// <summary>
     ///     perlinNoiseVectors stores the perlin noise vectors used in generating noise
     /// </summary>
+    private class Vector2DNode : VectorNode
+    {
+        /// <summary>
+        ///     neighbor node left relative to the current node
+        /// </summary>
+        public Vector2DNode left = null;
+
+        /// <summary>
+        ///     neighbor node right relative to the current node
+        /// </summary>
+        public Vector2DNode right = null;
+
+        /// <summary>
+        ///     neighbor node up relative to the current node
+        /// </summary>
+        public Vector2DNode up = null;
+
+        /// <summary>
+        ///     neighbor node down relative to the current node
+        /// </summary>
+        public Vector2DNode down = null;
+
+        /// <summary>
+        ///     Constructor creates Vector2DNode object 
+        /// </summary>
+        /// <param name="vector">intial value of vector value</param>
+        public Vector2DNode(float[] vector)
+        {
+            this.dim = 2;
+            this.set(vector);
+        }
+    }
 
     /// <summary>
     ///     perlinVectorDim stores the dim of perlinNoiseVectors
