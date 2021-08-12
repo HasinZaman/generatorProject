@@ -248,4 +248,11 @@ public abstract class NoiseHeightMapGenerator : HeightMapGenerator
     /// <param name="end">int array that stores the ending position at which nodes will stop generating</param>
     /// <param name="template">array of perlin noise vectors</param>
     public abstract void generateVectors(int[] start, int[] end, float[][] template);
+
+    /// <summary>
+    ///     getVector gets the perlin noise vector at a given position
+    /// </summary>
+    /// <param name="pos">int array of the position of the perlin noise vector</param>
+    /// <returns>float array of noise vector</returns>
+    public abstract float[] getVector(int[] pos);
 }
