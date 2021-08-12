@@ -178,15 +178,9 @@ public abstract class NoiseHeightMapGenerator : HeightMapGenerator
     /// <param name="templateVector">templateVector paramater assigns the template vectors that will be used in calculating perlin noise</param>
     /// <param name="seed">seed paramater is used to intialize random</param>
     /// <param name="nodeSize">nodeSize is an array that stores the dimension of the final height map grid</param>
-    public NoiseHeightMapGenerator(float[][] templateVector, int seed, int[] nodeSize)
+    public NoiseHeightMapGenerator(float[][] templateVector, int seed)
     {
-        if(nodeSize.Length != 3)
-        {
-            throw new ArgumentException("nodeSize must contain only three elements [x size, y size, z size]");
-        }
-
         this.random = new Random(seed);
-        this.grid = new Grid(new int[3] { nodeSize[0], nodeSize[1], nodeSize[2] });
 
         this.templateVector = templateVector;
     }
