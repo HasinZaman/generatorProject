@@ -173,12 +173,6 @@ public abstract class NoiseHeightMapGenerator : HeightMapGenerator
     protected float[][] templateVector;
 
     /// <summary>
-    ///     root stores the starting point of Noise Grid
-    /// </summary>
-    protected VectorNode root;
-
-
-    /// <summary>
     ///     NoiseHeightMapGenerator constructor intializes variables
     /// </summary>
     /// <param name="templateVector">templateVector paramater assigns the template vectors that will be used in calculating perlin noise</param>
