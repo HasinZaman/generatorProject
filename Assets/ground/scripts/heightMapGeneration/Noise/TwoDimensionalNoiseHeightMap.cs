@@ -85,46 +85,14 @@ public class TwoDimensionalNoiseHeightMap : NoiseHeightMapGenerator
     }
 
     /// <summary>
-    ///     Sample gets a noise value at x and y position
     /// </summary>
-    /// <param name="x"></param>
-    /// <param name="y"></param>
-    /// <returns>a perlin noise value is returned at a given coordinate position</returns>
-    public float sample(float x, float y)
     {
-        int[] perlinNoisePos = new int[2];
-        if(x < -1 || x > perlinVectorDim[0])
         {
-            throw new OverflowException($"x paramater greater than maximum size{perlinVectorDim[0] - 1}");
-        }
-        else if(x < 0)
-        {
-            perlinNoisePos[0] = -1;
-            //Debug.Log("X LESS THAN 0");
-        }
-        else if(x > perlinVectorDim[0] - 1)
-        {
-            perlinNoisePos[0] = 1;
-           // Debug.Log($"X Greater MAX {perlinVectorDim[0] - 1}");
-        }
-
-        if (y < -1 || y > perlinVectorDim[1])
-        {
-            throw new OverflowException($"y paramater greater than maximum size{perlinVectorDim[1] - 1}");
-        }
-        else if(y < 0)
-        {
-            perlinNoisePos[1] = -1;
-        }
-        else if( y > perlinVectorDim[1] - 1)
-        {
-            perlinNoisePos[1] = 1;
         }
 
 
-        return sample(new float[] { x, y });
+
         
-    }
 
     /// <summary>
     ///     Sample gets a noise value at x and y position
