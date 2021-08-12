@@ -209,21 +209,64 @@ public class TwoDimensionalNoiseHeightMap : NoiseHeightMapGenerator
             }
         }
     }
+
+    /// <summary>
+    ///     getNode gets the perlin noise noise at a given position
+    /// </summary>
+    /// <param name="pos">int array of the position of the perlin noise vector</param>
+    /// <returns>Vector2DNode of noise vector at pos</returns>
+    protected Vector2DNode getNode(int[] pos)
+    {
+        Vector2DNode pointer = root.up;
+
+        int[] direction = new int[2];
+
+        for (int i1 = 0; i1 < 2; i1++)
         {
+            direction[i1] = pos[i1] / Math.Abs(pos[i1]);
         }
 
+        for (int x = 0; x <= pos[0]; x += direction[0])
         {
+            if (pointer == null)
             {
+                throw new ArgumentException();
             }
+
+            if (direction[0] == 1)
             {
+                pointer = pointer.right;
+            }
+            else
+            {
+                pointer = pointer.left;
             }
         }
 
+        for (int y = 0; y <= pos[1]; y += direction[1])
         {
+
+            if (pointer == null)
             {
+                throw new ArgumentException();
+            }
+
+            if (direction[1] == 1)
+            {
+                pointer = pointer.up;
+            }
+            else
+            {
+                pointer = pointer.down;
             }
         }
 
+        if (pointer == null)
+        {
+            throw new ArgumentException();
+        }
+
+        return pointer;
     }
 
     /// <summary>
