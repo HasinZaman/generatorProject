@@ -61,7 +61,7 @@ public class TwoDimensionalNoiseHeightMap : NoiseHeightMapGenerator
     /// <param name="nodeSize">nodeSize is an array that stores the dimension of the final height map grid</param>
     /// <param name="perlinVectorDim">perlinVectorDim is an array that defines the size of perlinNoise vector</param>
     /// <param name="shader"></param>
-    public TwoDimensionalNoiseHeightMap(float[][] templateVector, int seed, int[] nodeSize, uint[] perlinVectorDim, ComputeShader shader) : base( templateVector, seed, nodeSize)
+    public TwoDimensionalNoiseHeightMap(float[][] templateVector, int seed, int[] perlinVectorDim, ComputeShader shader) : base( templateVector, seed)
     {
         if(perlinVectorDim.Length != 2)
         {
@@ -69,23 +69,6 @@ public class TwoDimensionalNoiseHeightMap : NoiseHeightMapGenerator
         }
 
         this.shader = shader;
-        float[] vector;
-
-        perlinNoiseVectors = new float[perlinVectorDim[0] * perlinVectorDim[1]][];
-
-        this.perlinVectorDim = perlinVectorDim;
-
-        this.nodeSize = nodeSize;
-
-        for (int x = 0; x < perlinVectorDim[0]; x++)
-        {
-            for (int y = 0; y < perlinVectorDim[1]; y++)
-            {
-                vector = templateVector[random.Next(0, templateVector.Length)];
-                perlinNoiseVectors[x + y * perlinVectorDim[0]]= vector;
-            }
-        }
-    }
 
     public static void setHorizontalEdge(TwoDimensionalNoiseHeightMap top, TwoDimensionalNoiseHeightMap bottom)
     {
@@ -217,6 +200,7 @@ public class TwoDimensionalNoiseHeightMap : NoiseHeightMapGenerator
         }
 
         neighbors[neighborCode] = neighborTemp;
+        generateVectors(new int[2] { 0, 0 }, perlinVectorDim, templateVector);
     }
 
     /// <summary>
