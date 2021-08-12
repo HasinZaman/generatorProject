@@ -270,16 +270,56 @@ public class TwoDimensionalNoiseHeightMap : NoiseHeightMapGenerator
     }
 
     /// <summary>
+    ///     getVector gets the perlin noise vector at a given position
     /// </summary>
+    /// <param name="pos">int array of the position of the perlin noise vector</param>
+    /// <returns>float array of noise vector</returns>
+    public override float[] getVector(int[] pos)
     {
+        return getNode(pos).val();
     }
 
+    public string toString()
     {
+        string temp = "";
 
+        Vector2DNode pointer = root;
 
-
+        //get top most value
+        while (pointer.up != null)
         {
-            {
-            }
+            pointer = pointer.up;
         }
+
+        //get left most value
+
+        while (pointer.left != null)
+        {
+            pointer = pointer.left;
+        }
+
+        while (pointer.down != null)
+        {
+            while (pointer.right != null)
+            {
+                temp += $"{pointer.toString()}\t";
+                pointer = pointer.right;
+            }
+
+            while (pointer.left != null)
+            {
+                pointer = pointer.left;
+            }
+
+            pointer = pointer.down;
+        }
+
+        while (pointer.right != null)
+        {
+            temp += $"{pointer.toString()}\t";
+            pointer = pointer.right;
+        }
+
+        return temp;
     }
+}
