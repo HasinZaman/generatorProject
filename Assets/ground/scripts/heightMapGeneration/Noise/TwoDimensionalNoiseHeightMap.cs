@@ -98,40 +98,114 @@ public class TwoDimensionalNoiseHeightMap : NoiseHeightMapGenerator
         }
 
 
+        Vector2DNode pointer = root.up;
 
+        //setting point to the starting position
+        int[] direction = new int[2];
         
-
+        for (int i1 = 0; i1 < 2; i1++)
         {
+            direction[i1] = start[i1] / Math.Abs(start[i1]);
+        }
+
+        for (int x = 0; x < start[0]; x += direction[0])
+        {
+            if (pointer == null)
             {
+                throw new ArgumentException();
             }
 
+            if (direction[0] == 1)
             {
+                pointer = pointer.up;
+            }
+            else
+            {
+                pointer = pointer.down;
             }
         }
 
+        for (int y = 0; y < start[1]; y += direction[1])
         {
-
+            if (pointer == null)
             {
+                throw new ArgumentException();
+            }
+
+            if (direction[1] == 1)
+            {
+                pointer = pointer.right;
+            }
+            else
+            {
+                pointer = pointer.left;
             }
         }
 
+        //generating
+        for (int y = start[1]; y < end[1]; y += direction[1])
         {
+            if(direction[1] == 1)
             {
+                if(pointer.up == null)
                 {
+                    Debug.Log("Create: Up");
+                    pointer.up = new Vector2DNode(templateVector[random.Next(0, templateVector.Length)]);
+                    pointer.up.down = pointer;
                 }
+                else
+                {
+                    pointer.up.set(templateVector[random.Next(0, templateVector.Length)]);
+                }
+                
+                pointer = pointer.up;
             }
+            else
             {
+                if (pointer.down == null)
+                {
+                    pointer.down = new Vector2DNode(templateVector[random.Next(0, templateVector.Length)]);
+                    pointer.down.up = pointer;
+                }
+                else
+                {
+                    pointer.down.set(templateVector[random.Next(0, templateVector.Length)]);
+                }
+                
+                pointer = pointer.down;
             }
 
+            for (int x = start[0] + direction[0]; x < end[0]; x += direction[0])
             {
+                if(direction[0] == 1)
+                {
+                    if(pointer.right == null)
                     {
+                        Debug.Log("Create: Right");
+                        pointer.right = new Vector2DNode(templateVector[random.Next(0, templateVector.Length)]);
+                        pointer.right.left = pointer;
                     }
+                    else
                     {
+                        pointer.right.set(templateVector[random.Next(0, templateVector.Length)]);
                     }
+
+                    pointer = pointer.right;
+                }
+                else
+                {
+                    if (pointer.left == null)
                     {
+                        pointer.left = new Vector2DNode(templateVector[random.Next(0, templateVector.Length)]);
+                        pointer.left.right = pointer;
                     }
+                    else
                     {
+                        pointer.left.set(templateVector[random.Next(0, templateVector.Length)]);
                     }
+
+                    pointer = pointer.left;
+                }
             }
         }
         {
