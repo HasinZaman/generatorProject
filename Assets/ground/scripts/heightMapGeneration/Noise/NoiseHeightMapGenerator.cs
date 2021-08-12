@@ -46,6 +46,26 @@ public abstract class NoiseHeightMapGenerator : HeightMapGenerator
         {
             return this.vector;
         }
+
+        /// <summary>
+        ///     toString method converts object into a string repersentation
+        /// </summary>
+        /// <returns>string format of VectorNode object</returns>
+        public string toString()
+        {
+            string temp = "(";
+
+            temp += $"{this.vector[0]}";
+
+            for (int i1 = 1; i1 < this.vector.Length; i1++)
+            {
+                temp += $"{this.vector[i1]}";
+            }
+
+            temp += ")";
+
+            return temp;
+        }
     }
 
     /// <summary>
