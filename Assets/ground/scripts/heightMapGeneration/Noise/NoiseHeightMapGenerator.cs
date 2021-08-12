@@ -244,4 +244,8 @@ public abstract class NoiseHeightMapGenerator : HeightMapGenerator
     /// <summary>
     ///     generateVectors is an abstract method to randomly generate perlin noise vector nodes
     /// </summary>
+    /// <param name="start">int array that stores the starting position at which nodes will be genrated</param>
+    /// <param name="end">int array that stores the ending position at which nodes will stop generating</param>
+    /// <param name="template">array of perlin noise vectors</param>
+    public abstract void generateVectors(int[] start, int[] end, float[][] template);
 }
