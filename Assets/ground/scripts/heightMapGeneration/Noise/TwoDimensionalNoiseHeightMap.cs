@@ -94,295 +94,67 @@ public class TwoDimensionalNoiseHeightMap : NoiseHeightMapGenerator
 
         
 
-    /// <summary>
-    ///     Sample gets a noise value at x and y position
-    /// </summary>
-    /// <param name="pos">float array containing x and y position</param>
-    /// <returns>a perlin noise value is returned at a given coordinate position</returns>
-    private float sample(float[] pos)
-    {
-        int[] sampleDim = grid.getDim();
-
-        float[][] pointDist = getPointDist(pos);
-        float[][] pointVector = new float[4][];
-
-        uint[] perlinVectorDimTemp = new uint[2] { perlinVectorDim[0] - 1, perlinVectorDim[1] - 1 };
-
-        int[][] posRounded = new int[2][] {
-            new int[] { (int)Math.Floor(pos[0]), (int)Math.Ceiling(pos[0]) },
-            new int[] { (int)Math.Floor(pos[1]), (int)Math.Ceiling(pos[1]) }
-        };
-
-        for (int i1 = 0; i1 < pos.Length; i1++)
         {
-            if(pos[i1] % 1 == 0)
             {
-                return 0;
+            }
+
+            {
             }
         }
 
-        //gets the dot product for every corner
-        for (int x1 = 0; x1 < 2; x1++)
         {
-            for (int y1 = 0; y1 < 2; y1++)
+
             {
-                pointVector[binaryToPositionIndex(x1, y1)] = perlinNoiseVectors[posRounded[0][x1] + posRounded[1][y1] * perlinVectorDimTemp[0]];
             }
         }
 
-        return sample(pos, pointDist, pointVector);
-    }
-
-    private float sample(float[] pos, float[][] pointDist, float[][] pointVector)
-    {
-        if(pos == null)
         {
-            throw new ArgumentNullException("pos cannot be null");
-        }
-        else if(pos.Length != 2)
-        {
-            throw new ArgumentException("Pos must contain two values");
-        }
-
-        if (pointDist == null)
-        {
-            throw new ArgumentNullException("pointDist cannot be null");
-        }
-        else if(pointDist.Length != 4)
-        {
-            throw new ArgumentException("pointDist must contain 4 distances");
-        }
-        else
-        {
-            for(int i1 = 0; i1 < 4; i1++)
             {
-                if(pointDist[i1] == null)
                 {
-                    throw new ArgumentException($"pointDist contains a null value at {i1}");
                 }
             }
-        }
-
-        if (pointVector == null)
-        {
-            throw new ArgumentNullException("pointVector cannot be null");
-        }
-        else if(pointVector.Length != 4)
-        {
-            throw new ArgumentNullException("pointVector must contain 4 distances");
-        }
-        else
-        {
-            for (int i1 = 0; i1 < 4; i1++)
             {
-                if (pointVector[i1] == null)
-                {
-                    throw new ArgumentException($"pointVector contains a null value at {i1}");
-                }
             }
-        }
 
-        float[] pointValue = new float[4];
-
-        uint[] perlinVectorDimTemp = new uint[2] { perlinVectorDim[0] - 1, perlinVectorDim[1] - 1 };
-
-        for (int x1 = 0; x1 < 2; x1++)
-        {
-            for (int y1 = 0; y1 < 2; y1++)
             {
-                pointValue[binaryToPositionIndex(x1, y1)] = dotProduct(pointVector[binaryToPositionIndex(x1, y1)], pointDist[binaryToPositionIndex(x1, y1)]);
-
-            }
-        }
-        // gets the interpolated value using the dot products
-
-        // p(0,1) --- Line 1 --- P(1,1)
-        //              |
-        //            line 2
-        //              |
-        // p(0,0) --- Line 0 --- P(1,0)
-        float line0Val = cosineInterpolate(
-                pointValue[binaryToPositionIndex(0, 0)],
-                pointValue[binaryToPositionIndex(1, 0)],
-                pos[0] % 1
-            );
-
-        float line1Val = cosineInterpolate(
-                pointValue[binaryToPositionIndex(0, 1)],
-                pointValue[binaryToPositionIndex(1, 1)],
-                pos[0] % 1
-            );
-
-        float line2Val = cosineInterpolate(
-                line0Val,
-                line1Val,
-                pos[1] % 1
-            );
-        return (line2Val + 2) / 4;
-    }
-
-    private float sampleEdge(float[] pos, int neighborCode)
-    {
-        float[][] pointVector = new float[4][];
-
-        int[][] posRounded = new int[2][] {
-            new int[] { (int)Math.Floor(pos[0]), (int)Math.Ceiling(pos[0]) },
-            new int[] { (int)Math.Floor(pos[1]), (int)Math.Ceiling(pos[1]) }
-        };
-        try
-        {
-            switch (neighborCode)
-            {
-                case NoiseNeighborCornerCode.corner0:
-                    //Debug.Log("Corner0");
-                    pointVector[binaryToPositionIndex(0, 0)] = neighbors[NoiseNeighborCornerCode.corner0].perlinNoiseVectors[(perlinVectorDim[0] - 1) + (perlinVectorDim[1] - 1) * perlinVectorDim[0]];
-                    pointVector[binaryToPositionIndex(1, 0)] = neighbors[NoiseNeighborCornerCode.edge0].perlinNoiseVectors[(0) + (perlinVectorDim[1] - 1) * perlinVectorDim[0]];
-                    pointVector[binaryToPositionIndex(0, 1)] = neighbors[NoiseNeighborCornerCode.edge1].perlinNoiseVectors[(perlinVectorDim[0] - 1) + (0) * perlinVectorDim[0]];
-                    pointVector[binaryToPositionIndex(1, 1)] = perlinNoiseVectors[(0) + (0) * perlinVectorDim[0]];
-                    //Debug.Log("Corner 0");
-                    break;
-                case NoiseNeighborCornerCode.corner1:
-                    //Debug.Log("Corner1");
-                    pointVector[binaryToPositionIndex(0, 0)] = neighbors[NoiseNeighborCornerCode.edge0].perlinNoiseVectors[(perlinVectorDim[0] - 1) + (perlinVectorDim[1] - 1) * perlinVectorDim[0]];
-                    pointVector[binaryToPositionIndex(1, 0)] = neighbors[NoiseNeighborCornerCode.corner1].perlinNoiseVectors[(0) + (perlinVectorDim[1] - 1) * perlinVectorDim[0]];
-                    pointVector[binaryToPositionIndex(0, 1)] = perlinNoiseVectors[(perlinVectorDim[0] - 1) + (0) * perlinVectorDim[0]];
-                    pointVector[binaryToPositionIndex(1, 1)] = neighbors[NoiseNeighborCornerCode.edge2].perlinNoiseVectors[(0) + (0) * perlinVectorDim[0]];
-                    break;
-                case NoiseNeighborCornerCode.corner2:
-                    //Debug.Log("Corner2");
-                    pointVector[binaryToPositionIndex(0, 0)] = neighbors[NoiseNeighborCornerCode.edge1].perlinNoiseVectors[(perlinVectorDim[0] - 1) + (perlinVectorDim[1] - 1) * perlinVectorDim[0]];
-                    pointVector[binaryToPositionIndex(1, 0)] = perlinNoiseVectors[(0) + (perlinVectorDim[1] - 1) * perlinVectorDim[0]];
-                    pointVector[binaryToPositionIndex(0, 1)] = neighbors[NoiseNeighborCornerCode.corner2].perlinNoiseVectors[(perlinVectorDim[0] - 1) + (0) * perlinVectorDim[0]];
-                    pointVector[binaryToPositionIndex(1, 1)] = neighbors[NoiseNeighborCornerCode.edge3].perlinNoiseVectors[(0) + (0) * perlinVectorDim[0]];
-                    break;
-                case NoiseNeighborCornerCode.corner3:
-                    //Debug.Log("Corner3");
-                    pointVector[binaryToPositionIndex(0, 0)] = perlinNoiseVectors[(perlinVectorDim[0] - 1) + (perlinVectorDim[1] - 1) * perlinVectorDim[0]];
-                    pointVector[binaryToPositionIndex(1, 0)] = neighbors[NoiseNeighborCornerCode.edge2].perlinNoiseVectors[(0) + (perlinVectorDim[1] - 1) * perlinVectorDim[0]];
-                    pointVector[binaryToPositionIndex(0, 1)] = neighbors[NoiseNeighborCornerCode.edge3].perlinNoiseVectors[(perlinVectorDim[0] - 1) + (0) * perlinVectorDim[0]];
-                    neighbors[NoiseNeighborCornerCode.corner3].gridDebug();
-                    pointVector[binaryToPositionIndex(1, 1)] = neighbors[NoiseNeighborCornerCode.corner3].perlinNoiseVectors[(0) + (0) * perlinVectorDim[0]];
-                    break;
-
-                case NoiseNeighborCornerCode.edge0:
-                    // Debug.Log("EDGE0");
-                    for (int x = 0; x < 2; x++)
                     {
-                        pointVector[binaryToPositionIndex(x, 0)] = neighbors[NoiseNeighborCornerCode.edge0].perlinNoiseVectors[posRounded[0][x] + (perlinVectorDim[1] - 1) * perlinVectorDim[0]];
-                        pointVector[binaryToPositionIndex(x, 1)] = perlinNoiseVectors[posRounded[0][x] + (0) * perlinVectorDim[0]];
                     }
-                    break;
-                case NoiseNeighborCornerCode.edge1:
-                    //Debug.Log("EDGE1");
-                    for (int y = 0; y < 2; y++)
                     {
-                        pointVector[binaryToPositionIndex(0, y)] = neighbors[NoiseNeighborCornerCode.edge0].perlinNoiseVectors[(perlinVectorDim[0] - 1) + posRounded[1][y] * perlinVectorDim[0]];
-                        pointVector[binaryToPositionIndex(1, y)] = perlinNoiseVectors[(0) + posRounded[1][y] * perlinVectorDim[0]];
                     }
-                    break;
-                case NoiseNeighborCornerCode.edge2:
-                    //Debug.Log("EDGE2");
-                    for (int y = 0; y < 2; y++)
                     {
-                        pointVector[binaryToPositionIndex(0, y)] = neighbors[NoiseNeighborCornerCode.edge0].perlinNoiseVectors[(perlinVectorDim[0] - 1) + posRounded[1][y] * perlinVectorDim[0]];
-                        pointVector[binaryToPositionIndex(1, y)] = perlinNoiseVectors[(0) + posRounded[1][y] * perlinVectorDim[0]];
                     }
-                    break;
-                case NoiseNeighborCornerCode.edge3:
-                    //Debug.Log("EDGE3");
-                    for (int x = 0; x < 2; x++)
                     {
-                        pointVector[binaryToPositionIndex(x, 0)] = neighbors[NoiseNeighborCornerCode.edge0].perlinNoiseVectors[posRounded[0][x] + (0) * perlinVectorDim[0]];
-                        pointVector[binaryToPositionIndex(x, 1)] = perlinNoiseVectors[posRounded[0][x] + (perlinVectorDim[1] - 1) * perlinVectorDim[0]];
                     }
-                    break;
-                default:
-                    throw new ArgumentException($"Invalid NoiseNeighborCornerCode {neighborCode}");
             }
         }
-        catch(NullReferenceException e)
         {
-            return 0;
         }
 
-        
-        string tmp = "";
-        float[] tmpVector;
-        
-        for(int x = 0; x <  2; x++)
         {
-            for(int y = 0; y < 2; y++)
             {
-                tmpVector = pointVector[binaryToPositionIndex(x, y)];
-                if(tmpVector == null)
-                {
-                    Debug.Log($"Pos:{pos[0]},{pos[1]}");
-                }
-                tmp += $"{tmpVector[0]},{tmpVector[1]}\t";
             }
-            tmp +="\n";
-        }
-        Debug.Log(tmp);
-        Debug.Log($"OG POS:{pos[0]},{pos[1]}");
-        for (int i1 = 0; i1 < pos.Length; i1++)
-        {
-            if(pos[i1] < 0)
             {
-                pos[i1] = 1 + pos[i1];
             }
         }
-        Debug.Log($"SAMPLE:{sample(pos, getPointDist(pos), pointVector)}");
-        return sample(pos, getPointDist(pos), pointVector);
-    }
 
-    private float[][] getPointDist(float[] pos)
-    {
-        float[][] pointDist = new float[4][];
-
-        for (int x1 = 0; x1 < 2; x1++)
         {
-            for (int y1 = 0; y1 < 2; y1++)
             {
-                pointDist[binaryToPositionIndex(x1, y1)] = new float[2] { (pos[0] % 1) - x1, (pos[1] % 1) - y1 };
             }
         }
 
-        return pointDist;
     }
 
     /// <summary>
-    /// binaryToPositionIndex converts a coord into a index for a one dimensitional 
     /// </summary>
-    /// <param name="x"></param>
-    /// <param name="y"></param>
-    /// <returns>an int repsenting the index of a coord</returns>
-    private int binaryToPositionIndex(int x, int y)
     {
-        return x + y * 2;
     }
 
-    private uint coordToPerlinPositionIndex(int x, int y)
     {
-        return (uint)(x + y * perlinVectorDim[1]);
-    }
 
-    private uint coordToPerlinPositionIndex(uint x, uint y)
-    {
-        return (uint) (x + y * perlinVectorDim[1]);
-    }
 
-    public void gridDebug()
-    {
-        string tmp = "";
 
-        for(int y = (int) perlinVectorDim[1] - 1; y >= 0; y--)
         {
-            for(int x = 0; x < perlinVectorDim[0]; x++)
             {
-                tmp += $"({perlinNoiseVectors[coordToPerlinPositionIndex(x,y)][0]},{perlinNoiseVectors[coordToPerlinPositionIndex(x, y)][1]})\t";
             }
-            tmp += "\n";
         }
-        Debug.Log(tmp);
     }
-}
