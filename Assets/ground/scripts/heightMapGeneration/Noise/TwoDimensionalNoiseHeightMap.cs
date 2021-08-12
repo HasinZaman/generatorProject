@@ -49,9 +49,9 @@ public class TwoDimensionalNoiseHeightMap : NoiseHeightMapGenerator
     ComputeShader shader;
 
     /// <summary>
-    ///     neighbors is an array that stores neighbor heightMap
+    ///     root stores the starting point of Noise Grid
     /// </summary>
-    TwoDimensionalNoiseHeightMap[] neighbors = new TwoDimensionalNoiseHeightMap[8];
+    protected Vector2DNode root = new Vector2DNode(null);
 
     /// <summary>
     ///     NoiseHeightMapGenerator constructor intializes variables
