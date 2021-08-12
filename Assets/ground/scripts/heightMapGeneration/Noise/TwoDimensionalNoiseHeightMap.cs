@@ -10,7 +10,7 @@ public class TwoDimensionalNoiseHeightMap : NoiseHeightMapGenerator
     /// <summary>
     ///     Vector2DNode stores perlin vector and neighbor node
     /// </summary>
-    private class Vector2DNode : VectorNode
+    protected class Vector2DNode : VectorNode
     {
         /// <summary>
         ///     neighbor node left relative to the current node
