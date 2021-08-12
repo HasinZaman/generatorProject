@@ -85,9 +85,16 @@ public class TwoDimensionalNoiseHeightMap : NoiseHeightMapGenerator
     }
 
     /// <summary>
+    ///     generateVectors is an abstract method to randomly generate perlin noise vector nodes
     /// </summary>
+    /// <param name="start">int array that stores the starting position at which nodes will be genrated</param>
+    /// <param name="end">int array that stores the ending position at which nodes will stop generating</param>
+    /// <param name="template">array of perlin noise vectors</param>
+    public override void generateVectors(int[] start, int[] end, float[][] template)
     {
+        if(start.Length != 2 && end.Length != 2)
         {
+            throw new ArgumentException("start and end paramater must be length 2");
         }
 
 
