@@ -46,6 +46,90 @@ public class TwoDimensionalNoiseHeightMap : NoiseHeightMapGenerator
         }
     }
 
+    protected class GeneratorIterator : Iterator<int>
+    {
+        /// <summary>
+        ///     constructor sets up Iterator class
+        /// </summary>
+        /// <param name="start">Starting position of iterator</param>
+        /// <param name="end">Ending position of iterator</param>
+        public GeneratorIterator(int start, int end) : base(start - 1, end + 1)
+        {
+            if (end == start)
+            {
+                this.delta = 0;
+            }
+            else if (end - start > 0)
+            {
+                this.delta = 1;
+            }
+            else
+            {
+                this.delta = -1;
+            }
+
+            this.restart();
+        }
+
+        /// <summary>
+        ///     hasNext method checks if another value exists
+        /// </summary>
+        /// <returns>boolean if the next number exists</returns>
+        public override bool hasNext()
+        {
+            int tmp = this.delta + this.current;
+
+            return this.start < tmp && tmp < this.end;
+        }
+
+        /// <summary>
+        ///     next method updates iterator
+        /// </summary>
+        /// <returns>int of current value</returns>
+        public override int next()
+        {
+            if(this.hasNext())
+            {
+                this.current += this.delta;
+                return this.current;
+            }
+            else
+            {
+                throw new InvalidOperationException();
+            }
+        }
+        
+        /// <summary>
+        ///     restart method sets current value back to start
+        /// </summary>
+        public void restart()
+        {
+            if(this.delta == 1)
+            {
+                this.current = this.start;
+            }
+            else
+            {
+                this.current = this.end;
+            }
+            this.current += this.delta;
+        }
+
+        /// <summary>
+        ///     reverse method swaps the start and end value
+        /// </summary>
+        public void reverse()
+        {
+            this.delta *= -1;
+        }
+
+        /// <summary>
+        /// toString method converts iterator into String
+        /// </summary>
+        /// <returns>String representation of iterator</returns>
+        public override string ToString()
+        {
+            return $"start:{this.start + delta}\tend:{this.end - delta}\tdelta:{this.delta}\tcurrent:{this.current}";
         }
     }
 
