@@ -76,17 +76,17 @@ public abstract class NoiseHeightMapGenerator : HeightMapGenerator
         /// <summary>
         ///     start value of Iterator
         /// </summary>
-        private float start;
+        protected T start;
 
         /// <summary>
         ///     end value of Iterator
         /// </summary>
-        private float end;
+        protected T end;
 
         /// <summary>
         ///     delta float step size required to iterate from start to end instance
         /// </summary>
-        private float delta;
+        protected T delta;
 
         /// <summary>
         ///     current value of the iterator
