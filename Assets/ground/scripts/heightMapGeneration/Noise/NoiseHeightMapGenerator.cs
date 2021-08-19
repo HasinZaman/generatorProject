@@ -1,4 +1,5 @@
 ﻿using System;
+using UnityEngine;
 
 /// <summary>
 ///     NoiseHeightMapGenerator is an abstract class to create a height map using perlin noise
@@ -196,7 +197,7 @@ public abstract class NoiseHeightMapGenerator : HeightMapGenerator
     /// <summary>
     ///     random is used to create grid using vectors
     /// </summary>
-    protected Random random;
+    protected System.Random random;
 
     /// <summary>
     ///     grid is the output height map
@@ -216,7 +217,7 @@ public abstract class NoiseHeightMapGenerator : HeightMapGenerator
     /// <param name="nodeSize">nodeSize is an array that stores the dimension of the final height map grid</param>
     public NoiseHeightMapGenerator(float[][] templateVector, int seed)
     {
-        this.random = new Random(seed);
+        this.random = new System.Random(seed);
 
         this.templateVector = templateVector;
     }
