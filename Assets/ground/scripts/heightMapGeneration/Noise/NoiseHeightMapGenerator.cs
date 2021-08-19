@@ -118,7 +118,7 @@ public abstract class NoiseHeightMapGenerator : HeightMapGenerator
         ///     next method updates the current value of the iterator with the next valid value
         /// </summary>
         /// <returns>float of the updated value of current</returns>
-        public float next()
+        public override float next()
         {
             if (this.current + this.delta > this.end + 0.00001)
             {
@@ -133,13 +133,14 @@ public abstract class NoiseHeightMapGenerator : HeightMapGenerator
         ///     hasNext checks if the next value of the iterator exists
         /// </summary>
         /// <returns>bool if the next value exists</returns>
-        public bool hasNext()
+        public override bool hasNext()
         {
             return !(this.current + this.delta > this.end + 0.00001);
         }
 
         /// <summary>
         ///     restart method returns current value back to the start
+        ///     restart method sets current value back to start
         /// </summary>
         public void restart()
         {
