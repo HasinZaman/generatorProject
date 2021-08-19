@@ -385,51 +385,50 @@ public class TwoDimensionalNoiseHeightMap : NoiseHeightMapGenerator
     {
         Vector2DNode pointer = root.up;
 
-        int[] direction = new int[2];
+        GeneratorIterator[] iterator = new GeneratorIterator[2];
 
-        for (int i1 = 0; i1 < 2; i1++)
+        for(int i1 = 0; i1 < 2; i1++)
         {
-            direction[i1] = pos[i1] / Math.Abs(pos[i1]);
+            iterator[i1] = new GeneratorIterator(0, pos[i1]);
         }
 
-        for (int x = 0; x <= pos[0]; x += direction[0])
+        while (iterator[1].hasNext())
         {
-            if (pointer == null)
-            {
-                throw new ArgumentException();
-            }
-
-            if (direction[0] == 1)
-            {
-                pointer = pointer.right;
-            }
-            else
-            {
-                pointer = pointer.left;
-            }
-        }
-
-        for (int y = 0; y <= pos[1]; y += direction[1])
-        {
+            iterator[1].next();
 
             if (pointer == null)
             {
                 throw new ArgumentException();
             }
 
-            if (direction[1] == 1)
+            switch(iterator[1].getDelta())
             {
-                pointer = pointer.up;
-            }
-            else
-            {
-                pointer = pointer.down;
+                case 1:
+                    pointer = pointer.up;
+                    break;
+                case -1:
+                    pointer = pointer.down;
+                    break;
             }
         }
 
-        if (pointer == null)
+        while (iterator[0].hasNext())
         {
-            throw new ArgumentException();
+            if (pointer == null)
+            {
+                throw new ArgumentException();
+            }
+
+            switch (iterator[1].getDelta())
+            {
+                case 1:
+                    pointer = pointer.right;
+                    break;
+                case -1:
+                    pointer = pointer.left;
+                    break;
+            }
+            iterator[0].next();
         }
 
         return pointer;
