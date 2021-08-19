@@ -158,6 +158,8 @@ public class TwoDimensionalNoiseHeightMap : NoiseHeightMapGenerator
             throw new ArgumentException();
         }
 
+        root.up = new Vector2DNode(null);
+
         this.shader = shader;
 
         generateVectors(new int[2] { 0, 0 }, perlinVectorDim, templateVector);
