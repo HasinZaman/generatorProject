@@ -326,55 +326,7 @@ public class TwoDimensionalNoiseHeightMap : NoiseHeightMapGenerator
     /// <returns>Vector2DNode of noise vector at pos</returns>
     protected Vector2DNode getNode(int[] pos)
     {
-        Vector2DNode pointer = root.up;
-
-        GeneratorIterator[] iterator = new GeneratorIterator[2];
-
-        for(int i1 = 0; i1 < 2; i1++)
-        {
-            iterator[i1] = new GeneratorIterator(0, pos[i1]);
-        }
-
-        while (iterator[1].hasNext())
-        {
-            iterator[1].next();
-
-            if (pointer == null)
-            {
-                throw new ArgumentException();
-            }
-
-            switch(iterator[1].getDelta())
-            {
-                case 1:
-                    pointer = pointer.up;
-                    break;
-                case -1:
-                    pointer = pointer.down;
-                    break;
-            }
-        }
-
-        while (iterator[0].hasNext())
-        {
-            if (pointer == null)
-            {
-                throw new ArgumentException();
-            }
-
-            switch (iterator[1].getDelta())
-            {
-                case 1:
-                    pointer = pointer.right;
-                    break;
-                case -1:
-                    pointer = pointer.left;
-                    break;
-            }
-            iterator[0].next();
-        }
-
-        return pointer;
+        return getNode(pos, root.up);
     }
 
     /// <summary>
