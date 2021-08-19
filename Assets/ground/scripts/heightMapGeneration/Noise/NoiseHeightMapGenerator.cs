@@ -103,6 +103,8 @@ public abstract class NoiseHeightMapGenerator : HeightMapGenerator
             this.start = start;
             this.current = start;
             this.end = end;
+        }
+
         /// <summary>
         ///     next method updates the current value of the iterator with the next valid value
         /// </summary>
