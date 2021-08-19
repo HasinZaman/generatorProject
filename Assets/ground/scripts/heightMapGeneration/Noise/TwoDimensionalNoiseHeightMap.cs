@@ -79,7 +79,7 @@ public class TwoDimensionalNoiseHeightMap : NoiseHeightMapGenerator
         {
             int tmp = this.delta + this.current;
 
-            return this.start < tmp && tmp < this.end;
+            return this.start < tmp && tmp < this.end && this.delta != 0;
         }
 
         /// <summary>
