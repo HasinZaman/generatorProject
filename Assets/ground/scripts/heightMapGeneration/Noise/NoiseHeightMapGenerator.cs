@@ -103,6 +103,17 @@ public abstract class NoiseHeightMapGenerator : HeightMapGenerator
             this.start = start;
             this.current = start;
             this.end = end;
+        /// <summary>
+        ///     next method updates the current value of the iterator with the next valid value
+        /// </summary>
+        /// <returns>T of the updated value of current</returns>
+        public abstract T next();
+
+        /// <summary>
+        ///     hasNext checks if the next value of the iterator exists
+        /// </summary>
+        /// <returns>bool if the next value exists</returns>
+        public abstract bool hasNext();
 
             if (samples < 3)
             {
