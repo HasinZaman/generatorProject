@@ -39,7 +39,13 @@ public class TwoDimensionalNoiseHeightMap : NoiseHeightMapGenerator
         public Vector2DNode(float[] vector)
         {
             this.dim = 2;
-            this.set(vector);
+            if(vector != null)
+            {
+                this.set(vector);
+            }
+        }
+    }
+
         }
     }
 
