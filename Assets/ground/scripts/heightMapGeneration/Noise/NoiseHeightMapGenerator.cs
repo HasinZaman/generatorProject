@@ -117,6 +117,15 @@ public abstract class NoiseHeightMapGenerator : HeightMapGenerator
         /// <returns>bool if the next value exists</returns>
         public abstract bool hasNext();
 
+        /// <summary>
+        ///     getDelta returns class delta value
+        /// </summary>
+        /// <returns>T of delta value</returns>
+        public T getDelta()
+        {
+            return this.delta;
+        }
+
             if (samples < 3)
             {
                 throw new ArgumentException("samples need to be greater than 2");
