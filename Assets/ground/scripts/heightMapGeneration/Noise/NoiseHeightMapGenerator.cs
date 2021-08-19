@@ -98,8 +98,7 @@ public abstract class NoiseHeightMapGenerator : HeightMapGenerator
         /// </summary>
         /// <param name="start">start value of iterator</param>
         /// <param name="end">end value of iterator</param>
-        /// <param name="samples">Number of samples that will be iterated through between start and end</param>
-        public SampleIterator(float start, float end, int samples)
+        public Iterator(T start, T end)
         {
             this.start = start;
             this.current = start;
