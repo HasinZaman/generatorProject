@@ -189,116 +189,190 @@ public class TwoDimensionalNoiseHeightMap : NoiseHeightMapGenerator
             throw new ArgumentException("start and end paramater must be length 2");
         }
 
+        //primary pointer
+        Vector2DNode pointer1 = root.up;
 
-        Vector2DNode pointer = root.up;
+        //secondary pointer that points to the previous y layer
+        Vector2DNode pointer2 = null;
 
         //setting point to the starting position
-        int[] direction = new int[2];
-        
-        for (int i1 = 0; i1 < 2; i1++)
+        GeneratorIterator[] iterator = new GeneratorIterator[2];
+
+        iterator[0] = new GeneratorIterator(0, start[0]);
+        if(end[1] - start[1] > 0)
         {
-            direction[i1] = start[i1] / Math.Abs(start[i1]);
+            iterator[1] = new GeneratorIterator(0, start[1]);
+        }
+        else
+        {
+            iterator[1] = new GeneratorIterator(0, start[1]);
         }
 
-        for (int x = 0; x < start[0]; x += direction[0])
+        while (iterator[1].hasNext())
         {
-            if (pointer == null)
+            iterator[1].next();
+
+            if (pointer1 == null)
             {
                 throw new ArgumentException();
             }
 
-            if (direction[0] == 1)
+            if (iterator[1].getDelta() == 1)
             {
-                pointer = pointer.up;
+                pointer1 = pointer1.up;
             }
             else
             {
-                pointer = pointer.down;
+                pointer1 = pointer1.down;
+            }
+
+            if(iterator[1].current != 0)
+            {
+                pointer2 = pointer1;
             }
         }
 
-        for (int y = 0; y < start[1]; y += direction[1])
+        while (iterator[0].hasNext())
         {
-            if (pointer == null)
+            if (pointer1 == null)
             {
                 throw new ArgumentException();
             }
 
-            if (direction[1] == 1)
+            if (iterator[0].getDelta() == 1)
             {
-                pointer = pointer.right;
+                pointer1 = pointer1.right;
             }
             else
             {
-                pointer = pointer.left;
+                pointer1 = pointer1.left;
             }
+            iterator[0].next();
+        }
+
+
+        iterator[0] = new GeneratorIterator(start[0], end[0] - 1);
+        iterator[1] = new GeneratorIterator(start[1], end[1]);
+
+        if (pointer1 == null)
+        {
+            pointer1 = new Vector2DNode(templateVector[random.Next(0, templateVector.Length)]);
+        }
+        else
+        {
+            pointer1.set(templateVector[random.Next(0, templateVector.Length)]);
         }
 
         //generating
-        for (int y = start[1]; y < end[1]; y += direction[1])
+        Vector2DNode tmp = pointer1;
+
+        while (iterator[1].hasNext())
         {
-            if(direction[1] == 1)
+            
+            while (iterator[0].hasNext())
             {
-                if(pointer.up == null)
+                if (iterator[0].getDelta() == 1)
                 {
-                    Debug.Log("Create: Up");
-                    pointer.up = new Vector2DNode(templateVector[random.Next(0, templateVector.Length)]);
-                    pointer.up.down = pointer;
+                    if(pointer1.right == null)
+                    {
+                        pointer1.right = new Vector2DNode(templateVector[random.Next(0, templateVector.Length)]);
+                        pointer1.right.left = pointer1;
+                    }
+                    else
+                    {
+                        pointer1.right.set(templateVector[random.Next(0, templateVector.Length)]);
+                    }
+
+                    pointer1 = pointer1.right;
+
+                    if (pointer2 != null)
+                    {
+                        pointer2 = pointer2.right;
+
+                        if (iterator[1].getDelta() == 1)
+                        {
+                            pointer2.up = pointer1;
+                            pointer1.down = pointer2;
+                        }
+                        else
+                        {
+                            pointer2.down = pointer1;
+                            pointer1.up = pointer2;
+                        }
+                    }
                 }
                 else
                 {
-                    pointer.up.set(templateVector[random.Next(0, templateVector.Length)]);
+                    if (pointer1.left == null)
+                    {
+                        pointer1.left = new Vector2DNode(templateVector[random.Next(0, templateVector.Length)]);
+                        pointer1.left.right = pointer1;
+                    }
+                    else
+                    {
+                        pointer1.left.set(templateVector[random.Next(0, templateVector.Length)]);
+                    }
+
+                    pointer1 = pointer1.left;
+
+                    if (pointer2 != null)
+                    {
+                        pointer2 = pointer2.left;
+                        
+                        if (iterator[1].getDelta() == 1)
+                        {
+                            pointer2.up = pointer1;
+                            pointer1.down = pointer2;
+                        }
+                        else
+                        {
+                            pointer1.up = pointer2;
+                            pointer2.down = pointer1;
+                        }
+                    }
                 }
-                
-                pointer = pointer.up;
+                iterator[0].next();
+            }
+            iterator[0].reverse();
+            iterator[0].restart();
+            //iterator[0].next();
+
+            //remeber start of current layer
+            pointer2 = pointer1;
+
+
+            //create next layer
+            if (iterator[1].getDelta() == 1)
+            {
+                if (pointer1.up == null)
+                {
+                    pointer1.up = new Vector2DNode(templateVector[random.Next(0, templateVector.Length)]);
+                }
+                else
+                {
+                    pointer1.up.set(templateVector[random.Next(0, templateVector.Length)]);
+                }
+
+                pointer1 = pointer1.up;
+                pointer1.down = pointer2;
+                pointer2.up = pointer1;
             }
             else
             {
-                if (pointer.down == null)
+                if (pointer1.down == null)
                 {
-                    pointer.down = new Vector2DNode(templateVector[random.Next(0, templateVector.Length)]);
-                    pointer.down.up = pointer;
+                    pointer1.down = new Vector2DNode(templateVector[random.Next(0, templateVector.Length)]);
                 }
                 else
                 {
-                    pointer.down.set(templateVector[random.Next(0, templateVector.Length)]);
+                    pointer1.down.set(templateVector[random.Next(0, templateVector.Length)]);
                 }
-                
-                pointer = pointer.down;
+
+                pointer1 = pointer1.down;
+                pointer1.up = pointer2;
+                pointer2.down = pointer1;
             }
-
-            for (int x = start[0] + direction[0]; x < end[0]; x += direction[0])
-            {
-                if(direction[0] == 1)
-                {
-                    if(pointer.right == null)
-                    {
-                        Debug.Log("Create: Right");
-                        pointer.right = new Vector2DNode(templateVector[random.Next(0, templateVector.Length)]);
-                        pointer.right.left = pointer;
-                    }
-                    else
-                    {
-                        pointer.right.set(templateVector[random.Next(0, templateVector.Length)]);
-                    }
-
-                    pointer = pointer.right;
-                }
-                else
-                {
-                    if (pointer.left == null)
-                    {
-                        pointer.left = new Vector2DNode(templateVector[random.Next(0, templateVector.Length)]);
-                        pointer.left.right = pointer;
-                    }
-                    else
-                    {
-                        pointer.left.set(templateVector[random.Next(0, templateVector.Length)]);
-                    }
-
-                    pointer = pointer.left;
-                }
-            }
+            iterator[1].next();
         }
     }
 
