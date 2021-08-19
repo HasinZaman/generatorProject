@@ -451,9 +451,12 @@ public class TwoDimensionalNoiseHeightMap : NoiseHeightMapGenerator
 
         Vector2DNode pointer = root;
 
+        int i1 = 0;
+
         //get top most value
         while (pointer.up != null)
         {
+            i1++;
             pointer = pointer.up;
         }
 
@@ -471,13 +474,14 @@ public class TwoDimensionalNoiseHeightMap : NoiseHeightMapGenerator
                 temp += $"{pointer.toString()}\t";
                 pointer = pointer.right;
             }
+            temp += $"{pointer.toString()}\t";
 
             while (pointer.left != null)
             {
                 pointer = pointer.left;
             }
-
             pointer = pointer.down;
+            temp += "\n";
         }
 
         while (pointer.right != null)
@@ -485,6 +489,7 @@ public class TwoDimensionalNoiseHeightMap : NoiseHeightMapGenerator
             temp += $"{pointer.toString()}\t";
             pointer = pointer.right;
         }
+        temp += $"{pointer.toString()}";
 
         return temp;
     }
