@@ -190,7 +190,7 @@ public class TwoDimensionalNoiseHeightMap : NoiseHeightMapGenerator
         }
 
         //primary pointer
-        Vector2DNode pointer1 = root.up;
+        Vector2DNode pointer1 = null;
 
         //secondary pointer that points to the previous y layer
         Vector2DNode pointer2 = null;
@@ -198,74 +198,20 @@ public class TwoDimensionalNoiseHeightMap : NoiseHeightMapGenerator
         //setting point to the starting position
         GeneratorIterator[] iterator = new GeneratorIterator[2];
 
-        iterator[0] = new GeneratorIterator(0, start[0]);
-        if(end[1] - start[1] > 0)
+        pointer1 = this.getNode(start);
+
+        if(pointer1.down != null)
         {
-            iterator[1] = new GeneratorIterator(0, start[1]);
+            pointer2 = pointer1.down;
         }
-        else
-        {
-            iterator[1] = new GeneratorIterator(0, start[1]);
-        }
-
-        while (iterator[1].hasNext())
-        {
-            iterator[1].next();
-
-            if (pointer1 == null)
-            {
-                throw new ArgumentException();
-            }
-
-            if (iterator[1].getDelta() == 1)
-            {
-                pointer1 = pointer1.up;
-            }
-            else
-            {
-                pointer1 = pointer1.down;
-            }
-
-            if(iterator[1].current != 0)
-            {
-                pointer2 = pointer1;
-            }
-        }
-
-        while (iterator[0].hasNext())
-        {
-            if (pointer1 == null)
-            {
-                throw new ArgumentException();
-            }
-
-            if (iterator[0].getDelta() == 1)
-            {
-                pointer1 = pointer1.right;
-            }
-            else
-            {
-                pointer1 = pointer1.left;
-            }
-            iterator[0].next();
-        }
-
 
         iterator[0] = new GeneratorIterator(start[0], end[0] - 1);
         iterator[1] = new GeneratorIterator(start[1], end[1]);
 
-        if (pointer1 == null)
-        {
-            pointer1 = new Vector2DNode(templateVector[random.Next(0, templateVector.Length)]);
-        }
-        else
-        {
-            pointer1.set(templateVector[random.Next(0, templateVector.Length)]);
-        }
+
+        pointer1.set(templateVector[random.Next(0, templateVector.Length)]);
 
         //generating
-        Vector2DNode tmp = pointer1;
-
         while (iterator[1].hasNext())
         {
             
