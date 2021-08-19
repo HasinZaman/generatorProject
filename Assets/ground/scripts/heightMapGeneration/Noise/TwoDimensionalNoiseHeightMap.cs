@@ -373,7 +373,7 @@ public class TwoDimensionalNoiseHeightMap : NoiseHeightMapGenerator
                 throw new ArgumentException();
             }
 
-            switch (iterator[1].getDelta())
+            switch (iterator[0].getDelta())
             {
                 case 1:
                     pointer = pointer.right;
