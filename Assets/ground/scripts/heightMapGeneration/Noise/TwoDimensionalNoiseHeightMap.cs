@@ -379,6 +379,65 @@ public class TwoDimensionalNoiseHeightMap : NoiseHeightMapGenerator
     }
 
     /// <summary>
+    ///     getNode gets the perlin noise noise at a given position
+    /// </summary>
+    /// <param name="pos">int array of the position of the perlin noise vector relative to startNode</param>
+    /// <param name="startNode">Vector2DNode instance is the start position</param>
+    /// <returns>Vector2DNode of noise vector at pos</returns>
+    protected Vector2DNode getNode(int[] pos, Vector2DNode startNode)
+    {
+        Vector2DNode pointer = startNode;
+
+        GeneratorIterator[] iterator = new GeneratorIterator[2];
+
+        for (int i1 = 0; i1 < 2; i1++)
+        {
+            iterator[i1] = new GeneratorIterator(0, pos[i1]);
+        }
+
+        while (iterator[1].hasNext())
+        {
+            iterator[1].next();
+
+            if (pointer == null)
+            {
+                throw new ArgumentException();
+            }
+
+            switch (iterator[1].getDelta())
+            {
+                case 1:
+                    pointer = pointer.up;
+                    break;
+                case -1:
+                    pointer = pointer.down;
+                    break;
+            }
+        }
+
+        while (iterator[0].hasNext())
+        {
+            if (pointer == null)
+            {
+                throw new ArgumentException();
+            }
+
+            switch (iterator[1].getDelta())
+            {
+                case 1:
+                    pointer = pointer.right;
+                    break;
+                case -1:
+                    pointer = pointer.left;
+                    break;
+            }
+            iterator[0].next();
+        }
+
+        return pointer;
+    }
+
+    /// <summary>
     ///     getVector gets the perlin noise vector at a given position
     /// </summary>
     /// <param name="pos">int array of the position of the perlin noise vector</param>
