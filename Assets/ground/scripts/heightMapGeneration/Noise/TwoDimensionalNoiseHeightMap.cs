@@ -280,8 +280,6 @@ public class TwoDimensionalNoiseHeightMap : NoiseHeightMapGenerator
                 iterator[0].next();
             }
             iterator[0].reverse();
-            iterator[0].restart();
-            //iterator[0].next();
 
             //remeber start of current layer
             pointer2 = pointer1;
