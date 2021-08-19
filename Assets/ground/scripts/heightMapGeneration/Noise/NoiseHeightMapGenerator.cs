@@ -59,7 +59,7 @@ public abstract class NoiseHeightMapGenerator : HeightMapGenerator
 
             for (int i1 = 1; i1 < this.vector.Length; i1++)
             {
-                temp += $"{this.vector[i1]}";
+                temp += $",{this.vector[i1]}";
             }
 
             temp += ")";
