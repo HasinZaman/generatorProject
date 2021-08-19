@@ -284,7 +284,6 @@ public class TwoDimensionalNoiseHeightMap : NoiseHeightMapGenerator
             //remeber start of current layer
             pointer2 = pointer1;
 
-
             //create next layer
             if (iterator[1].getDelta() == 1)
             {
