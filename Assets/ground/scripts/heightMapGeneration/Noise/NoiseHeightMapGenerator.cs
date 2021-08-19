@@ -139,7 +139,6 @@ public abstract class NoiseHeightMapGenerator : HeightMapGenerator
         }
 
         /// <summary>
-        ///     restart method returns current value back to the start
         ///     restart method sets current value back to start
         /// </summary>
         public void restart()
