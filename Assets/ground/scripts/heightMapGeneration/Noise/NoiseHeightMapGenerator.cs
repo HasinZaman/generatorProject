@@ -69,9 +69,9 @@ public abstract class NoiseHeightMapGenerator : HeightMapGenerator
     }
 
     /// <summary>
-    ///     SampleIterator iterates through a range of values
+    ///     Iterator abstract class handles through a range of values
     /// </summary>
-    protected class SampleIterator
+    protected abstract class Iterator<T>
     {
         /// <summary>
         ///     start value of Iterator
