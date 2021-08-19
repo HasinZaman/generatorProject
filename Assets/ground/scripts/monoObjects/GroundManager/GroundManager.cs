@@ -16,6 +16,7 @@ public class GroundManager : MonoBehaviour
     void Start()
     {
         TwoDimensionalNoiseHeightMap twoDimensionalNoiseHeightMap = new TwoDimensionalNoiseHeightMap(NoiseVectors.TwoDimensionSet1, 0, new int[] { 3, 3 }, shaderList.Noise);
+        Debug.Log(twoDimensionalNoiseHeightMap.toString());
     }
 
     private int count = 0;
