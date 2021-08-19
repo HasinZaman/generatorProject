@@ -146,15 +146,6 @@ public abstract class NoiseHeightMapGenerator : HeightMapGenerator
             this.current = this.start;
             this.current -= this.delta;
         }
-
-        /// <summary>
-        /// toString method converts iterator into String
-        /// </summary>
-        /// <returns>String representation of iterator</returns>
-        public string toString()
-        {
-            return $"start:{this.start}\tend:{this.end}\tdelta:{this.delta}";
-        }
     }
 
     /// <summary>
