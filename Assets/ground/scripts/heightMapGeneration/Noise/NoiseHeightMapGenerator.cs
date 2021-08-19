@@ -126,6 +126,17 @@ public abstract class NoiseHeightMapGenerator : HeightMapGenerator
             return this.delta;
         }
 
+        /// <summary>
+        /// toString method converts iterator into String
+        /// </summary>
+        /// <returns>String representation of iterator</returns>
+        public override string ToString()
+        {
+            return $"start:{this.start}\tend:{this.end}\tdelta:{this.delta}\tcurrent:{this.current}";
+        }
+
+    }
+
             if (samples < 3)
             {
                 throw new ArgumentException("samples need to be greater than 2");
