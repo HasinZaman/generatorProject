@@ -137,6 +137,19 @@ public abstract class NoiseHeightMapGenerator : HeightMapGenerator
 
     }
 
+    /// <summary>
+    ///     SampleIterator iterates through a range of values
+    /// </summary>
+    protected class SampleIterator : Iterator<float>
+    {
+        /// <summary>
+        ///     Constructor sets up iterator
+        /// </summary>
+        /// <param name="start">start value of iterator</param>
+        /// <param name="end">end value of iterator</param>
+        /// <param name="samples">Number of samples that will be iterated through between start and end</param>
+        public SampleIterator(float start, float end, int samples) : base(start, end)
+        {
             if (samples < 3)
             {
                 throw new ArgumentException("samples need to be greater than 2");
