@@ -398,6 +398,19 @@ public class TwoDimensionalNoiseHeightMap : NoiseHeightMapGenerator
         return getNode(pos).val();
     }
 
+    public float sample(float x, float y)
+    {
+
+        float[][] vectors = new float[4][];
+        Vector2DNode p00 = getNode(new int[] {(int) Math.Floor(x), (int) Math.Floor(y) });
+        Vector2DNode p01 = getNode(new int[] { 0, 1 }, p00);
+        Vector2DNode p10 = getNode(new int[] { 1, 0 }, p00);
+        Vector2DNode p11 = getNode(new int[] { 1, 1 }, p00);
+        Debug.Log($"{p01.toString()}\t{p11.toString()}\n{p00.toString()}\t{p10.toString()}");
+
+        return 0;
+    }
+
     public string toString()
     {
         string temp = "";
