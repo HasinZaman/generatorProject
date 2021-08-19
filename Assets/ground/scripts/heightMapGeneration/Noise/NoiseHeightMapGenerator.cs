@@ -91,7 +91,7 @@ public abstract class NoiseHeightMapGenerator : HeightMapGenerator
         /// <summary>
         ///     current value of the iterator
         /// </summary>
-        public float current;
+        public T current;
 
         /// <summary>
         ///     Constructor sets up iterator
