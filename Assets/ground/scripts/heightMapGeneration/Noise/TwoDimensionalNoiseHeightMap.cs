@@ -400,15 +400,35 @@ public class TwoDimensionalNoiseHeightMap : NoiseHeightMapGenerator
 
     public float sample(float x, float y)
     {
-
         float[][] vectors = new float[4][];
-        Vector2DNode p00 = getNode(new int[] {(int) Math.Floor(x), (int) Math.Floor(y) });
-        Vector2DNode p01 = getNode(new int[] { 0, 1 }, p00);
-        Vector2DNode p10 = getNode(new int[] { 1, 0 }, p00);
-        Vector2DNode p11 = getNode(new int[] { 1, 1 }, p00);
-        Debug.Log($"{p01.toString()}\t{p11.toString()}\n{p00.toString()}\t{p10.toString()}");
+        float[][] dist = new float[4][];
+        float[] vertexVal = new float[4];
 
-        return 0;
+        Vector2DNode pointer = getNode(new int[] { (int)Math.Floor(x), (int)Math.Floor(y) });
+
+        for (int x1 = 0; x1 < 2; x1++)
+        {
+            for (int y1 = 0; y1 < 2; y1++)
+            {
+                vectors[x1 + y1 * 2] = getNode(new int[] { x1, y1 }, pointer).val();
+                dist[x1 + y1 * 2] = new float[] { x % 1 - x1, y % 1 - y1};
+
+                vertexVal[x1 + y1 * 2] = dotProduct(vectors[x1 + y1 * 2], dist[x1 + y1 * 2]);
+            }
+        }
+
+        /*
+         * 01--Line0--11
+         *       |
+         *     Line2 (return)
+         *       |
+         * 00--Line1--10
+         */
+
+        float line0 = cosineInterpolate(vertexVal[0 + 1 * 2], vertexVal[1 + 1 * 2], x % 1);
+        float line1 = cosineInterpolate(vertexVal[0 + 1 * 2], vertexVal[1 + 0 * 2], x % 1);
+
+        return cosineInterpolate(line0, line1, y % 1);
     }
 
     public string toString()
