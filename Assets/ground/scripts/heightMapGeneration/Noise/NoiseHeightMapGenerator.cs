@@ -4,7 +4,7 @@ using UnityEngine;
 /// <summary>
 ///     NoiseHeightMapGenerator is an abstract class to create a height map using perlin noise
 /// </summary>
-public abstract class NoiseHeightMapGenerator : HeightMapGenerator
+public abstract class NoiseHeightMapGenerator : HeightMapGenerator<Grid>
 {
     /// <summary>
     ///     VectorNode stores noise vector
