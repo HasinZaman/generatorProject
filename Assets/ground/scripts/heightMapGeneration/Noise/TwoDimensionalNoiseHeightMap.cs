@@ -46,6 +46,9 @@ public class TwoDimensionalNoiseHeightMap : NoiseHeightMapGenerator
         }
     }
 
+    /// <summary>
+    ///     GeneratorIterator class traverses in a back and forth manner between a range of values inorder to create a linked grids using Vector2DNode
+    /// </summary>
     protected class GeneratorIterator : Iterator<int>
     {
         /// <summary>
