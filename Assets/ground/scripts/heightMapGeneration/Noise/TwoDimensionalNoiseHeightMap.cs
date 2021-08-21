@@ -245,9 +245,62 @@ public class TwoDimensionalNoiseHeightMap : NoiseHeightMapGenerator
     /// <returns>
     ///     Grid that repesents the heightMap created with perlin noise
     /// </returns>
-    public override Grid getHeightMap()
+    public override Grid getHeightMap(object param)
     {
-        throw new NotImplementedException();
+        if (typeof(GridParam) != param.GetType())
+        {
+            throw new ArgumentException();
+        }
+
+        Node[] nodes;
+
+        GridParam gridParam = (GridParam) param;
+
+        float[] start = gridParam.getStart();
+        float[] end = gridParam.getEnd();
+        int[] dim = new int[3] { gridParam.getSamples()[0], gridParam.height, gridParam.getSamples()[1] };
+
+        Grid grid = new Grid(dim);
+
+        SampleIterator[] pos = new SampleIterator[2];
+        
+        for (int i1 = 0; i1 < 2; i1++)
+        {
+            pos[i1] = new SampleIterator(start[i1], end[i1], dim[2 * i1]);
+        }
+
+
+        nodes = new Node[dim[0] * dim[1] * dim[2]];
+
+        float tmp;
+
+        for(int y = 0; y < dim[1]; y++)
+        {
+            for(int z = 0; z < dim[2]; z++)
+            {
+                tmp = this.sample(pos[0].current, pos[1].current) * (float) (dim[1] - 1);
+
+                for (int x = 0; x < dim[0]; x++)
+                {
+                    nodes[x + (y + z * dim[1]) * dim[0]] = new Node();
+                    if(tmp - y > 1)
+                    {
+                        nodes[x + (y + z * dim[1]) * dim[0]].setValue(1);
+                    }
+                    else
+                    {
+                        nodes[x + (y + z * dim[1]) * dim[0]].setValue(Math.Max(tmp % 1, 0));
+                    }
+                }
+                pos[1].next();
+            }
+            pos[0].next();
+            pos[1].restart();
+        }
+
+        grid.setNodes(nodes);
+
+        return grid;
     }
 
     /// <summary>
