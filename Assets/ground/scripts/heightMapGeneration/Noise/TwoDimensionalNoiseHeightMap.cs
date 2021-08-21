@@ -259,8 +259,6 @@ public class TwoDimensionalNoiseHeightMap : NoiseHeightMapGenerator
         float[] end = gridParam.getEnd();
         int[] dim = new int[3] { gridParam.getSamples()[0], gridParam.height, gridParam.getSamples()[1] };
 
-        Grid grid = new Grid(dim);
-
         SampleIterator[] pos = new SampleIterator[2];
         
         for (int i1 = 0; i1 < 2; i1++)
@@ -297,9 +295,7 @@ public class TwoDimensionalNoiseHeightMap : NoiseHeightMapGenerator
             pos[1].restart();
         }
 
-        grid.setNodes(nodes);
-
-        return grid;
+        return new Grid(nodes, dim);
     }
 
     /// <summary>
