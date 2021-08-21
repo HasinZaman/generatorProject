@@ -137,6 +137,77 @@ public class TwoDimensionalNoiseHeightMap : NoiseHeightMapGenerator
     }
 
     /// <summary>
+    ///     GridParam stores custom paramater values for getHeightMap method
+    /// </summary>
+    public class GridParam
+    {
+        private float[] start = new float[2];
+        private float[] end = new float[2];
+        private int[] samples = new int[2];
+        public int height;
+
+        /// <summary>
+        ///     setStart method sets start instance
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        public void setStart(float x, float y)
+        {
+            start[0] = x;
+            start[1] = y;
+        }
+
+        /// <summary>
+        ///     setEnd method set end instance
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        public void setEnd(float x, float y)
+        {
+            end[0] = x;
+            end[1] = y;
+        }
+
+        /// <summary>
+        ///     setSamples method set samples instance
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        public void setSamples(int x, int y)
+        {
+            samples[0] = x;
+            samples[1] = y;
+        }
+
+        /// <summary>
+        ///     getStart method returns start instance
+        /// </summary>
+        /// <returns>float[2] of start instance</returns>
+        public float[] getStart()
+        {
+            return start;
+        }
+
+        /// <summary>
+        ///     getEnd method returns end instance
+        /// </summary>
+        /// <returns>float[2] of end instance</returns>
+        public float[] getEnd()
+        {
+            return end;
+        }
+
+        /// <summary>
+        ///     getSamples method returns sample instance
+        /// </summary>
+        /// <returns>int[2] of sample instance</returns>
+        public int[] getSamples()
+        {
+            return samples;
+        }
+    }
+
+    /// <summary>
     ///     shader is stores a computeShader used to calculate the noise
     /// </summary>
     ComputeShader shader;
