@@ -3,20 +3,38 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+///     Chunk MonoBehaviour script handles ChunkGameObject
+/// </summary>
 public class Chunk : MonoBehaviour
 {
-    int[] chunkPos;
+    /// <summary>
+    ///     pos instances stores the position of the Chunk relative to center
+    /// </summary>
+    int[] pos;
 
-    public Grid chunkGrid;
-    public MeshGenerator meshGenerator;
+    /// <summary>
+    ///     meshGenerator object handles mesh generating
+    /// </summary>
+    private MeshGenerator meshGenerator;
     
-    MeshData meshData;
+    /// <summary>
+    ///     meshData strut stores the current mesh information
+    /// </summary>
+    private MeshData meshData;
 
+    // object mesh instances
     Material material;
-    public MeshFilter meshFilter;
-    public Mesh mesh;
-    public MeshCollider collider;
+    [SerializeField]
+    private MeshFilter meshFilter;
+    [SerializeField]
+    private Mesh mesh;
+    [SerializeField]
+    private MeshCollider collider;
 
+    /// <summary>
+    ///     start method sets up Chunk objects
+    /// </summary>
     public void Start()
     {
         meshFilter = GetComponent<MeshFilter>();
