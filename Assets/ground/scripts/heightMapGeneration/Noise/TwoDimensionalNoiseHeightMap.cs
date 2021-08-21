@@ -8,16 +8,204 @@ public class TwoDimensionalNoiseHeightMap : NoiseHeightMapGenerator
 {
 
     /// <summary>
-    ///     perlinNoiseVectors stores the perlin noise vectors used in generating noise
+    ///     Vector2DNode stores perlin vector and neighbor node
     /// </summary>
-    public float[][] perlinNoiseVectors;
+    protected class Vector2DNode : VectorNode
+    {
+        /// <summary>
+        ///     neighbor node left relative to the current node
+        /// </summary>
+        public Vector2DNode left = null;
+
+        /// <summary>
+        ///     neighbor node right relative to the current node
+        /// </summary>
+        public Vector2DNode right = null;
+
+        /// <summary>
+        ///     neighbor node up relative to the current node
+        /// </summary>
+        public Vector2DNode up = null;
+
+        /// <summary>
+        ///     neighbor node down relative to the current node
+        /// </summary>
+        public Vector2DNode down = null;
+
+        /// <summary>
+        ///     Constructor creates Vector2DNode object 
+        /// </summary>
+        /// <param name="vector">intial value of vector value</param>
+        public Vector2DNode(float[] vector)
+        {
+            this.dim = 2;
+            if(vector != null)
+            {
+                this.set(vector);
+            }
+        }
+    }
 
     /// <summary>
-    ///     perlinVectorDim stores the dim of perlinNoiseVectors
+    ///     GeneratorIterator class traverses in a back and forth manner between a range of values inorder to create a linked grids using Vector2DNode
     /// </summary>
-    uint[] perlinVectorDim;
+    protected class GeneratorIterator : Iterator<int>
+    {
+        /// <summary>
+        ///     constructor sets up Iterator class
+        /// </summary>
+        /// <param name="start">Starting position of iterator</param>
+        /// <param name="end">Ending position of iterator</param>
+        public GeneratorIterator(int start, int end) : base(start - 1, end + 1)
+        {
+            if (end == start)
+            {
+                this.delta = 0;
+            }
+            else if (end - start > 0)
+            {
+                this.delta = 1;
+            }
+            else
+            {
+                this.delta = -1;
+            }
 
-    int[] nodeSize;
+            this.restart();
+        }
+
+        /// <summary>
+        ///     hasNext method checks if another value exists
+        /// </summary>
+        /// <returns>boolean if the next number exists</returns>
+        public override bool hasNext()
+        {
+            int tmp = this.delta + this.current;
+
+            return this.start < tmp && tmp < this.end && this.delta != 0;
+        }
+
+        /// <summary>
+        ///     next method updates iterator
+        /// </summary>
+        /// <returns>int of current value</returns>
+        public override int next()
+        {
+            if(this.hasNext())
+            {
+                this.current += this.delta;
+                return this.current;
+            }
+            else
+            {
+                throw new InvalidOperationException();
+            }
+        }
+        
+        /// <summary>
+        ///     restart method sets current value back to start
+        /// </summary>
+        public void restart()
+        {
+            if(this.delta == 1)
+            {
+                this.current = this.start;
+            }
+            else
+            {
+                this.current = this.end;
+            }
+            this.current += this.delta;
+        }
+
+        /// <summary>
+        ///     reverse method swaps the start and end value
+        /// </summary>
+        public void reverse()
+        {
+            this.delta *= -1;
+        }
+
+        /// <summary>
+        /// toString method converts iterator into String
+        /// </summary>
+        /// <returns>String representation of iterator</returns>
+        public override string ToString()
+        {
+            return $"start:{this.start + delta}\tend:{this.end - delta}\tdelta:{this.delta}\tcurrent:{this.current}";
+        }
+    }
+
+    /// <summary>
+    ///     GridParam stores custom paramater values for getHeightMap method
+    /// </summary>
+    public class GridParam
+    {
+        private float[] start = new float[2];
+        private float[] end = new float[2];
+        private int[] samples = new int[2];
+        public int height;
+
+        /// <summary>
+        ///     setStart method sets start instance
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        public void setStart(float x, float y)
+        {
+            start[0] = x;
+            start[1] = y;
+        }
+
+        /// <summary>
+        ///     setEnd method set end instance
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        public void setEnd(float x, float y)
+        {
+            end[0] = x;
+            end[1] = y;
+        }
+
+        /// <summary>
+        ///     setSamples method set samples instance
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        public void setSamples(int x, int y)
+        {
+            samples[0] = x;
+            samples[1] = y;
+        }
+
+        /// <summary>
+        ///     getStart method returns start instance
+        /// </summary>
+        /// <returns>float[2] of start instance</returns>
+        public float[] getStart()
+        {
+            return start;
+        }
+
+        /// <summary>
+        ///     getEnd method returns end instance
+        /// </summary>
+        /// <returns>float[2] of end instance</returns>
+        public float[] getEnd()
+        {
+            return end;
+        }
+
+        /// <summary>
+        ///     getSamples method returns sample instance
+        /// </summary>
+        /// <returns>int[2] of sample instance</returns>
+        public int[] getSamples()
+        {
+            return samples;
+        }
+    }
 
     /// <summary>
     ///     shader is stores a computeShader used to calculate the noise
@@ -25,225 +213,29 @@ public class TwoDimensionalNoiseHeightMap : NoiseHeightMapGenerator
     ComputeShader shader;
 
     /// <summary>
-    ///     neighbors is an array that stores neighbor heightMap
+    ///     root stores the starting point of Noise Grid
     /// </summary>
-    TwoDimensionalNoiseHeightMap[] neighbors = new TwoDimensionalNoiseHeightMap[8];
-
-    private class SampleIterator
-    {
-        public float start;
-        public float end;
-        public float delta;
-        public float current;
-
-        public SampleIterator(float start, float end, int samples)
-        {
-            this.start = start;
-            this.current = start;
-            this.end = end;
-
-
-            if(samples < 3)
-            {
-                throw new ArgumentException("samples need to be greater than 2");
-            }
-
-            this.delta = (end - current) / (float)(samples - 1);
-            this.current -= this.delta;
-        }
-
-        public float next()
-        {
-            if(this.current + this.delta > this.end + 0.00001)
-            {
-                throw new InvalidOperationException("Iterator has reached end");
-            }
-            this.current += this.delta;
-
-            return this.current;
-        }
-
-        public bool hasNext()
-        {
-            return !(this.current + this.delta > this.end + 0.00001);
-        }
-
-        public void restart()
-        {
-            this.current = this.start;
-            this.current -= this.delta;
-        }
-
-        public string toString()
-        {
-            return $"start:{this.start}\tend:{this.end}\tdelta:{this.delta}";
-        }
-    }
+    protected Vector2DNode root = new Vector2DNode(null);
 
     /// <summary>
     ///     NoiseHeightMapGenerator constructor intializes variables
     /// </summary>
     /// <param name="templateVector">templateVector paramater assigns the template vectors that will be used in calculating perlin noise</param>
     /// <param name="seed">seed paramater is used to intialize random</param>
-    /// <param name="nodeSize">nodeSize is an array that stores the dimension of the final height map grid</param>
     /// <param name="perlinVectorDim">perlinVectorDim is an array that defines the size of perlinNoise vector</param>
     /// <param name="shader"></param>
-    public TwoDimensionalNoiseHeightMap(float[][] templateVector, int seed, int[] nodeSize, uint[] perlinVectorDim, ComputeShader shader) : base( templateVector, seed, nodeSize)
+    public TwoDimensionalNoiseHeightMap(float[][] templateVector, int seed, int[] perlinVectorDim, ComputeShader shader) : base( templateVector, seed)
     {
         if(perlinVectorDim.Length != 2)
         {
             throw new ArgumentException();
         }
 
+        root.up = new Vector2DNode(null);
+
         this.shader = shader;
-        float[] vector;
 
-        perlinNoiseVectors = new float[perlinVectorDim[0] * perlinVectorDim[1]][];
-
-        this.perlinVectorDim = perlinVectorDim;
-
-        this.nodeSize = nodeSize;
-
-        for (int x = 0; x < perlinVectorDim[0]; x++)
-        {
-            for (int y = 0; y < perlinVectorDim[1]; y++)
-            {
-                vector = templateVector[random.Next(0, templateVector.Length)];
-                perlinNoiseVectors[x + y * perlinVectorDim[0]]= vector;
-            }
-        }
-    }
-
-    public static void setHorizontalEdge(TwoDimensionalNoiseHeightMap top, TwoDimensionalNoiseHeightMap bottom)
-    {
-        if(top.perlinVectorDim[0] != bottom.perlinVectorDim[0])
-        {
-            throw new ArgumentException();
-        }
-
-        for(int x = 0; x < bottom.perlinVectorDim[0] - 1; x++)
-        {
-            top.perlinNoiseVectors[x] = bottom.perlinNoiseVectors[x + (bottom.perlinVectorDim[1] - 1) * bottom.perlinVectorDim[0]];
-        }
-    }
-
-    public static void setVerticalEdge(TwoDimensionalNoiseHeightMap left, TwoDimensionalNoiseHeightMap right)
-    {
-        if (left.perlinVectorDim[1] != right.perlinVectorDim[1])
-        {
-            throw new ArgumentException();
-        }
-        for (int y = 0; y < left.perlinVectorDim[1] - 1; y++)
-        {
-            right.perlinNoiseVectors[y * left.perlinVectorDim[0]] = left.perlinNoiseVectors[right.perlinVectorDim[0] - 1 + y * right.perlinVectorDim[0]];
-
-        }
-    }
-
-    public static void setCorner(TwoDimensionalNoiseHeightMap corner00, TwoDimensionalNoiseHeightMap corner01, TwoDimensionalNoiseHeightMap corner10, TwoDimensionalNoiseHeightMap corner11, int selected)
-    {
-        //cornerXY
-        float[] noiseVector;
-        
-        switch(selected)
-        {
-            case 0:
-                noiseVector = corner00.perlinNoiseVectors[corner00.perlinVectorDim[0] - 1 + (corner00.perlinVectorDim[1] - 1) * corner00.perlinVectorDim[0]];
-                break;
-            case 1:
-                noiseVector = corner01.perlinNoiseVectors[corner01.perlinVectorDim[0] - 1 + (0) * corner01.perlinVectorDim[0]];
-                break;
-            case 2:
-                noiseVector = corner10.perlinNoiseVectors[0 + (corner01.perlinVectorDim[1] - 1) * corner01.perlinVectorDim[0]];
-                break;
-            case 3:
-                noiseVector = corner11.perlinNoiseVectors[0];
-                break;
-            default:
-                throw new ArgumentNullException();
-        }
-
-        if (corner00 != null)
-        {
-            corner00.perlinNoiseVectors[corner00.perlinVectorDim[0] - 1 + (corner00.perlinVectorDim[1] - 1) * corner00.perlinVectorDim[0]] = noiseVector;
-        }
-        
-        if (corner01 != null)
-        {
-            corner01.perlinNoiseVectors[corner01.perlinVectorDim[0] - 1 + (0) * corner01.perlinVectorDim[0]] = noiseVector;
-        }
-        
-        if (corner10 != null)
-        {
-            corner10.perlinNoiseVectors[0 + (corner10.perlinVectorDim[1] - 1) * corner10.perlinVectorDim[0]] = noiseVector;
-        }
-        
-        if (corner11 != null)
-        {
-            corner11.perlinNoiseVectors[0] = noiseVector;
-        }
-    }
-
-    /// <summary>
-    ///     setVector sets a vector at a certian position
-    /// </summary>
-    /// <param name="x">x component of the location that will be modified</param>
-    /// <param name="y">y component of the location that will be modified</param>
-    /// <param name="vectorVal">vectorVal is a new vector that will be modified</param>
-    public void setVector(int x, int y, float[] vectorVal)
-    {
-        if(x < 0 || x > perlinVectorDim[0])
-        {
-            throw new ArgumentOutOfRangeException($"x value needs to be between {0} <= x < {perlinVectorDim[0]}");
-        }
-
-        if(y < 0 || y > perlinVectorDim[1])
-        {
-            throw new ArgumentOutOfRangeException($"y value needs to be between {0} <= y < {perlinVectorDim[1]}");
-        }
-
-        if(vectorVal.Length != 2)
-        {
-            throw new ArgumentException("vectorVal cannot must have two values");
-        }
-
-        for(int i1 = 0; i1 < 2; i1++)
-        {
-            if(vectorVal[i1] < -1 || vectorVal[i1] > 1)
-            {
-                throw new ArgumentException($"vectorVal[{i1}] must between -1 <= vectorVal[{i1}] <= 1");
-            }
-        }
-
-        perlinNoiseVectors[x * y] = vectorVal;
-    }
-
-    public override void setNeighbor(NoiseHeightMapGenerator neighbor, int neighborCode)
-    {
-        if(neighborCode < 0 || 7 < neighborCode)
-        {
-            throw new ArgumentException($"{neighborCode < 0} {7 < neighborCode}");
-        }
-
-        if (neighbor == null)
-        {
-            neighbors[neighborCode] = null;
-            return;
-        }
-
-        if(neighbor.GetType().Name != this.GetType().Name)
-        {
-            throw new ArgumentException("neighbor object must be TwoDimensionalNoiseHeightMap object");
-        }
-
-        TwoDimensionalNoiseHeightMap neighborTemp = (TwoDimensionalNoiseHeightMap) neighbor;
-
-        if (neighborTemp.perlinVectorDim[0] != this.perlinVectorDim[0] || neighborTemp.perlinVectorDim[1] != this.perlinVectorDim[1])
-        {
-            throw new ArgumentException("neighbor must have the same perlinVectorDim");
-        }
-
-        neighbors[neighborCode] = neighborTemp;
+        generateVectors(new int[2] { 0, 0 }, perlinVectorDim, templateVector);
     }
 
     /// <summary>
@@ -252,420 +244,361 @@ public class TwoDimensionalNoiseHeightMap : NoiseHeightMapGenerator
     /// <returns>
     ///     Grid that repesents the heightMap created with perlin noise
     /// </returns>
-    public override Grid getHeightMap()
+    public override Grid getHeightMap(object param)
     {
-        float[] samplePos = new float[2];
+        if (typeof(GridParam) != param.GetType())
+        {
+            throw new ArgumentException();
+        }
 
-        int[] nodeSizeTmp = new int[2] { nodeSize[0], nodeSize[1] };
+        Node[] nodes;
 
-        float sampleTemp;
+        GridParam gridParam = (GridParam) param;
 
-        SampleIterator xPos, yPos;
-        float start, end;
+        float[] start = gridParam.getStart();
+        float[] end = gridParam.getEnd();
+        int[] dim = new int[3] { gridParam.getSamples()[0], gridParam.height, gridParam.getSamples()[1] };
 
-        start = 0;
-        end = (float) perlinVectorDim[0] - 1;
+        SampleIterator[] pos = new SampleIterator[2];
+        
+        for (int i1 = 0; i1 < 2; i1++)
+        {
+            pos[i1] = new SampleIterator(start[i1], end[i1], dim[2 * i1]);
+        }
+
+
+        nodes = new Node[dim[0] * dim[1] * dim[2]];
+
+        float tmp;
+
+        for(int y = 0; y < dim[1]; y++)
+        {
+            for(int z = 0; z < dim[2]; z++)
+            {
+                tmp = this.sample(pos[0].current, pos[1].current) * (float) (dim[1] - 1);
+
+                for (int x = 0; x < dim[0]; x++)
+                {
+                    nodes[x + (y + z * dim[1]) * dim[0]] = new Node();
+                    if(tmp - y > 1)
+                    {
+                        nodes[x + (y + z * dim[1]) * dim[0]].setValue(1);
+                    }
+                    else
+                    {
+                        nodes[x + (y + z * dim[1]) * dim[0]].setValue(Math.Max(tmp % 1, 0));
+                    }
+                }
+                pos[1].next();
+            }
+            pos[0].next();
+            pos[1].restart();
+        }
+
+        return new Grid(nodes, dim);
+    }
+
+    /// <summary>
+    ///     generateVectors is an abstract method to randomly generate perlin noise vector nodes
+    /// </summary>
+    /// <param name="start">int array that stores the starting position at which nodes will be genrated</param>
+    /// <param name="end">int array that stores the ending position at which nodes will stop generating</param>
+    /// <param name="template">array of perlin noise vectors</param>
+    public override void generateVectors(int[] start, int[] end, float[][] template)
+    {
+        if(start.Length != 2 && end.Length != 2)
+        {
+            throw new ArgumentException("start and end paramater must be length 2");
+        }
+
+        //primary pointer
+        Vector2DNode pointer1 = null;
+
+        //secondary pointer that points to the previous y layer
+        Vector2DNode pointer2 = null;
+
+        //setting point to the starting position
+        GeneratorIterator[] iterator = new GeneratorIterator[2];
+
+        pointer1 = this.getNode(start);
+
+        if(pointer1.down != null)
+        {
+            pointer2 = pointer1.down;
+        }
+
+        iterator[0] = new GeneratorIterator(start[0], end[0] - 1);
+        iterator[1] = new GeneratorIterator(start[1], end[1]);
+
+
+        pointer1.set(templateVector[random.Next(0, templateVector.Length)]);
+
+        //generating
+        while (iterator[1].hasNext())
+        {
+            
+            while (iterator[0].hasNext())
+            {
+                if (iterator[0].getDelta() == 1)
+                {
+                    if(pointer1.right == null)
+                    {
+                        pointer1.right = new Vector2DNode(templateVector[random.Next(0, templateVector.Length)]);
+                        pointer1.right.left = pointer1;
+                    }
+                    else
+                    {
+                        pointer1.right.set(templateVector[random.Next(0, templateVector.Length)]);
+                    }
+
+                    pointer1 = pointer1.right;
+
+                    if (pointer2 != null)
+                    {
+                        pointer2 = pointer2.right;
+
+                        if (iterator[1].getDelta() == 1)
+                        {
+                            pointer2.up = pointer1;
+                            pointer1.down = pointer2;
+                        }
+                        else
+                        {
+                            pointer2.down = pointer1;
+                            pointer1.up = pointer2;
+                        }
+                    }
+                }
+                else
+                {
+                    if (pointer1.left == null)
+                    {
+                        pointer1.left = new Vector2DNode(templateVector[random.Next(0, templateVector.Length)]);
+                        pointer1.left.right = pointer1;
+                    }
+                    else
+                    {
+                        pointer1.left.set(templateVector[random.Next(0, templateVector.Length)]);
+                    }
+
+                    pointer1 = pointer1.left;
+
+                    if (pointer2 != null)
+                    {
+                        pointer2 = pointer2.left;
+                        
+                        if (iterator[1].getDelta() == 1)
+                        {
+                            pointer2.up = pointer1;
+                            pointer1.down = pointer2;
+                        }
+                        else
+                        {
+                            pointer1.up = pointer2;
+                            pointer2.down = pointer1;
+                        }
+                    }
+                }
+                iterator[0].next();
+            }
+            iterator[0].reverse();
+
+            //remeber start of current layer
+            pointer2 = pointer1;
+
+            //create next layer
+            if (iterator[1].getDelta() == 1)
+            {
+                if (pointer1.up == null)
+                {
+                    pointer1.up = new Vector2DNode(templateVector[random.Next(0, templateVector.Length)]);
+                }
+                else
+                {
+                    pointer1.up.set(templateVector[random.Next(0, templateVector.Length)]);
+                }
+
+                pointer1 = pointer1.up;
+                pointer1.down = pointer2;
+                pointer2.up = pointer1;
+            }
+            else
+            {
+                if (pointer1.down == null)
+                {
+                    pointer1.down = new Vector2DNode(templateVector[random.Next(0, templateVector.Length)]);
+                }
+                else
+                {
+                    pointer1.down.set(templateVector[random.Next(0, templateVector.Length)]);
+                }
+
+                pointer1 = pointer1.down;
+                pointer1.up = pointer2;
+                pointer2.down = pointer1;
+            }
+            iterator[1].next();
+        }
+    }
+
+    /// <summary>
+    ///     getNode gets the perlin noise noise at a given position
+    /// </summary>
+    /// <param name="pos">int array of the position of the perlin noise vector</param>
+    /// <returns>Vector2DNode of noise vector at pos</returns>
+    protected Vector2DNode getNode(int[] pos)
+    {
+        return getNode(pos, root.up);
+    }
+
+    /// <summary>
+    ///     getNode gets the perlin noise noise at a given position
+    /// </summary>
+    /// <param name="pos">int array of the position of the perlin noise vector relative to startNode</param>
+    /// <param name="startNode">Vector2DNode instance is the start position</param>
+    /// <returns>Vector2DNode of noise vector at pos</returns>
+    protected Vector2DNode getNode(int[] pos, Vector2DNode startNode)
+    {
+        Vector2DNode pointer = startNode;
+
+        GeneratorIterator[] iterator = new GeneratorIterator[2];
+
+        for (int i1 = 0; i1 < 2; i1++)
+        {
+            iterator[i1] = new GeneratorIterator(0, pos[i1]);
+        }
+
+        while (iterator[1].hasNext())
+        {
+            iterator[1].next();
+
+            if (pointer == null)
+            {
+                throw new ArgumentException();
+            }
+
+            switch (iterator[1].getDelta())
+            {
+                case 1:
+                    pointer = pointer.up;
+                    break;
+                case -1:
+                    pointer = pointer.down;
+                    break;
+            }
+        }
+
+        while (iterator[0].hasNext())
+        {
+            if (pointer == null)
+            {
+                throw new ArgumentException();
+            }
+
+            switch (iterator[0].getDelta())
+            {
+                case 1:
+                    pointer = pointer.right;
+                    break;
+                case -1:
+                    pointer = pointer.left;
+                    break;
+            }
+            iterator[0].next();
+        }
+
+        return pointer;
+    }
+
+    /// <summary>
+    ///     getVector gets the perlin noise vector at a given position
+    /// </summary>
+    /// <param name="pos">int array of the position of the perlin noise vector</param>
+    /// <returns>float array of noise vector</returns>
+    public override float[] getVector(int[] pos)
+    {
+        return getNode(pos).val();
+    }
+
+    public float sample(float x, float y)
+    {
+        float[][] vectors = new float[4][];
+        float[][] dist = new float[4][];
+        float[] vertexVal = new float[4];
+
+        Vector2DNode pointer = getNode(new int[] { (int)Math.Floor(x), (int)Math.Floor(y) });
+
+        for (int x1 = 0; x1 < 2; x1++)
+        {
+            for (int y1 = 0; y1 < 2; y1++)
+            {
+                vectors[x1 + y1 * 2] = getNode(new int[] { x1, y1 }, pointer).val();
+                dist[x1 + y1 * 2] = new float[] { x % 1 - x1, y % 1 - y1};
+
+                vertexVal[x1 + y1 * 2] = dotProduct(vectors[x1 + y1 * 2], dist[x1 + y1 * 2]);
+            }
+        }
 
         /*
+         * 01--Line0--11
+         *       |
+         *     Line2 (return)
+         *       |
+         * 00--Line1--10
+         */
 
-        if(neighbors[NoiseNeighborCornerCode.edge1] != null)
-        {
-            start = -0.5f;
-            nodeSizeTmp[0] += 1;
-        }
-        if(neighbors[NoiseNeighborCornerCode.edge2] != null)
-        {
-            end += 0.5f;
-            nodeSizeTmp[0] += 1;
-        }
-        */
-        xPos = new SampleIterator(start, end, nodeSizeTmp[0]) ;
-        /*
+        float line0 = cosineInterpolate(vertexVal[0 + 1 * 2], vertexVal[1 + 1 * 2], x % 1);
+        float line1 = cosineInterpolate(vertexVal[0 + 1 * 2], vertexVal[1 + 0 * 2], x % 1);
 
-        start = 0;
-        end = (float) perlinVectorDim[1] - 1;
+        return cosineInterpolate(line0, line1, y % 1);
+    }
 
-        if (neighbors[NoiseNeighborCornerCode.edge0] != null)
-        {
-            start -= 0.5f;
-            nodeSizeTmp[1] += 1;
-        }
-        if(neighbors[NoiseNeighborCornerCode.edge3] != null)
-        {
-            end += 0.5f;
-            nodeSizeTmp[1] += 1;
-        }*/
+    public string toString()
+    {
+        string temp = "";
 
-        yPos = new SampleIterator(start, end, nodeSizeTmp[1]);
-
-        Node[] nodes = new Node[nodeSizeTmp[0] * nodeSize[1] * nodeSizeTmp[1]];
-        int x = 0;
-        int z = 0;
+        Vector2DNode pointer = root;
 
         int i1 = 0;
 
-
-
-        //Debug.Log($"X : {xPos.toString()}");
-        //Debug.Log($"Y : {yPos.toString()}");
-
-        while (xPos.hasNext())
+        //get top most value
+        while (pointer.up != null)
         {
-            samplePos[0] = xPos.next();
-            z = 0;
-            while (yPos.hasNext())
+            i1++;
+            pointer = pointer.up;
+        }
+
+        //get left most value
+
+        while (pointer.left != null)
+        {
+            pointer = pointer.left;
+        }
+
+        while (pointer.down != null)
+        {
+            while (pointer.right != null)
             {
-                samplePos[1] = yPos.next();
-                //Debug.Log($"{x},{z} = {samplePos[0]},{samplePos[1]}");
-                sampleTemp = sample(samplePos[0], samplePos[1]);
-                sampleTemp *= (float)nodeSize[1];
-                for (int y = 0; y < nodeSize[1]; y++)
-                {
-                    nodes[x + (y + z * nodeSize[1]) * nodeSizeTmp[0]] = new Node(Mathf.Clamp(sampleTemp - y, 0, 1));
-                    i1++;
-                }
-                z++;
+                temp += $"{pointer.toString()}\t";
+                pointer = pointer.right;
             }
-            yPos.restart();
-            x++;
-        }
-        
-        grid = new Grid(new int[] { nodeSizeTmp[0], nodeSize[1], nodeSizeTmp[1] });
-        grid.setNodes(nodes);
-        return grid;
-    }
+            temp += $"{pointer.toString()}\t";
 
-    /// <summary>
-    ///     Sample gets a noise value at x and y position
-    /// </summary>
-    /// <param name="x"></param>
-    /// <param name="y"></param>
-    /// <returns>a perlin noise value is returned at a given coordinate position</returns>
-    public float sample(float x, float y)
-    {
-        int[] perlinNoisePos = new int[2];
-        if(x < -1 || x > perlinVectorDim[0])
-        {
-            throw new OverflowException($"x paramater greater than maximum size{perlinVectorDim[0] - 1}");
-        }
-        else if(x < 0)
-        {
-            perlinNoisePos[0] = -1;
-            //Debug.Log("X LESS THAN 0");
-        }
-        else if(x > perlinVectorDim[0] - 1)
-        {
-            perlinNoisePos[0] = 1;
-           // Debug.Log($"X Greater MAX {perlinVectorDim[0] - 1}");
-        }
-
-        if (y < -1 || y > perlinVectorDim[1])
-        {
-            throw new OverflowException($"y paramater greater than maximum size{perlinVectorDim[1] - 1}");
-        }
-        else if(y < 0)
-        {
-            perlinNoisePos[1] = -1;
-        }
-        else if( y > perlinVectorDim[1] - 1)
-        {
-            perlinNoisePos[1] = 1;
-        }
-
-
-        return sample(new float[] { x, y });
-        
-    }
-
-    /// <summary>
-    ///     Sample gets a noise value at x and y position
-    /// </summary>
-    /// <param name="pos">float array containing x and y position</param>
-    /// <returns>a perlin noise value is returned at a given coordinate position</returns>
-    private float sample(float[] pos)
-    {
-        int[] sampleDim = grid.getDim();
-
-        float[][] pointDist = getPointDist(pos);
-        float[][] pointVector = new float[4][];
-
-        uint[] perlinVectorDimTemp = new uint[2] { perlinVectorDim[0] - 1, perlinVectorDim[1] - 1 };
-
-        int[][] posRounded = new int[2][] {
-            new int[] { (int)Math.Floor(pos[0]), (int)Math.Ceiling(pos[0]) },
-            new int[] { (int)Math.Floor(pos[1]), (int)Math.Ceiling(pos[1]) }
-        };
-
-        for (int i1 = 0; i1 < pos.Length; i1++)
-        {
-            if(pos[i1] % 1 == 0)
+            while (pointer.left != null)
             {
-                return 0;
+                pointer = pointer.left;
             }
+            pointer = pointer.down;
+            temp += "\n";
         }
 
-        //gets the dot product for every corner
-        for (int x1 = 0; x1 < 2; x1++)
+        while (pointer.right != null)
         {
-            for (int y1 = 0; y1 < 2; y1++)
-            {
-                pointVector[binaryToPositionIndex(x1, y1)] = perlinNoiseVectors[posRounded[0][x1] + posRounded[1][y1] * perlinVectorDimTemp[0]];
-            }
+            temp += $"{pointer.toString()}\t";
+            pointer = pointer.right;
         }
+        temp += $"{pointer.toString()}";
 
-        return sample(pos, pointDist, pointVector);
-    }
-
-    private float sample(float[] pos, float[][] pointDist, float[][] pointVector)
-    {
-        if(pos == null)
-        {
-            throw new ArgumentNullException("pos cannot be null");
-        }
-        else if(pos.Length != 2)
-        {
-            throw new ArgumentException("Pos must contain two values");
-        }
-
-        if (pointDist == null)
-        {
-            throw new ArgumentNullException("pointDist cannot be null");
-        }
-        else if(pointDist.Length != 4)
-        {
-            throw new ArgumentException("pointDist must contain 4 distances");
-        }
-        else
-        {
-            for(int i1 = 0; i1 < 4; i1++)
-            {
-                if(pointDist[i1] == null)
-                {
-                    throw new ArgumentException($"pointDist contains a null value at {i1}");
-                }
-            }
-        }
-
-        if (pointVector == null)
-        {
-            throw new ArgumentNullException("pointVector cannot be null");
-        }
-        else if(pointVector.Length != 4)
-        {
-            throw new ArgumentNullException("pointVector must contain 4 distances");
-        }
-        else
-        {
-            for (int i1 = 0; i1 < 4; i1++)
-            {
-                if (pointVector[i1] == null)
-                {
-                    throw new ArgumentException($"pointVector contains a null value at {i1}");
-                }
-            }
-        }
-
-        float[] pointValue = new float[4];
-
-        uint[] perlinVectorDimTemp = new uint[2] { perlinVectorDim[0] - 1, perlinVectorDim[1] - 1 };
-
-        for (int x1 = 0; x1 < 2; x1++)
-        {
-            for (int y1 = 0; y1 < 2; y1++)
-            {
-                pointValue[binaryToPositionIndex(x1, y1)] = dotProduct(pointVector[binaryToPositionIndex(x1, y1)], pointDist[binaryToPositionIndex(x1, y1)]);
-
-            }
-        }
-        // gets the interpolated value using the dot products
-
-        // p(0,1) --- Line 1 --- P(1,1)
-        //              |
-        //            line 2
-        //              |
-        // p(0,0) --- Line 0 --- P(1,0)
-        float line0Val = cosineInterpolate(
-                pointValue[binaryToPositionIndex(0, 0)],
-                pointValue[binaryToPositionIndex(1, 0)],
-                pos[0] % 1
-            );
-
-        float line1Val = cosineInterpolate(
-                pointValue[binaryToPositionIndex(0, 1)],
-                pointValue[binaryToPositionIndex(1, 1)],
-                pos[0] % 1
-            );
-
-        float line2Val = cosineInterpolate(
-                line0Val,
-                line1Val,
-                pos[1] % 1
-            );
-        return (line2Val + 2) / 4;
-    }
-
-    private float sampleEdge(float[] pos, int neighborCode)
-    {
-        float[][] pointVector = new float[4][];
-
-        int[][] posRounded = new int[2][] {
-            new int[] { (int)Math.Floor(pos[0]), (int)Math.Ceiling(pos[0]) },
-            new int[] { (int)Math.Floor(pos[1]), (int)Math.Ceiling(pos[1]) }
-        };
-        try
-        {
-            switch (neighborCode)
-            {
-                case NoiseNeighborCornerCode.corner0:
-                    //Debug.Log("Corner0");
-                    pointVector[binaryToPositionIndex(0, 0)] = neighbors[NoiseNeighborCornerCode.corner0].perlinNoiseVectors[(perlinVectorDim[0] - 1) + (perlinVectorDim[1] - 1) * perlinVectorDim[0]];
-                    pointVector[binaryToPositionIndex(1, 0)] = neighbors[NoiseNeighborCornerCode.edge0].perlinNoiseVectors[(0) + (perlinVectorDim[1] - 1) * perlinVectorDim[0]];
-                    pointVector[binaryToPositionIndex(0, 1)] = neighbors[NoiseNeighborCornerCode.edge1].perlinNoiseVectors[(perlinVectorDim[0] - 1) + (0) * perlinVectorDim[0]];
-                    pointVector[binaryToPositionIndex(1, 1)] = perlinNoiseVectors[(0) + (0) * perlinVectorDim[0]];
-                    //Debug.Log("Corner 0");
-                    break;
-                case NoiseNeighborCornerCode.corner1:
-                    //Debug.Log("Corner1");
-                    pointVector[binaryToPositionIndex(0, 0)] = neighbors[NoiseNeighborCornerCode.edge0].perlinNoiseVectors[(perlinVectorDim[0] - 1) + (perlinVectorDim[1] - 1) * perlinVectorDim[0]];
-                    pointVector[binaryToPositionIndex(1, 0)] = neighbors[NoiseNeighborCornerCode.corner1].perlinNoiseVectors[(0) + (perlinVectorDim[1] - 1) * perlinVectorDim[0]];
-                    pointVector[binaryToPositionIndex(0, 1)] = perlinNoiseVectors[(perlinVectorDim[0] - 1) + (0) * perlinVectorDim[0]];
-                    pointVector[binaryToPositionIndex(1, 1)] = neighbors[NoiseNeighborCornerCode.edge2].perlinNoiseVectors[(0) + (0) * perlinVectorDim[0]];
-                    break;
-                case NoiseNeighborCornerCode.corner2:
-                    //Debug.Log("Corner2");
-                    pointVector[binaryToPositionIndex(0, 0)] = neighbors[NoiseNeighborCornerCode.edge1].perlinNoiseVectors[(perlinVectorDim[0] - 1) + (perlinVectorDim[1] - 1) * perlinVectorDim[0]];
-                    pointVector[binaryToPositionIndex(1, 0)] = perlinNoiseVectors[(0) + (perlinVectorDim[1] - 1) * perlinVectorDim[0]];
-                    pointVector[binaryToPositionIndex(0, 1)] = neighbors[NoiseNeighborCornerCode.corner2].perlinNoiseVectors[(perlinVectorDim[0] - 1) + (0) * perlinVectorDim[0]];
-                    pointVector[binaryToPositionIndex(1, 1)] = neighbors[NoiseNeighborCornerCode.edge3].perlinNoiseVectors[(0) + (0) * perlinVectorDim[0]];
-                    break;
-                case NoiseNeighborCornerCode.corner3:
-                    //Debug.Log("Corner3");
-                    pointVector[binaryToPositionIndex(0, 0)] = perlinNoiseVectors[(perlinVectorDim[0] - 1) + (perlinVectorDim[1] - 1) * perlinVectorDim[0]];
-                    pointVector[binaryToPositionIndex(1, 0)] = neighbors[NoiseNeighborCornerCode.edge2].perlinNoiseVectors[(0) + (perlinVectorDim[1] - 1) * perlinVectorDim[0]];
-                    pointVector[binaryToPositionIndex(0, 1)] = neighbors[NoiseNeighborCornerCode.edge3].perlinNoiseVectors[(perlinVectorDim[0] - 1) + (0) * perlinVectorDim[0]];
-                    neighbors[NoiseNeighborCornerCode.corner3].gridDebug();
-                    pointVector[binaryToPositionIndex(1, 1)] = neighbors[NoiseNeighborCornerCode.corner3].perlinNoiseVectors[(0) + (0) * perlinVectorDim[0]];
-                    break;
-
-                case NoiseNeighborCornerCode.edge0:
-                    // Debug.Log("EDGE0");
-                    for (int x = 0; x < 2; x++)
-                    {
-                        pointVector[binaryToPositionIndex(x, 0)] = neighbors[NoiseNeighborCornerCode.edge0].perlinNoiseVectors[posRounded[0][x] + (perlinVectorDim[1] - 1) * perlinVectorDim[0]];
-                        pointVector[binaryToPositionIndex(x, 1)] = perlinNoiseVectors[posRounded[0][x] + (0) * perlinVectorDim[0]];
-                    }
-                    break;
-                case NoiseNeighborCornerCode.edge1:
-                    //Debug.Log("EDGE1");
-                    for (int y = 0; y < 2; y++)
-                    {
-                        pointVector[binaryToPositionIndex(0, y)] = neighbors[NoiseNeighborCornerCode.edge0].perlinNoiseVectors[(perlinVectorDim[0] - 1) + posRounded[1][y] * perlinVectorDim[0]];
-                        pointVector[binaryToPositionIndex(1, y)] = perlinNoiseVectors[(0) + posRounded[1][y] * perlinVectorDim[0]];
-                    }
-                    break;
-                case NoiseNeighborCornerCode.edge2:
-                    //Debug.Log("EDGE2");
-                    for (int y = 0; y < 2; y++)
-                    {
-                        pointVector[binaryToPositionIndex(0, y)] = neighbors[NoiseNeighborCornerCode.edge0].perlinNoiseVectors[(perlinVectorDim[0] - 1) + posRounded[1][y] * perlinVectorDim[0]];
-                        pointVector[binaryToPositionIndex(1, y)] = perlinNoiseVectors[(0) + posRounded[1][y] * perlinVectorDim[0]];
-                    }
-                    break;
-                case NoiseNeighborCornerCode.edge3:
-                    //Debug.Log("EDGE3");
-                    for (int x = 0; x < 2; x++)
-                    {
-                        pointVector[binaryToPositionIndex(x, 0)] = neighbors[NoiseNeighborCornerCode.edge0].perlinNoiseVectors[posRounded[0][x] + (0) * perlinVectorDim[0]];
-                        pointVector[binaryToPositionIndex(x, 1)] = perlinNoiseVectors[posRounded[0][x] + (perlinVectorDim[1] - 1) * perlinVectorDim[0]];
-                    }
-                    break;
-                default:
-                    throw new ArgumentException($"Invalid NoiseNeighborCornerCode {neighborCode}");
-            }
-        }
-        catch(NullReferenceException e)
-        {
-            return 0;
-        }
-
-        
-        string tmp = "";
-        float[] tmpVector;
-        
-        for(int x = 0; x <  2; x++)
-        {
-            for(int y = 0; y < 2; y++)
-            {
-                tmpVector = pointVector[binaryToPositionIndex(x, y)];
-                if(tmpVector == null)
-                {
-                    Debug.Log($"Pos:{pos[0]},{pos[1]}");
-                }
-                tmp += $"{tmpVector[0]},{tmpVector[1]}\t";
-            }
-            tmp +="\n";
-        }
-        Debug.Log(tmp);
-        Debug.Log($"OG POS:{pos[0]},{pos[1]}");
-        for (int i1 = 0; i1 < pos.Length; i1++)
-        {
-            if(pos[i1] < 0)
-            {
-                pos[i1] = 1 + pos[i1];
-            }
-        }
-        Debug.Log($"SAMPLE:{sample(pos, getPointDist(pos), pointVector)}");
-        return sample(pos, getPointDist(pos), pointVector);
-    }
-
-    private float[][] getPointDist(float[] pos)
-    {
-        float[][] pointDist = new float[4][];
-
-        for (int x1 = 0; x1 < 2; x1++)
-        {
-            for (int y1 = 0; y1 < 2; y1++)
-            {
-                pointDist[binaryToPositionIndex(x1, y1)] = new float[2] { (pos[0] % 1) - x1, (pos[1] % 1) - y1 };
-            }
-        }
-
-        return pointDist;
-    }
-
-    /// <summary>
-    /// binaryToPositionIndex converts a coord into a index for a one dimensitional 
-    /// </summary>
-    /// <param name="x"></param>
-    /// <param name="y"></param>
-    /// <returns>an int repsenting the index of a coord</returns>
-    private int binaryToPositionIndex(int x, int y)
-    {
-        return x + y * 2;
-    }
-
-    private uint coordToPerlinPositionIndex(int x, int y)
-    {
-        return (uint)(x + y * perlinVectorDim[1]);
-    }
-
-    private uint coordToPerlinPositionIndex(uint x, uint y)
-    {
-        return (uint) (x + y * perlinVectorDim[1]);
-    }
-
-    public void gridDebug()
-    {
-        string tmp = "";
-
-        for(int y = (int) perlinVectorDim[1] - 1; y >= 0; y--)
-        {
-            for(int x = 0; x < perlinVectorDim[0]; x++)
-            {
-                tmp += $"({perlinNoiseVectors[coordToPerlinPositionIndex(x,y)][0]},{perlinNoiseVectors[coordToPerlinPositionIndex(x, y)][1]})\t";
-            }
-            tmp += "\n";
-        }
-        Debug.Log(tmp);
+        return temp;
     }
 }

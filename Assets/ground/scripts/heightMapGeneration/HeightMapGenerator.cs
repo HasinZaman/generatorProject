@@ -1,7 +1,7 @@
 ﻿/// <summary>
 ///     HeightMapGenerator is a interface that declares required methods
 /// </summary>
-public interface HeightMapGenerator
+public interface HeightMapGenerator <T>
 {
     /// <summary>
     ///     getHeightMap generates a Grid object that contains the nodes for a HeightMap
@@ -9,5 +9,5 @@ public interface HeightMapGenerator
     /// <returns>
     ///     A grid with the HeightMap data
     /// </returns>
-    Grid getHeightMap();
+    T getHeightMap(object param);
 }

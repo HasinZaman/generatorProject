@@ -15,13 +15,26 @@ public class GroundManager : MonoBehaviour
     int[] gridDim = new int[] { 4, 4, 4 };
     void Start()
     {
-        generate();
+        TwoDimensionalNoiseHeightMap twoDimensionalNoiseHeightMap = new TwoDimensionalNoiseHeightMap(NoiseVectors.TwoDimensionSet1, 0, new int[] { 3, 3 }, shaderList.Noise);
+        Debug.Log(twoDimensionalNoiseHeightMap.toString());
+
+        TwoDimensionalNoiseHeightMap.GridParam param = new TwoDimensionalNoiseHeightMap.GridParam();
+
+        param.setStart(0.2f, 0.2f);
+        param.setEnd(0.8f, 0.8f);
+        param.setSamples(5, 5);
+        param.height = 5;
+
+        Debug.Log(twoDimensionalNoiseHeightMap.getHeightMap(param).toString());
+
+        //Chunk c = new Chunk();
     }
 
     private int count = 0;
 
     private void Update()
     {
+        /*
         if(count == 100)
         {
             for (int i1 = 0; i1 < chunks.Length; i1++)
@@ -35,11 +48,13 @@ public class GroundManager : MonoBehaviour
         {
             count++;
         }
+        */
     }
 
     /// <summary>
     ///     generate method creates the chunks required for the ground
     /// </summary>
+    /*
     public void generate()
     {
         GameObject gameObjectTemp;
@@ -152,7 +167,7 @@ public class GroundManager : MonoBehaviour
                 chunks[x + z * chunkDim[0]] = chunkTemp;
             }
         }
-    }
+    }*/
 
     /// <summary>
     ///     Load takes a file and generates chunks
