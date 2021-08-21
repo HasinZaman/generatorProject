@@ -18,15 +18,16 @@ public class GroundManager : MonoBehaviour
         TwoDimensionalNoiseHeightMap twoDimensionalNoiseHeightMap = new TwoDimensionalNoiseHeightMap(NoiseVectors.TwoDimensionSet1, 0, new int[] { 3, 3 }, shaderList.Noise);
         Debug.Log(twoDimensionalNoiseHeightMap.toString());
 
+        TwoDimensionalNoiseHeightMap.GridParam param = new TwoDimensionalNoiseHeightMap.GridParam();
 
-        float[] tmp;
+        param.setStart(0.2f, 0.2f);
+        param.setEnd(0.8f, 0.8f);
+        param.setSamples(5, 5);
+        param.height = 5;
 
-        tmp = twoDimensionalNoiseHeightMap.getVector(new int[] { 0, 0 });
-        Debug.Log($"{tmp[0]},{tmp[1]}");
-        tmp = twoDimensionalNoiseHeightMap.getVector(new int[] { 1, 1 });
-        Debug.Log($"{tmp[0]},{tmp[1]}");
-        tmp = twoDimensionalNoiseHeightMap.getVector(new int[] { 2, 2 });
-        Debug.Log($"{tmp[0]},{tmp[1]}");
+        Debug.Log(twoDimensionalNoiseHeightMap.getHeightMap(param).toString());
+
+        //Chunk c = new Chunk();
     }
 
     private int count = 0;
