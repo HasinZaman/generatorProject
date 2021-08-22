@@ -11,7 +11,8 @@ public class Chunk : MonoBehaviour
     /// <summary>
     ///     pos instances stores the position of the Chunk relative to center
     /// </summary>
-    int[] pos;
+    [SerializeField]
+    private int[] pos;
 
     /// <summary>
     ///     meshGenerator object handles mesh generating
