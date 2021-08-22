@@ -46,9 +46,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 69127789c42db8d4a8411d3db5c88445, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  meshFilter: {fileID: 0}
+  pos: 
+  meshFilter: {fileID: 8558743031531893565}
   mesh: {fileID: 0}
-  collider: {fileID: 0}
+  collider: {fileID: 1780940707769439058}
 --- !u!33 &8558743031531893565
 MeshFilter:
   m_ObjectHideFlags: 0
