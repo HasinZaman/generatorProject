@@ -27,14 +27,20 @@ public class GroundManager : MonoBehaviour
 
         Debug.Log(twoDimensionalNoiseHeightMap.getHeightMap(param).toString());
 
-        //Chunk c = new Chunk();
+        chunks = new Chunk[1];
+
+        GameObject chunk = Instantiate(chunkPrefab, this.transform);
+
+        chunks[0] = chunk.GetComponent<Chunk>();
+
+        chunks[0].setChunk(twoDimensionalNoiseHeightMap.getHeightMap(param), shaderList.MarchingCube, nodeDistTemplate);
+
     }
 
     private int count = 0;
 
     private void Update()
     {
-        /*
         if(count == 100)
         {
             for (int i1 = 0; i1 < chunks.Length; i1++)
@@ -43,12 +49,10 @@ public class GroundManager : MonoBehaviour
             }
 
             count++;
-        }
-        else
+        }else if( count < 100)
         {
             count++;
         }
-        */
     }
 
     /// <summary>
