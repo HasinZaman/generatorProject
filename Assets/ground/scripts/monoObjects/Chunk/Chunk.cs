@@ -3,39 +3,20 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-/// <summary>
-///     Chunk MonoBehaviour script handles ChunkGameObject
-/// </summary>
 public class Chunk : MonoBehaviour
 {
-    /// <summary>
-    ///     pos instances stores the position of the Chunk relative to center
-    /// </summary>
-    [SerializeField]
-    private int[] pos;
+    int[] chunkPos;
 
-    /// <summary>
-    ///     meshGenerator object handles mesh generating
-    /// </summary>
-    private MeshGenerator meshGenerator;
+    public Grid chunkGrid;
+    public MeshGenerator meshGenerator;
     
-    /// <summary>
-    ///     meshData strut stores the current mesh information
-    /// </summary>
-    private MeshData meshData;
+    MeshData meshData;
 
-    // object mesh instances
     Material material;
-    [SerializeField]
-    private MeshFilter meshFilter;
-    [SerializeField]
-    private Mesh mesh;
-    [SerializeField]
-    private MeshCollider collider;
+    public MeshFilter meshFilter;
+    public Mesh mesh;
+    public MeshCollider collider;
 
-    /// <summary>
-    ///     start method sets up Chunk objects
-    /// </summary>
     public void Start()
     {
         meshFilter = GetComponent<MeshFilter>();
@@ -59,7 +40,6 @@ public class Chunk : MonoBehaviour
             throw new InvalidOperationException("meshGenerator not defined");
         }
         meshData = meshGenerator.getMesh();
-
         mesh.Clear();
 
         mesh.vertices = meshData.vertices;
@@ -103,6 +83,7 @@ public class Chunk : MonoBehaviour
         {
             throw new ArgumentException("nodeDist cannot be greater than 0");
         }
+        this.chunkGrid = grid;
         this.meshGenerator = new MeshGenerator(grid, shader, "getVertices", 0.5f, 1);
     }
 
@@ -126,7 +107,8 @@ public class Chunk : MonoBehaviour
                 throw new ArgumentException("nodeDist cannot be greater than 0");
             }
         }
-
+        
+        this.chunkGrid = grid;
         this.meshGenerator = new MeshGenerator(grid, shader, "getVertices", 0.5f, nodeDist);
     }
 }

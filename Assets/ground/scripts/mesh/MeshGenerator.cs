@@ -86,6 +86,10 @@ public class MeshGenerator
     /// <param name="grid"></param>
     public void setGrid(Grid grid)
     {
+        if(grid == null)
+        {
+            throw new ArgumentNullException();
+        }
         this.grid = grid;
     }
 
@@ -116,10 +120,6 @@ public class MeshGenerator
     /// </returns>
     public MeshData getMesh(int n)
     {
-        if(this.grid == null)
-        {
-            throw new InvalidOperationException("Grid not set");
-        }
         //Debug.Log(grid.toString());
         int[] dim = grid.getDim();
         
