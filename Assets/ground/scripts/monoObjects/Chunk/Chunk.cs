@@ -59,6 +59,7 @@ public class Chunk : MonoBehaviour
             throw new InvalidOperationException("meshGenerator not defined");
         }
         meshData = meshGenerator.getMesh();
+
         mesh.Clear();
 
         mesh.vertices = meshData.vertices;
@@ -102,7 +103,6 @@ public class Chunk : MonoBehaviour
         {
             throw new ArgumentException("nodeDist cannot be greater than 0");
         }
-        this.chunkGrid = grid;
         this.meshGenerator = new MeshGenerator(grid, shader, "getVertices", 0.5f, 1);
     }
 
@@ -126,8 +126,7 @@ public class Chunk : MonoBehaviour
                 throw new ArgumentException("nodeDist cannot be greater than 0");
             }
         }
-        
-        this.chunkGrid = grid;
+
         this.meshGenerator = new MeshGenerator(grid, shader, "getVertices", 0.5f, nodeDist);
     }
 }
