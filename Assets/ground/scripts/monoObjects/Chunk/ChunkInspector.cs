@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEditor;
 
-[CustomEditor(typeof(chunk))]
+//[CustomEditor(typeof(Chunk))]
 public class ChunkInspector : Editor
 {
     public void OnEnable()
