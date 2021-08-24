@@ -29,6 +29,23 @@ public class GroundManager : MonoBehaviour
         this.generate(twoDimensionalNoiseHeightMap, samples, height, bias, amplitude, start, end);
     }
 
+    private int count = 0;
+
+    private void Update()
+    {
+        if(count == 100)
+        {
+            for (int i1 = 0; i1 < chunks.Length; i1++)
+            {
+                chunks[i1].updateMesh();
+            }
+
+            count++;
+        }else if( count < 100)
+        {
+            count++;
+        }
+    }
         TwoDimensionalNoiseHeightMap.GridParam param = new TwoDimensionalNoiseHeightMap.GridParam();
 
         param.setSamples(10, 10);
