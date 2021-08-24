@@ -46,32 +46,34 @@ public class GroundManager : MonoBehaviour
             count++;
         }
     }
+
+    /// <summary>
+    ///     generate method creates the chunks required for the ground
+    /// </summary>
+    public void generate(HeightMapGenerator<Grid> heightMap, int[] samplesPerChunk, int height, float bias, float amplitude, float[] start, float[] end )
+    {
         TwoDimensionalNoiseHeightMap.GridParam param = new TwoDimensionalNoiseHeightMap.GridParam();
 
-        param.setSamples(10, 10);
-        param.height = 5;
+        param.setSamples(samplesPerChunk[0], samplesPerChunk[1]);
+        param.height = height;
 
-        param.bias = 1;
-        param.amplitude = 3f / 4f;
+        param.bias = bias;
+        param.amplitude = amplitude;
 
-        float[] start = new float[2] { 0.2f, 0.2f };
-        float[] current = new float[2];
-        float[] end = new float[2] { 1.8f, 1.8f };
         float[] delta = new float[2];
 
         GameObject chunk;
 
         for (int i1 = 0; i1 < 2; i1++)
         {
-            current[i1] = start[i1];
-            delta[i1] = (end[i1] - start[i1]) / (float) chunkDim[i1];
+            delta[i1] = (end[i1] - start[i1]) / (float)chunkDim[i1];
         }
 
         chunks = new Chunk[chunkDim[0] * chunkDim[1]];
 
         for (int x1 = 0; x1 < chunkDim[0]; x1++)
         {
-            for(int y1 = 0; y1 < chunkDim[1]; y1++)
+            for (int y1 = 0; y1 < chunkDim[1]; y1++)
             {
                 param.setStart(start[0] + delta[0] * x1, start[1] + delta[1] * y1);
                 param.setEnd(start[0] + delta[0] * (x1 + 1), start[1] + delta[1] * (y1 + 1));
@@ -80,38 +82,12 @@ public class GroundManager : MonoBehaviour
 
                 chunk.name = $"({x1},{y1})";
                 chunk.transform.position = new Vector3(x1 * nodeDistTemplate[0] * (10 - 1), 0, y1 * nodeDistTemplate[2] * (10 - 1));
-                
+
                 chunks[x1 + y1 * chunkDim[0]] = chunk.GetComponent<Chunk>();
 
-                chunks[x1 + y1 * chunkDim[0]].setChunk(twoDimensionalNoiseHeightMap.getHeightMap(param), shaderList.MarchingCube, nodeDistTemplate);
+                chunks[x1 + y1 * chunkDim[0]].setChunk(heightMap.getHeightMap(param), shaderList.MarchingCube, nodeDistTemplate);
             }
         }
-    }
-
-    private int count = 0;
-
-    private void Update()
-    {
-        if(count == 100)
-        {
-            for (int i1 = 0; i1 < chunks.Length; i1++)
-            {
-                chunks[i1].updateMesh();
-            }
-
-            count++;
-        }else if( count < 100)
-        {
-            count++;
-        }
-    }
-
-    /// <summary>
-    ///     generate method creates the chunks required for the ground
-    /// </summary>
-    public void generate()
-    {
-        
     }
 
     /// <summary>
