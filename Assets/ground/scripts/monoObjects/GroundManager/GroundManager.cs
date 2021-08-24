@@ -50,7 +50,13 @@ public class GroundManager : MonoBehaviour
     /// <summary>
     ///     generate method creates the chunks required for the ground
     /// </summary>
-    public void generate(HeightMapGenerator<Grid> heightMap, int[] samplesPerChunk, int height, float bias, float amplitude, float[] start, float[] end )
+    /// <param name="HeightMapGenerator">HeightMapGenerator object that generates height map</param>
+    /// <param name="samplesPerChunk">int array of number samples & nodes along the x and z axis (Unity axis)</param>
+    /// <param name="height">int of the number of nodes along the y axis</param>
+    /// <param name="bias">A bias used to generate height node values</param>
+    /// <param name="amplitude">A amplitude modifier used to generate height node values</param>
+    /// <param name="start">float array of the intial sample values</param>
+    /// <param name="end">float array of the final sample values</param>
     public void generate(HeightMapGenerator<Grid> HeightMapGenerator, int[] samplesPerChunk, int height, float bias, float amplitude, float[] start, float[] end )
     {
         TwoDimensionalNoiseHeightMap.GridParam param = new TwoDimensionalNoiseHeightMap.GridParam();
