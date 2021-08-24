@@ -51,6 +51,7 @@ public class GroundManager : MonoBehaviour
     ///     generate method creates the chunks required for the ground
     /// </summary>
     public void generate(HeightMapGenerator<Grid> heightMap, int[] samplesPerChunk, int height, float bias, float amplitude, float[] start, float[] end )
+    public void generate(HeightMapGenerator<Grid> HeightMapGenerator, int[] samplesPerChunk, int height, float bias, float amplitude, float[] start, float[] end )
     {
         TwoDimensionalNoiseHeightMap.GridParam param = new TwoDimensionalNoiseHeightMap.GridParam();
 
@@ -85,7 +86,7 @@ public class GroundManager : MonoBehaviour
 
                 chunks[x1 + y1 * chunkDim[0]] = chunk.GetComponent<Chunk>();
 
-                chunks[x1 + y1 * chunkDim[0]].setChunk(heightMap.getHeightMap(param), shaderList.MarchingCube, nodeDistTemplate);
+                chunks[x1 + y1 * chunkDim[0]].setChunk(HeightMapGenerator.getHeightMap(param), shaderList.MarchingCube, nodeDistTemplate);
             }
         }
     }
