@@ -9,14 +9,25 @@ public class GroundManager : MonoBehaviour
     public GameObject chunkPrefab;
 
     Chunk[] chunks;
-    int[] chunkDim = new int[2] { 2, 2 };
+    int[] chunkDim = new int[2] { 5, 5 };
 
     float[] nodeDistTemplate = new float[] { 1, 1, 1 };
     int[] gridDim = new int[] { 4, 4, 4 };
+
+    int[] samples = new int[] {10, 10};
+    int height = 5;
+    float bias = 1;
+    float amplitude = 3f / 4f;
+    float[] start = new float[2] { 0.2f, 0.2f };
+    float[] end = new float[2] { 1.8f, 1.8f };
+
     void Start()
     {
         TwoDimensionalNoiseHeightMap twoDimensionalNoiseHeightMap = new TwoDimensionalNoiseHeightMap(NoiseVectors.TwoDimensionSet1, 0, new int[] { 3, 3 }, shaderList.Noise);
         Debug.Log(twoDimensionalNoiseHeightMap.toString());
+
+        this.generate(twoDimensionalNoiseHeightMap, samples, height, bias, amplitude, start, end);
+    }
 
         TwoDimensionalNoiseHeightMap.GridParam param = new TwoDimensionalNoiseHeightMap.GridParam();
 
