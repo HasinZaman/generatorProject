@@ -145,6 +145,8 @@ public class TwoDimensionalNoiseHeightMap : NoiseHeightMapGenerator
         private float[] end = new float[2];
         private int[] samples = new int[2];
         public int height;
+        public float amplitude = 1;
+        public float bias = 0;
 
         /// <summary>
         ///     setStart method sets start instance
@@ -253,11 +255,15 @@ public class TwoDimensionalNoiseHeightMap : NoiseHeightMapGenerator
 
         Node[] nodes;
 
+        float tmp;
+
         GridParam gridParam = (GridParam) param;
 
         float[] start = gridParam.getStart();
         float[] end = gridParam.getEnd();
         int[] dim = new int[3] { gridParam.getSamples()[0], gridParam.height, gridParam.getSamples()[1] };
+
+        float sampleConst = 2.084991f;
 
         SampleIterator[] pos = new SampleIterator[2];
         
@@ -266,35 +272,36 @@ public class TwoDimensionalNoiseHeightMap : NoiseHeightMapGenerator
             pos[i1] = new SampleIterator(start[i1], end[i1], dim[2 * i1]);
         }
 
-
         nodes = new Node[dim[0] * dim[1] * dim[2]];
 
-        float tmp;
-
-        for(int y = 0; y < dim[1]; y++)
+        for (int x = 0; x < dim[0]; x++)
         {
             for(int z = 0; z < dim[2]; z++)
             {
-                tmp = this.sample(pos[0].current, pos[1].current) * (float) (dim[1] - 1);
-
-                for (int x = 0; x < dim[0]; x++)
+                tmp = (this.sample(pos[0].current, pos[1].current) + sampleConst / 2) / sampleConst * (dim[1] - 1) * gridParam.amplitude + gridParam.bias;
+                
+                for (int y = 0; y < dim[1]; y++)
                 {
                     nodes[x + (y + z * dim[1]) * dim[0]] = new Node();
-                    if(tmp - y > 1)
+                    if (tmp - y >= 1)
                     {
                         nodes[x + (y + z * dim[1]) * dim[0]].setValue(1);
                     }
+                    else if(tmp - y <= 0)
+                    {
+                        nodes[x + (y + z * dim[1]) * dim[0]].setValue(0);
+                    }
                     else
                     {
-                        nodes[x + (y + z * dim[1]) * dim[0]].setValue(Math.Max(tmp % 1, 0));
+                        nodes[x + (y + z * dim[1]) * dim[0]].setValue(tmp%1);
                     }
+
                 }
                 pos[1].next();
             }
             pos[0].next();
             pos[1].restart();
         }
-
         return new Grid(nodes, dim);
     }
 
