@@ -20,21 +20,44 @@ public class GroundManager : MonoBehaviour
 
         TwoDimensionalNoiseHeightMap.GridParam param = new TwoDimensionalNoiseHeightMap.GridParam();
 
-        param.setStart(0.2f, 0.2f);
-        param.setEnd(0.8f, 0.8f);
-        param.setSamples(5, 5);
+        param.setSamples(10, 10);
         param.height = 5;
 
-        Debug.Log(twoDimensionalNoiseHeightMap.getHeightMap(param).toString());
+        param.bias = 1;
+        param.amplitude = 3f / 4f;
 
-        chunks = new Chunk[1];
+        float[] start = new float[2] { 0.2f, 0.2f };
+        float[] current = new float[2];
+        float[] end = new float[2] { 1.8f, 1.8f };
+        float[] delta = new float[2];
 
-        GameObject chunk = Instantiate(chunkPrefab, this.transform);
+        GameObject chunk;
 
-        chunks[0] = chunk.GetComponent<Chunk>();
+        for (int i1 = 0; i1 < 2; i1++)
+        {
+            current[i1] = start[i1];
+            delta[i1] = (end[i1] - start[i1]) / (float) chunkDim[i1];
+        }
 
-        chunks[0].setChunk(twoDimensionalNoiseHeightMap.getHeightMap(param), shaderList.MarchingCube, nodeDistTemplate);
+        chunks = new Chunk[chunkDim[0] * chunkDim[1]];
 
+        for (int x1 = 0; x1 < chunkDim[0]; x1++)
+        {
+            for(int y1 = 0; y1 < chunkDim[1]; y1++)
+            {
+                param.setStart(start[0] + delta[0] * x1, start[1] + delta[1] * y1);
+                param.setEnd(start[0] + delta[0] * (x1 + 1), start[1] + delta[1] * (y1 + 1));
+
+                chunk = Instantiate(chunkPrefab, this.transform);
+
+                chunk.name = $"({x1},{y1})";
+                chunk.transform.position = new Vector3(x1 * nodeDistTemplate[0] * (10 - 1), 0, y1 * nodeDistTemplate[2] * (10 - 1));
+                
+                chunks[x1 + y1 * chunkDim[0]] = chunk.GetComponent<Chunk>();
+
+                chunks[x1 + y1 * chunkDim[0]].setChunk(twoDimensionalNoiseHeightMap.getHeightMap(param), shaderList.MarchingCube, nodeDistTemplate);
+            }
+        }
     }
 
     private int count = 0;
