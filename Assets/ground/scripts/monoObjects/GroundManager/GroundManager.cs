@@ -15,9 +15,9 @@ public class GroundManager : MonoBehaviour
     int[] gridDim = new int[] { 4, 4, 4 };
 
     int[] samples = new int[] {10, 10};
-    int height = 5;
+    int height = 10;
     float bias = 1;
-    float amplitude = 3f / 4f;
+    float amplitude = 7f / 9f;
     float[] start = new float[2] { 0.2f, 0.2f };
     float[] end = new float[2] { 1.8f, 1.8f };
 
