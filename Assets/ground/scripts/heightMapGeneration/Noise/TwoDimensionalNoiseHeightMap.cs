@@ -555,9 +555,9 @@ public class TwoDimensionalNoiseHeightMap : NoiseHeightMapGenerator
          */
 
         float line0 = cosineInterpolate(vertexVal[0 + 1 * 2], vertexVal[1 + 1 * 2], x % 1);
-        float line1 = cosineInterpolate(vertexVal[0 + 1 * 2], vertexVal[1 + 0 * 2], x % 1);
+        float line1 = cosineInterpolate(vertexVal[0 + 0 * 2], vertexVal[1 + 0 * 2], x % 1);
 
-        return cosineInterpolate(line0, line1, y % 1);
+        return cosineInterpolate(line1, line0, y % 1);
     }
 
     public string toString()
