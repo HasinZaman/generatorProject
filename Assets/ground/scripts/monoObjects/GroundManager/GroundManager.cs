@@ -9,32 +9,24 @@ public class GroundManager : MonoBehaviour
     public GameObject chunkPrefab;
 
     Chunk[] chunks;
-    int[] chunkDim = new int[2] { 2, 2 };
+    int[] chunkDim = new int[2] { 5, 5 };
 
     float[] nodeDistTemplate = new float[] { 1, 1, 1 };
     int[] gridDim = new int[] { 4, 4, 4 };
+
+    int[] samples = new int[] {10, 10};
+    int height = 10;
+    float bias = 1;
+    float amplitude = 7f / 9f;
+    float[] start = new float[2] { 0.2f, 0.2f };
+    float[] end = new float[2] { 1.8f, 1.8f };
+
     void Start()
     {
         TwoDimensionalNoiseHeightMap twoDimensionalNoiseHeightMap = new TwoDimensionalNoiseHeightMap(NoiseVectors.TwoDimensionSet1, 0, new int[] { 3, 3 }, shaderList.Noise);
         Debug.Log(twoDimensionalNoiseHeightMap.toString());
 
-        TwoDimensionalNoiseHeightMap.GridParam param = new TwoDimensionalNoiseHeightMap.GridParam();
-
-        param.setStart(0.2f, 0.2f);
-        param.setEnd(0.8f, 0.8f);
-        param.setSamples(5, 5);
-        param.height = 5;
-
-        Debug.Log(twoDimensionalNoiseHeightMap.getHeightMap(param).toString());
-
-        chunks = new Chunk[1];
-
-        GameObject chunk = Instantiate(chunkPrefab, this.transform);
-
-        chunks[0] = chunk.GetComponent<Chunk>();
-
-        chunks[0].setChunk(twoDimensionalNoiseHeightMap.getHeightMap(param), shaderList.MarchingCube, nodeDistTemplate);
-
+        this.generate(twoDimensionalNoiseHeightMap, samples, height, bias, amplitude, start, end);
     }
 
     private int count = 0;
@@ -58,120 +50,52 @@ public class GroundManager : MonoBehaviour
     /// <summary>
     ///     generate method creates the chunks required for the ground
     /// </summary>
-    /*
-    public void generate()
+    /// <param name="HeightMapGenerator">HeightMapGenerator object that generates height map</param>
+    /// <param name="samplesPerChunk">int array of number samples & nodes along the x and z axis (Unity axis)</param>
+    /// <param name="height">int of the number of nodes along the y axis</param>
+    /// <param name="bias">A bias used to generate height node values</param>
+    /// <param name="amplitude">A amplitude modifier used to generate height node values</param>
+    /// <param name="start">float array of the intial sample values</param>
+    /// <param name="end">float array of the final sample values</param>
+    public void generate(HeightMapGenerator<Grid> HeightMapGenerator, int[] samplesPerChunk, int height, float bias, float amplitude, float[] start, float[] end )
     {
-        GameObject gameObjectTemp;
-        Chunk chunkTemp;
+        TwoDimensionalNoiseHeightMap.GridParam param = new TwoDimensionalNoiseHeightMap.GridParam();
+
+        param.setSamples(samplesPerChunk[0], samplesPerChunk[1]);
+        param.height = height;
+
+        param.bias = bias;
+        param.amplitude = amplitude;
+
+        float[] delta = new float[2];
+
+        GameObject chunk;
+
+        for (int i1 = 0; i1 < 2; i1++)
+        {
+            delta[i1] = (end[i1] - start[i1]) / (float)chunkDim[i1];
+        }
 
         chunks = new Chunk[chunkDim[0] * chunkDim[1]];
 
-        TwoDimensionalNoiseHeightMap[] n = new TwoDimensionalNoiseHeightMap[chunkDim[0] * chunkDim[1]];
-
-        Debug.Log("OG");
-        for (int y = 0; y < chunkDim[1]; y++)
+        for (int x1 = 0; x1 < chunkDim[0]; x1++)
         {
-            for (int x = 0; x < chunkDim[0]; x++)
+            for (int y1 = 0; y1 < chunkDim[1]; y1++)
             {
-                n[x + y * chunkDim[0]] = new TwoDimensionalNoiseHeightMap(NoiseVectors.TwoDimensionSet1, x + y * chunkDim[1] + 1, gridDim, new uint[] { 3, 3 }, shaderList.Noise);
-                Debug.Log($"{x},{y}");
-                //n[x + y * chunkDim[1]].gridDebug();
+                param.setStart(start[0] + delta[0] * x1, start[1] + delta[1] * y1);
+                param.setEnd(start[0] + delta[0] * (x1 + 1), start[1] + delta[1] * (y1 + 1));
 
-                                            //cornerXY
-                TwoDimensionalNoiseHeightMap corner00 = null;
-                TwoDimensionalNoiseHeightMap corner01 = null;
-                TwoDimensionalNoiseHeightMap corner10 = null;
-                TwoDimensionalNoiseHeightMap corner11 = n[x + y * chunkDim[0]];
-                
-                if (x - 1 >= 0)
-                {
-                    corner01 = n[(x - 1) + y * chunkDim[0]];
-                    TwoDimensionalNoiseHeightMap.setVerticalEdge(corner01, corner11);
-                }
+                chunk = Instantiate(chunkPrefab, this.transform);
 
-                if(y - 1 >= 0)
-                {
-                    corner10 = n[x + (y - 1) * chunkDim[0]];
-                    TwoDimensionalNoiseHeightMap.setHorizontalEdge(corner11, corner10);
-                }
+                chunk.name = $"({x1},{y1})";
+                chunk.transform.position = new Vector3(x1 * nodeDistTemplate[0] * (10 - 1), 0, y1 * nodeDistTemplate[2] * (10 - 1));
 
-                if (x - 1 >= 0 && y - 1 >= 0)
-                {
-                    corner00 = n[(x - 1) + (y - 1) * chunkDim[0]];
-                    TwoDimensionalNoiseHeightMap.setCorner(corner00, corner01, corner10, corner11, 0);
-                }
+                chunks[x1 + y1 * chunkDim[0]] = chunk.GetComponent<Chunk>();
+
+                chunks[x1 + y1 * chunkDim[0]].setChunk(HeightMapGenerator.getHeightMap(param), shaderList.MarchingCube, nodeDistTemplate);
             }
         }
-
-        Debug.Log("After Sharing Nodes");
-        for (int y = 0; y < chunkDim[1]; y++)
-        {
-            for (int x = 0; x < chunkDim[0]; x++)
-            {
-                Debug.Log($"{x},{y}");
-                n[x + y * chunkDim[0]].gridDebug();
-            }
-        }
-        Debug.Log("FINAL GRID");
-
-        string tmp = "";
-        TwoDimensionalNoiseHeightMap tmpNoise;
-        for (int chunkY = chunkDim[1] - 1; chunkY >= 0; chunkY--)
-        {
-            for (int y = 2; y >= 0; y--)
-            {
-                for (int chunkX = 0; chunkX < chunkDim[0]; chunkX++)
-                {
-
-                    tmpNoise = n[chunkX + chunkY * chunkDim[0]];
-                    for (int x = 0; x < 3; x++)
-                    {
-                        tmp += $"({tmpNoise.perlinNoiseVectors[x + y * 3][0]},{tmpNoise.perlinNoiseVectors[x + y * 3][1]})\t";
-                    }
-                    tmp += "|\t";
-                }
-                tmp += "\n";
-            }
-            for (int chunkX = 0; chunkX < chunkDim[0]; chunkX++)
-            {
-                for (int x = 0; x < 3; x++)
-                {
-                    if(x == 1)
-                    {
-                        tmp += $"[{chunkX},{chunkY}]\t";
-                    }
-                    else
-                    {
-                        tmp += "-----\t";
-                    }
-                }
-                tmp += "+\t";
-            }
-            tmp += "\n";
-
-        }
-        Debug.Log(tmp);
-
-        Vector3 pos = new Vector3(0, 0, 0);
-
-        for (int x = 0; x < chunkDim[0]; x++)
-        {
-            pos.x = x * (gridDim[0] - 1) * nodeDistTemplate[0];
-
-            for (int z = 0; z < chunkDim[1]; z++)
-            {
-                pos.z = z * (gridDim[2] - 1) * nodeDistTemplate[2];
-
-                gameObjectTemp = Instantiate(chunkPrefab, pos, new Quaternion(0, 0, 0, 0), this.transform);
-                gameObjectTemp.name = $"Chunk:{x},{z}";
-                chunkTemp = gameObjectTemp.GetComponent<Chunk>();
-
-                chunkTemp.setChunk(n[x + z * chunkDim[0]].getHeightMap(), shaderList.MarchingCube, nodeDistTemplate);
-
-                chunks[x + z * chunkDim[0]] = chunkTemp;
-            }
-        }
-    }*/
+    }
 
     /// <summary>
     ///     Load takes a file and generates chunks

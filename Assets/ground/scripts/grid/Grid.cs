@@ -510,6 +510,10 @@ public class Grid
         return (int[]) dim.Clone();
     }
 
+    /// <summary>
+    ///     toString method repersentation object in the format of a string
+    /// </summary>
+    /// <returns>String repersentation of Object</returns>
     public string toString()
     {
         string str = "";
