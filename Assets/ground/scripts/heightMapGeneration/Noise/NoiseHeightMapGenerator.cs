@@ -154,18 +154,6 @@ public abstract class NoiseHeightMapGenerator : HeightMapGenerator<Grid>
     }
 
     /// <summary>
-    ///     vectorToPixel converts a int from templateVector into a texture value
-    /// </summary>
-    /// <param name="f">int that is coverted into a texture value</param>
-    /// <returns>
-    ///     a float that can repersents f for a texture
-    /// </returns>
-    protected float vectorToPixel(float f)
-    {
-        return (f + 1) / 2;
-    }
-
-    /// <summary>
     ///     dotProduct returns the dotProduct of two vectors
     /// </summary>
     /// <param name="v1">v1 is a vector of n length</param>
