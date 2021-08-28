@@ -154,28 +154,6 @@ public abstract class NoiseHeightMapGenerator : HeightMapGenerator<Grid>
     }
 
     /// <summary>
-    ///     dotProduct returns the dotProduct of two vectors
-    /// </summary>
-    /// <param name="v1">v1 is a vector of n length</param>
-    /// <param name="v2">v2 is a vector of n length</param>
-    /// <returns>
-    ///     float of the dotProduct of v1 and v2
-    /// </returns>
-    protected float dotProduct(float[] v1, float[] v2)
-    {
-        if (v1.Length != v2.Length)
-        {
-            throw new ArgumentException($"vector 1 and vector need to be the same size. v1.length={v1.Length} v2.length={v2.Length}");
-        }
-        float temp = 0;
-        for (int i1 = 0; i1 < v1.Length; i1++)
-        {
-            temp += v1[i1] * v2[i1];
-        }
-        return temp;
-    }
-
-    /// <summary>
     ///     cosineInterpolate interpolates between y1 and y2
     /// </summary>
     /// <param name="y1">y1 is the first value</param>
