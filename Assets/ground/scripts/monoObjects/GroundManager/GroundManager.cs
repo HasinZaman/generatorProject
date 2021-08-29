@@ -52,10 +52,12 @@ public class GroundManager : MonoBehaviour
 
     void Start()
     {
-        TwoDimensionalNoiseHeightMap twoDimensionalNoiseHeightMap = new TwoDimensionalNoiseHeightMap(NoiseVectors.TwoDimensionSet1, 0, new int[] { 3, 3 });
-        Debug.Log(twoDimensionalNoiseHeightMap.toString());
+        Noise n = new noise(NoiseVectors.TwoDimensionSet1, 0, new int[] { 3, 3 });
 
-        this.generate(twoDimensionalNoiseHeightMap, samples, height, bias, amplitude, start, end);
+        NoiseHeightMapGenerator noiseHeightMapGenerator = new NoiseHeightMapGenerator(n);
+        Debug.Log(n.toString());
+
+        this.generate(noiseHeightMapGenerator);
     }
 
     private int count = 0;
