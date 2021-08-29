@@ -82,21 +82,16 @@ public class GroundManager : MonoBehaviour
     ///     generate method creates the chunks required for the ground
     /// </summary>
     /// <param name="HeightMapGenerator">HeightMapGenerator object that generates height map</param>
-    /// <param name="samplesPerChunk">int array of number samples & nodes along the x and z axis (Unity axis)</param>
-    /// <param name="height">int of the number of nodes along the y axis</param>
-    /// <param name="bias">A bias used to generate height node values</param>
-    /// <param name="amplitude">A amplitude modifier used to generate height node values</param>
-    /// <param name="start">float array of the intial sample values</param>
-    /// <param name="end">float array of the final sample values</param>
-    public void generate(HeightMapGenerator<Grid> HeightMapGenerator, int[] samplesPerChunk, int height, float bias, float amplitude, float[] start, float[] end )
+    public void generate(HeightMapGenerator<Grid> HeightMapGenerator)
     {
-        TwoDimensionalNoiseHeightMap.GridParam param = new TwoDimensionalNoiseHeightMap.GridParam();
+        NoiseHeightMapGenerator.NoiseParam param = new NoiseHeightMapGenerator.NoiseParam();
 
-        param.setSamples(samplesPerChunk[0], samplesPerChunk[1]);
         param.height = height;
 
-        param.bias = bias;
-        param.amplitude = amplitude;
+        param.start = new float[] {0.1f, 0.1f, 0.1f};
+        param.end = new float[] { 0.9f, 0.9f, 0.9f };
+        param.dim = new int[] { samples[0], height, samples[1] };
+        param.height = height;
 
         float[] delta = new float[2];
 
@@ -113,8 +108,8 @@ public class GroundManager : MonoBehaviour
         {
             for (int y1 = 0; y1 < chunkDim[1]; y1++)
             {
-                param.setStart(start[0] + delta[0] * x1, start[1] + delta[1] * y1);
-                param.setEnd(start[0] + delta[0] * (x1 + 1), start[1] + delta[1] * (y1 + 1));
+                param.start = new float[] { start[0] + delta[0] * x1, 0, start[1] + delta[1] * y1 };
+                param.end = new float[] { start[0] + delta[0] * (x1 + 1), 0, start[1] + delta[1] * (y1 + 1) };
 
                 chunk = Instantiate(chunkPrefab, this.transform);
 
