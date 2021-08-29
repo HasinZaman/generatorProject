@@ -154,39 +154,10 @@ public abstract class NoiseHeightMapGenerator : HeightMapGenerator<Grid>
     }
 
     /// <summary>
-    ///     cosineInterpolate interpolates between y1 and y2
-    /// </summary>
-    /// <param name="y1">y1 is the first value</param>
-    /// <param name="y2">y2 is the second value</param>
-    /// <param name="intermediaryPoint">intermediaryPoint is the x position which an interpolated value will be extracted at</param>
-    /// <returns>float of the interpolated value between y1 and y2</returns>
-    protected float cosineInterpolate(float y1, float y2, float intermediaryPoint)
-    {
-        float mu = (float)(1 - Math.Cos(intermediaryPoint * Math.PI)) / 2;
-
-        return y1 * (1 - mu) + y2 * mu;
-    }
-
-    /// <summary>
     ///     getHeightMap returns the final height map grid
     /// </summary>
     /// <returns>
     ///     Grid that repesents the heightMap created with perlin noise
     /// </returns>
     public abstract Grid getHeightMap(object param);
-
-    /// <summary>
-    ///     generateVectors is an abstract method to randomly generate perlin noise vector nodes
-    /// </summary>
-    /// <param name="start">int array that stores the starting position at which nodes will be genrated</param>
-    /// <param name="end">int array that stores the ending position at which nodes will stop generating</param>
-    /// <param name="template">array of perlin noise vectors</param>
-    public abstract void generateVectors(int[] start, int[] end, float[][] template);
-
-    /// <summary>
-    ///     getVector gets the perlin noise vector at a given position
-    /// </summary>
-    /// <param name="pos">int array of the position of the perlin noise vector</param>
-    /// <returns>float array of noise vector</returns>
-    public abstract float[] getVector(int[] pos);
 }
