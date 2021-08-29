@@ -215,4 +215,10 @@ public abstract class Perlin : Noise
     /// <param name="end">int array that stores the ending position at which nodes will stop generating</param>
     /// <param name="template">array of perlin noise vectors</param>
     public abstract void generateVectors(int[] start, int[] end);
+
+    /// <summary>
+    ///     toString method returns a repsentation of perlin noise in a string format
+    /// </summary>
+    /// <returns>string repsentation of perlin noise</returns>
+    public abstract string toString();
 }
