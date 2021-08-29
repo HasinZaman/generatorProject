@@ -328,7 +328,7 @@ public class Perlin2D : Perlin
         return (cosineInterpolate(line1, line0, y % 1) + sampleConst / 2f) / sampleConst;
     }
 
-    public string toString()
+    public override string toString()
     {
         string temp = "";
 
