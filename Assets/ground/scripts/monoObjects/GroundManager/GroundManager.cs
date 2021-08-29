@@ -3,6 +3,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+///     GroundManager handles Chunk generation and maintenance
+/// </summary>
 public class GroundManager : MonoBehaviour
 {
     public ComputeShaderList shaderList;
