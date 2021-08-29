@@ -63,6 +63,18 @@ public class NoiseHeightMapGenerator : HeightMapGenerator<Grid>
         }
     }
 
+    public class NoiseParam
+    {
+        public float[] start;
+        public float[] end;
+        public int[] dim;
+        public int height;
+
+        public NoiseParam()
+        {
+        }
+    }
+
     /// <summary>
     ///     grid is the output height map
     /// </summary>
