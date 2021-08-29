@@ -104,11 +104,10 @@ public class NoiseHeightMapGenerator : HeightMapGenerator<Grid>
     /// <summary>
     ///     NoiseHeightMapGenerator constructor intializes variables
     /// </summary>
-    /// <param name="templateVector">templateVector paramater assigns the template vectors that will be used in calculating perlin noise</param>
-    /// <param name="seed">seed paramater is used to intialize random</param>
-    /// <param name="nodeSize">nodeSize is an array that stores the dimension of the final height map grid</param>
-    public NoiseHeightMapGenerator()
+    /// <param name="noise">Noise object used to sample</param>
+    public NoiseHeightMapGenerator(Noise noise)
     {
+        this.noise = noise;
     }
 
     /// <summary>
