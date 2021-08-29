@@ -24,11 +24,14 @@ public abstract class VectorNode
     /// <param name="vector">New vector value</param>
     public void set(float[] vector)
     {
-        if (dim != vector.Length && vector != null)
+        if(vector != null)
         {
-            throw new ArgumentException($"vector lenght must have exactly {dim} elements");
+            if (dim != vector.Length)
+            {
+                throw new ArgumentException($"vector lenght must have exactly {dim} elements");
+            }
+            this.vector = vector;
         }
-        this.vector = vector;
     }
 
     /// <summary>
