@@ -19,8 +19,6 @@ public class GroundManager : MonoBehaviour
 
     int[] samples = new int[] {10, 10};
     int height = 10;
-    float bias = 1;
-    float amplitude = 5f/9f;
     float[] start = new float[2] { 0.2f, 0.2f };
     float[] end = new float[2] { 1.8f, 1.8f };
 
