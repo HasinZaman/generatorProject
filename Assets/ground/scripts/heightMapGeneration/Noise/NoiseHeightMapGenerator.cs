@@ -63,22 +63,43 @@ public class NoiseHeightMapGenerator : HeightMapGenerator<Grid>
         }
     }
 
+    /// <summary>
+    ///     NoiseParam stores values of used in getHeightMap method
+    /// </summary>
     public class NoiseParam
     {
+        /// <summary>
+        ///     float array stores the starting sample points
+        /// </summary>
         public float[] start;
+
+        /// <summary>
+        ///     float array stores the end sample points
+        /// </summary>
         public float[] end;
+
+        /// <summary>
+        ///     int array that stores the number of samples stored between start and end
+        /// </summary>
         public int[] dim;
+
+        /// <summary>
+        ///     int stores the height of grid map
+        /// </summary>
         public int height;
 
+        /// <summary>
+        ///     Constructor of NoiseParam
+        /// </summary>
         public NoiseParam()
         {
         }
     }
 
     /// <summary>
-    ///     grid is the output height map
+    ///     noise stores an object that implements Noise and is used to sample at given coordinates
     /// </summary>
-    protected Grid grid;
+    Noise noise;
 
     /// <summary>
     ///     NoiseHeightMapGenerator constructor intializes variables
