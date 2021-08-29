@@ -113,8 +113,68 @@ public class NoiseHeightMapGenerator : HeightMapGenerator<Grid>
     /// <summary>
     ///     getHeightMap returns the final height map grid
     /// </summary>
+    /// <param name="param"></param>
     /// <returns>
     ///     Grid that repesents the heightMap created with perlin noise
     /// </returns>
-    public abstract Grid getHeightMap(object param);
+    public Grid getHeightMap(object param)
+    {
+        if (typeof(NoiseParam) != param.GetType())
+        {
+            throw new ArgumentException();
+        }
+
+        Node[] nodes;
+
+        NoiseParam noiseParam = (NoiseParam) param;
+
+        float[] start = noiseParam.start;
+        float[] end = noiseParam.end;
+        int[] dim = noiseParam.dim;
+
+        SampleIterator[] pos = new SampleIterator[3];
+
+        float tmp;
+
+        for (int i1 = 0; i1 < 3; i1++)
+        {
+            pos[i1] = new SampleIterator(start[i1], end[i1], dim[i1]);
+        }
+
+        nodes = new Node[dim[0] * dim[1] * dim[2]];
+
+        for (int x = 0; x < dim[0]; x++)
+        {
+            pos[0].next();
+            for (int z = 0; z < dim[2]; z++)
+            {
+                pos[2].next();
+
+                for (int y = 0; y < dim[1]; y++)
+                {
+                    pos[1].next();
+                    tmp = noise.sample(new float[] { pos[0].current, pos[1].current, pos[2].current, x, y, z });
+
+                    
+                    nodes[x + (y + z * dim[1]) * dim[0]] = new Node();
+                    if (tmp - y >= 1)
+                    {
+                        nodes[x + (y + z * dim[1]) * dim[0]].setValue(1);
+                    }
+                    else if (tmp - y <= 0)
+                    {
+                        nodes[x + (y + z * dim[1]) * dim[0]].setValue(0);
+                    }
+                    else
+                    {
+                        nodes[x + (y + z * dim[1]) * dim[0]].setValue(tmp % 1);
+                    }
+
+                }
+                pos[1].restart();
+            }
+            pos[2].restart();
+        }
+        return new Grid(nodes, dim);
+    }
 }
