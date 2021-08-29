@@ -64,5 +64,4 @@ public abstract class Iterator<T>
     {
         return $"start:{this.start}\tend:{this.end}\tdelta:{this.delta}\tcurrent:{this.current}";
     }
-
 }
