@@ -6,69 +6,7 @@ using UnityEngine;
 /// </summary>
 public abstract class NoiseHeightMapGenerator : HeightMapGenerator<Grid>
 {
-    /// <summary>
-    ///     VectorNode stores noise vector
-    /// </summary>
-    protected class VectorNode
-    {
-        /// <summary>
-        ///     vector stores the perlin noise vector
-        /// </summary>
-        protected float[] vector;
-
-        /// <summary>
-        ///     dim stores size of the perlin noise vectors
-        /// </summary>
-        protected int dim;
-
-        public VectorNode()
-        {
-
-        }
-
-        /// <summary>
-        ///     Set method assigns vector value
-        /// </summary>
-        /// <param name="vector">New vector value</param>
-        public void set(float[] vector)
-        {
-            if (dim != vector.Length)
-            {
-                throw new ArgumentException($"vector lenght must have exactly {dim} elements");
-            }
-            this.vector = vector;
-        }
-
-        /// <summary>
-        ///     get method returns vector value
-        /// </summary>
-        /// <returns>A float array of vector</returns>
-        public float[] val()
-        {
-            return this.vector;
-        }
-
-        /// <summary>
-        ///     toString method converts object into a string repersentation
-        /// </summary>
-        /// <returns>string format of VectorNode object</returns>
-        public string toString()
-        {
-            string temp = "(";
-
-            temp += $"{this.vector[0]}";
-
-            for (int i1 = 1; i1 < this.vector.Length; i1++)
-            {
-                temp += $",{this.vector[i1]}";
-            }
-
-            temp += ")";
-
-            return temp;
-        }
-    }
-
+   
     /// <summary>
     ///     SampleIterator iterates through a range of values
     /// </summary>
@@ -126,19 +64,9 @@ public abstract class NoiseHeightMapGenerator : HeightMapGenerator<Grid>
     }
 
     /// <summary>
-    ///     random is used to create grid using vectors
-    /// </summary>
-    protected System.Random random;
-
-    /// <summary>
     ///     grid is the output height map
     /// </summary>
     protected Grid grid;
-
-    /// <summary>
-    ///     templateVector is an arry of vectors that used in calculating perlin noise
-    /// </summary>
-    protected float[][] templateVector;
 
     /// <summary>
     ///     NoiseHeightMapGenerator constructor intializes variables
@@ -146,11 +74,8 @@ public abstract class NoiseHeightMapGenerator : HeightMapGenerator<Grid>
     /// <param name="templateVector">templateVector paramater assigns the template vectors that will be used in calculating perlin noise</param>
     /// <param name="seed">seed paramater is used to intialize random</param>
     /// <param name="nodeSize">nodeSize is an array that stores the dimension of the final height map grid</param>
-    public NoiseHeightMapGenerator(float[][] templateVector, int seed)
+    public NoiseHeightMapGenerator()
     {
-        this.random = new System.Random(seed);
-
-        this.templateVector = templateVector;
     }
 
     /// <summary>

@@ -88,7 +88,7 @@ public class TwoDimensionalNoiseHeightMap : NoiseHeightMapGenerator
     /// <param name="seed">seed paramater is used to intialize random</param>
     /// <param name="perlinVectorDim">perlinVectorDim is an array that defines the size of perlinNoise vector</param>
     /// <param name="shader"></param>
-    public TwoDimensionalNoiseHeightMap(float[][] templateVector, int seed, int[] perlinVectorDim) : base( templateVector, seed)
+    public TwoDimensionalNoiseHeightMap(float[][] templateVector, int seed, int[] perlinVectorDim) : base()
     {
         if(perlinVectorDim.Length != 2)
         {
