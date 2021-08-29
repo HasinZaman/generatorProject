@@ -22,6 +22,34 @@ public class GroundManager : MonoBehaviour
     float[] start = new float[2] { 0.2f, 0.2f };
     float[] end = new float[2] { 1.8f, 1.8f };
 
+    /// <summary>
+    ///     noise class is Noise object used height map generation using one/multiple noise algorithms
+    /// </summary>
+    class noise : Noise
+    {
+        Perlin2D perlin2D;
+
+        public noise(float[][] templateVector, int seed, int[] perlinVectorDim)
+        {
+            perlin2D = new Perlin2D(templateVector, seed, perlinVectorDim);
+        }
+
+        public float sample(float[] pos)
+        {
+            float[] sample = new float[] { pos[0], pos[2]};
+            float[] coord = new float[] { pos[3], pos[4], pos[5] };
+
+            float tmp = perlin2D.sample(sample);
+
+            return (tmp * 15f + 1) - coord[1];
+        }
+
+        public string toString()
+        {
+            return perlin2D.toString();
+        }
+    }
+
     void Start()
     {
         TwoDimensionalNoiseHeightMap twoDimensionalNoiseHeightMap = new TwoDimensionalNoiseHeightMap(NoiseVectors.TwoDimensionSet1, 0, new int[] { 3, 3 });
