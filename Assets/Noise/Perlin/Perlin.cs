@@ -369,7 +369,7 @@ public abstract class Perlin<T> : Noise where T : VectorNode
     /// </summary>
     /// <param name="pos">int array of the position of the perlin noise vector</param>
     /// <returns>float array of noise vector</returns>
-    protected abstract VectorNode getVector(int[] pos);
+    protected abstract T getVector(int[] pos);
 
     /// <summary>
     ///     getNode gets the perlin noise noise at a given position
@@ -377,7 +377,7 @@ public abstract class Perlin<T> : Noise where T : VectorNode
     /// <param name="pos">int array of the position of the perlin noise vector relative to startNode</param>
     /// <param name="startNode">Vector2DNode instance is the start position</param>
     /// <returns>Vector2DNode of noise vector at pos</returns>
-    protected abstract VectorNode getVector(int[] pos, VectorNode start);
+    protected abstract T getVector(int[] pos, T start);
 
     /// <summary>
     ///     toString method returns a repsentation of perlin noise in a string format
