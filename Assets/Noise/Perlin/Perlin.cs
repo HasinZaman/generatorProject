@@ -176,7 +176,7 @@ public abstract class Perlin<T> : Noise where T : VectorNode
 
     private void increment(int[] pos, int i1)
     {
-        if(i1 > pos.Length)
+        if(i1 >= pos.Length)
         {
             throw new Exception();
         }
@@ -188,7 +188,10 @@ public abstract class Perlin<T> : Noise where T : VectorNode
         else
         {
             pos[i1] = 0;
-            increment(pos, i1 + 1);
+            if(i1 + 1 < pos.Length)
+            {
+                increment(pos, i1 + 1);
+            }
         }
     }
 
