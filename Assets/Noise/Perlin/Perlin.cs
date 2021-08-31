@@ -210,8 +210,6 @@ public abstract class Perlin<T> : Noise where T : VectorNode
 
         return tmp;
     }
-        return tmp;
-    }
 
     /// <summary>
     ///     abstract sample method gets noise value at a given position
