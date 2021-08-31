@@ -273,7 +273,8 @@ public abstract class Perlin<T> : Noise where T : VectorNode
                 increment(pos, 0);
             }
         }
-        /*Debug.Log
+        /*
+        Debug.Log
         (
             $"vertex:{String.Join(",", new List<float[]>(vectors).ConvertAll(f => $"({f[0]},{f[1]})").ToArray())}\n" +
             $"dist:{String.Join(",", new List<float[]>(dist).ConvertAll(f => $"({f[0]},{f[1]})").ToArray())}\n" +
@@ -298,16 +299,17 @@ public abstract class Perlin<T> : Noise where T : VectorNode
                 
                 if (pos.Length > 0)
                 {
-                    vertexVal[calcPos(pos)] = cosineInterpolate(vertexVal[posTmp1], vertexVal[posTmp2], samplePos[i1] % 1);
+                    vertexVal[calcPos(pos)] = cosineInterpolate(vertexVal[posTmp1], vertexVal[posTmp2], samplePos[i] % 1);
 
                     increment(pos, 0);
                 }
                 else
                 {
-                    vertexVal[0] = cosineInterpolate(vertexVal[posTmp1], vertexVal[posTmp2], samplePos[i1] % 1);
+                    vertexVal[0] = cosineInterpolate(vertexVal[posTmp1], vertexVal[posTmp2], samplePos[i] % 1);
                 }
             }
-            /*Debug.Log
+            /*
+            Debug.Log
             (
                 $"i:{i}\n" +
                 $"vertexVal:{String.Join(",", vertexVal)}"
