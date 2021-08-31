@@ -169,17 +169,7 @@ public abstract class Perlin<T> : Noise where T : VectorNode
     ///     random is used to create grid using vectors
     /// </summary>
     protected System.Random random;
-
-    private bool lastPosCheck(int[] pos)
     {
-        for(int i1 = 0; i1 < pos.Length; i1++)
-        {
-            if(pos[i1] != 0)
-            {
-                return false;
-            }
-        }
-        return true;
     }
 
     private void increment(int[] pos, int i1)
