@@ -199,11 +199,17 @@ public abstract class Perlin<T> : Noise where T : VectorNode
     {
         int tmp = 0;
 
-        for (int i1 = this.dim - 1; i1 >= 0; i1--)
+        // x + 2 * (y + 2 * (z + 2 * (w + ...)))
+
+        for (int i1 = pos.Length - 1; i1 > 0; i1--)
         {
             tmp = 2 * (pos[i1] + tmp);
         }
 
+        tmp += pos[0];
+
+        return tmp;
+    }
         return tmp;
     }
 
