@@ -163,7 +163,7 @@ public abstract class Perlin<T> : Noise where T : VectorNode
     /// <summary>
     ///     dim stores size of the perlin noise vectors
     /// </summary>
-    int dim;
+    protected int dim;
 
     /// <summary>
     ///     random is used to create grid using vectors
