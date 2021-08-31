@@ -174,6 +174,11 @@ public abstract class Perlin<T> : Noise where T : VectorNode
         this.dim = dim;
     }
 
+    /// <summary>
+    ///     increment utility method increments pos array by one
+    /// </summary>
+    /// <param name="pos">position array that is incremented</param>
+    /// <param name="i1">index in position array to be incremented</param>
     private void increment(int[] pos, int i1)
     {
         if(i1 >= pos.Length)
@@ -195,6 +200,11 @@ public abstract class Perlin<T> : Noise where T : VectorNode
         }
     }
 
+    /// <summary>
+    ///     calcPos is utility method that converts pos array into an int index
+    /// </summary>
+    /// <param name="pos">int array that stores position</param>
+    /// <returns>index value of position array</returns>
     private int calcPos(int[] pos)
     {
         int tmp = 0;
