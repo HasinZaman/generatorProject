@@ -7,7 +7,7 @@ using UnityEngine;
 /// <summary>
 ///     Perlin abstract class creates foundation for higher level Dimension noise 
 /// </summary>
-public abstract class Perlin : Noise
+public abstract class Perlin<T> : Noise where T : VectorNode
 {
     /// <summary>
     ///     SampleIterator iterates through a range of values
