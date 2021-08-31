@@ -156,6 +156,11 @@ public abstract class Perlin<T> : Noise where T : VectorNode
     }
 
     /// <summary>
+    ///     root stores the starting point of Noise Grid
+    /// </summary>
+    T root;
+
+    /// <summary>
     ///     dim stores size of the perlin noise vectors
     /// </summary>
     int dim;
