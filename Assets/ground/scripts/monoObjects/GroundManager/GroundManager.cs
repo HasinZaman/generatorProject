@@ -32,6 +32,12 @@ public class GroundManager : MonoBehaviour
         public noise(float[][] templateVector, int seed, int[] perlinVectorDim)
         {
             perlin2D = new Perlin2D(templateVector, seed, perlinVectorDim);
+            Debug.Log($"(0.5, 0.5) = {perlin2D.sample(new float[] { 0.5f, 0.5f })}");
+            Debug.Log($"(0.25, 0.75) = {perlin2D.sample(new float[] { 0.25f, 0.75f })}");
+            Debug.Log($"(0.1, 0.1) = {perlin2D.sample(new float[] { 0.1f, 0.1f })}");
+
+            //Debug.Log($"(0.9, 0.5) = {perlin2D.sample(new float[] { 0.9f, 0.5f })}");
+            //Debug.Log($"(1.1, 0.5) = {perlin2D.sample(new float[] { 1.1f, 0.5f })}");
         }
 
         public float sample(float[] pos)
@@ -41,7 +47,7 @@ public class GroundManager : MonoBehaviour
 
             float tmp = perlin2D.sample(sample);
 
-            return (tmp * 15f + 1) - coord[1];
+            return (tmp * 10f + 1) - coord[1];
         }
 
         public string toString()
