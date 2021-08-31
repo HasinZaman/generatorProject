@@ -223,112 +223,101 @@ public abstract class Perlin<T> : Noise where T : VectorNode
             throw new ArgumentException();
         }
 
-        bool endCond = false;
-
-        float sampleConst = 2.084991f;
-
         float[][] vectors = new float[1 << this.dim][];
         float[][] dist = new float[1 << this.dim][];
         float[] vertexVal = new float[1 << this.dim];
 
-        int[] pos = new int[this.dim];
+        float sampleConst = 2.084991f;
 
-        float[] interplateTmp1;
+        int[] pos = new int[this.dim];
 
         for (int i1 = 0; i1 < this.dim; i1++)
         {
-            pos[i1] = (int)samplePos[i1];
+            pos[i1] = (int) Math.Floor(samplePos[i1]);
         }
 
-        VectorNode pointer = getVector(pos);
+        T pointer = getVector(pos);
 
         pos = new int[this.dim];
 
         int posTmp;
-
-        while (lastPosCheck(pos) || endCond)
+        for(int i1 = 0; i1 < 1 << this.dim; i1++)
         {
             //converting vector position into array index
             posTmp = calcPos(pos);
+            /*
+            string tmp = "";
 
+            for(int i2 = 0; i2 < pos.Length; i2++)
+            {
+                tmp += $"{pos[i2]}\t";
+            }
+
+            Debug.Log($"pos:{tmp}\nindex:{posTmp}\nsize:{vectors.Length}");
+            */
             //get vector at position
             vectors[posTmp] = getVector(pos, pointer).val();
 
             //get distance from node
             dist[posTmp] = new float[this.dim];
-            
-            for(int i1 = 0; i1 < this.dim; i1++)
+
+            for(int i2 = 0; i2 < this.dim; i2++)
             {
-                dist[posTmp][i1] = samplePos[i1] % 1 - pos[i1];
+                dist[posTmp][i2] = samplePos[i2] % 1 - pos[i2];
             }
 
-            //geting vertVal
+            //getting vertexVal
             vertexVal[posTmp] = dotProduct(vectors[posTmp], dist[posTmp]);
-
-
-            if(lastPosCheck(pos) && !endCond)
-            {
-                endCond = true;
-            }
-            else if(endCond)
-            {
-                break;
-            }
-            else
+            if(pos.Length > 0)
             {
                 increment(pos, 0);
             }
         }
+        /*Debug.Log
+        (
+            $"vertex:{String.Join(",", new List<float[]>(vectors).ConvertAll(f => $"({f[0]},{f[1]})").ToArray())}\n" +
+            $"dist:{String.Join(",", new List<float[]>(dist).ConvertAll(f => $"({f[0]},{f[1]})").ToArray())}\n" +
+            $"vertexVal:{String.Join(",", vertexVal)}"
+        );*/
+        int dimTmp = this.dim;
 
-        int dimTmp = this.dim - 1;
+        int[][] tmpArray = new int[][] { new int[] { 0 }, new int[] { 1 } };
 
-        interplateTmp1 = new float[1 << dimTmp];
-
-        pos = new int[this.dim];
+        int posTmp1;
+        int posTmp2;
 
         int i = 0;
 
-        ArraySegment<int> splice;
-        int[] spliceArray;
-        int[][] tmpArray = new int[][] { new int[] { 0 }, new int[] { 1 } };
-        
-        while (dimTmp / 2 != 1)
+        while (dimTmp > 0)
         {
-            for(int i1 = 0; i1 < pos.Length; i1++)
+            pos = new int[dimTmp - 1];
+            for (int i1 = 0; i1 < 1 << (dimTmp - 1); i1++)
             {
-                pos[i + i1] = 0;
-            }
-            endCond = false;
-
-
-
-            while (lastPosCheck(pos) || endCond)
-            {
-                splice = new ArraySegment<int>(pos, i, pos.Length);
-                spliceArray = splice.ToArray();
-                vertexVal[calcPos(spliceArray)] =
-                    cosineInterpolate
-                    (
-                        vertexVal[calcPos(tmpArray[0].Concat(spliceArray).ToArray())],
-                        vertexVal[calcPos(tmpArray[1].Concat(spliceArray).ToArray())],
-                        pos[i] % 1
-                    );
-
-                if (lastPosCheck(pos) && !endCond)
+                posTmp1 = calcPos(tmpArray[0].Concat(pos).ToArray());
+                posTmp2 = calcPos(tmpArray[1].Concat(pos).ToArray());
+                
+                if (pos.Length > 0)
                 {
-                    endCond = true;
-                }
-                else if (endCond)
-                {
-                    break;
+                    vertexVal[calcPos(pos)] = cosineInterpolate(vertexVal[posTmp1], vertexVal[posTmp2], samplePos[i1] % 1);
+
+                    increment(pos, 0);
                 }
                 else
                 {
-                    increment(pos, i);
+                    vertexVal[0] = cosineInterpolate(vertexVal[posTmp1], vertexVal[posTmp2], samplePos[i1] % 1);
                 }
             }
+            /*Debug.Log
+            (
+                $"i:{i}\n" +
+                $"vertexVal:{String.Join(",", vertexVal)}"
+            );*/
+
+            dimTmp -= 1;
+            i++;
         }
-        return (cosineInterpolate(vertexVal[0], vertexVal[1], samplePos[samplePos.Length - 1] % 1) + sampleConst / 2f) / sampleConst;
+
+        return (vertexVal[0] + sampleConst / 2f) / sampleConst;
     }
 
     /// <summary>
