@@ -1,7 +1,7 @@
 ﻿using System;
 using UnityEngine;
 
-public class Perlin2D : Perlin
+public class Perlin2D : Perlin<Perlin2D.Vector2DNode>
 {
     public class Vector2DNode : VectorNode
     {
@@ -33,11 +33,6 @@ public class Perlin2D : Perlin
     }
 
     /// <summary>
-    ///     dim stores the size of dimension
-    /// </summary>
-    int dim = 2;
-
-    /// <summary>
     ///     root stores the starting point of Noise Grid
     /// </summary>
     Vector2DNode root = new Vector2DNode(null);
@@ -53,9 +48,9 @@ public class Perlin2D : Perlin
     /// <param name="templateVector"></param>
     /// <param name="seed"></param>
     /// <param name="perlinVectorDim"></param>
-    public Perlin2D(float[][] templateVector, int seed, int[] perlinVectorDim)
+    public Perlin2D(float[][] templateVector, int seed, int[] perlinVectorDim) : base(2)
     {
-        if (perlinVectorDim.Length != 2)
+        if (perlinVectorDim.Length != this.dim)
         {
             throw new ArgumentException();
         }
@@ -74,7 +69,7 @@ public class Perlin2D : Perlin
     /// </summary>
     /// <param name="pos">int array of the position of the perlin noise vector</param>
     /// <returns>float array of noise vector</returns>
-    protected Vector2DNode getVector(int[] pos)
+    protected override Vector2DNode getVector(int[] pos)
     {
         return getVector(pos, root.up);
     }
@@ -85,7 +80,7 @@ public class Perlin2D : Perlin
     /// <param name="pos">int array of the position of the perlin noise vector relative to startNode</param>
     /// <param name="startNode">Vector2DNode instance is the start position</param>
     /// <returns>Vector2DNode of noise vector at pos</returns>
-    protected Vector2DNode getVector(int[] pos, Vector2DNode start)
+    protected override Vector2DNode getVector(int[] pos, Vector2DNode start)
     {
         Vector2DNode pointer = start;
 
@@ -286,6 +281,7 @@ public class Perlin2D : Perlin
     /// </summary>
     /// <param name="pos"></param>
     /// <returns></returns>
+    /*
     public override float sample(float[] pos)
     {
         if (dim != pos.Length)
@@ -321,13 +317,13 @@ public class Perlin2D : Perlin
          *       |
          * 00--Line1--10
          */
-
+    /*
         float line0 = cosineInterpolate(vertexVal[0 + 1 * 2], vertexVal[1 + 1 * 2], x % 1);
         float line1 = cosineInterpolate(vertexVal[0 + 0 * 2], vertexVal[1 + 0 * 2], x % 1);
 
         return (cosineInterpolate(line1, line0, y % 1) + sampleConst / 2f) / sampleConst;
     }
-
+    */
     public override string toString()
     {
         string temp = "";
