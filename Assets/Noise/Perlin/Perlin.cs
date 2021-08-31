@@ -169,7 +169,9 @@ public abstract class Perlin<T> : Noise where T : VectorNode
     ///     random is used to create grid using vectors
     /// </summary>
     protected System.Random random;
+    public Perlin(int dim)
     {
+        this.dim = dim;
     }
 
     private void increment(int[] pos, int i1)
