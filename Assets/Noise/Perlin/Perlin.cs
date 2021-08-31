@@ -183,7 +183,7 @@ public abstract class Perlin<T> : Noise where T : VectorNode
     {
         if(i1 >= pos.Length)
         {
-            throw new Exception();
+            throw new ArgumentException();
         }
 
         if(pos[i1] == 0)
