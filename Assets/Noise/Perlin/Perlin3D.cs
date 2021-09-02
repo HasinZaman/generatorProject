@@ -41,5 +41,22 @@ public class Perlin3D : Perlin<Perlin3D.Vector3DNode>
             this.set(vector);
         }
     }
+ 
+    public Perlin3D(float[][] templateVector, int seed, int[] perlinVectorDim) : base(3)
+    {
+        if (perlinVectorDim.Length != this.dim)
+        {
+            throw new ArgumentException();
+        }
+
+        root.up = new Vector3DNode(null);
+
+        this.templateVector = templateVector;
+
+        random = new System.Random(seed);
+
+        generateVectors(new int[3] { 0, 0, 0 }, perlinVectorDim);
+    }
+
     }
 }
