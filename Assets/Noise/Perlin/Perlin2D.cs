@@ -33,16 +33,6 @@ public class Perlin2D : Perlin<Perlin2D.Vector2DNode>
     }
 
     /// <summary>
-    ///     root stores the starting point of Noise Grid
-    /// </summary>
-    Vector2DNode root = new Vector2DNode(null);
-
-    /// <summary>
-    ///     templateVector is an arry of vectors that used in calculating perlin noise
-    /// </summary>
-    float[][] templateVector;
-
-    /// <summary>
     ///     Constructor sets up 2D perlin noise object
     /// </summary>
     /// <param name="templateVector"></param>
@@ -54,6 +44,8 @@ public class Perlin2D : Perlin<Perlin2D.Vector2DNode>
         {
             throw new ArgumentException();
         }
+
+        root = new Vector2DNode(null);
 
         root.up = new Vector2DNode(null);
 

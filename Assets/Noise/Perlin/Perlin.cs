@@ -158,7 +158,12 @@ public abstract class Perlin<T> : Noise where T : VectorNode
     /// <summary>
     ///     root stores the starting point of Noise Grid
     /// </summary>
-    T root;
+    protected T root;
+
+    /// <summary>
+    ///     templateVector is an arry of vectors that used in calculating perlin noise
+    /// </summary>
+    protected float[][] templateVector;
 
     /// <summary>
     ///     dim stores size of the perlin noise vectors
