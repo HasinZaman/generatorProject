@@ -267,54 +267,6 @@ public class Perlin2D : Perlin<Perlin2D.Vector2DNode>
         }
     }
     
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="pos"></param>
-    /// <returns></returns>
-    /*
-    public override float sample(float[] pos)
-    {
-        if (dim != pos.Length)
-        {
-            throw new ArgumentException();
-        }
-        float sampleConst = 2.084991f;
-
-        float[][] vectors = new float[4][];
-        float[][] dist = new float[4][];
-        float[] vertexVal = new float[4];
-
-        float x = pos[0];
-        float y = pos[1];
-
-        Vector2DNode pointer = getVector(new int[] { (int)Math.Floor(x), (int)Math.Floor(y) });
-
-        for (int x1 = 0; x1 < 2; x1++)
-        {
-            for (int y1 = 0; y1 < 2; y1++)
-            {
-                vectors[x1 + y1 * 2] = getVector(new int[] { x1, y1 }, pointer).val();
-                dist[x1 + y1 * 2] = new float[] { x % 1 - x1, y % 1 - y1 };
-
-                vertexVal[x1 + y1 * 2] = dotProduct(vectors[x1 + y1 * 2], dist[x1 + y1 * 2]);
-            }
-        }
-
-        /*
-         * 01--Line0--11
-         *       |
-         *     Line2 (return)
-         *       |
-         * 00--Line1--10
-         */
-    /*
-        float line0 = cosineInterpolate(vertexVal[0 + 1 * 2], vertexVal[1 + 1 * 2], x % 1);
-        float line1 = cosineInterpolate(vertexVal[0 + 0 * 2], vertexVal[1 + 0 * 2], x % 1);
-
-        return (cosineInterpolate(line1, line0, y % 1) + sampleConst / 2f) / sampleConst;
-    }
-    */
     public override string toString()
     {
         string temp = "";
