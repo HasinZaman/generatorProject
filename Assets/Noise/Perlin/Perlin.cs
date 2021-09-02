@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -6,7 +7,7 @@ using UnityEngine;
 /// <summary>
 ///     Perlin abstract class creates foundation for higher level Dimension noise 
 /// </summary>
-public abstract class Perlin : Noise
+public abstract class Perlin<T> : Noise where T : VectorNode
 {
     /// <summary>
     ///     SampleIterator iterates through a range of values
@@ -155,21 +156,186 @@ public abstract class Perlin : Noise
     }
 
     /// <summary>
+    ///     root stores the starting point of Noise Grid
+    /// </summary>
+    protected T root;
+
+    /// <summary>
+    ///     templateVector is an arry of vectors that used in calculating perlin noise
+    /// </summary>
+    protected float[][] templateVector;
+
+    /// <summary>
     ///     dim stores size of the perlin noise vectors
     /// </summary>
-    int dim;
+    protected int dim;
 
     /// <summary>
     ///     random is used to create grid using vectors
     /// </summary>
     protected System.Random random;
+    public Perlin(int dim)
+    {
+        this.dim = dim;
+    }
+
+    /// <summary>
+    ///     increment utility method increments pos array by one
+    /// </summary>
+    /// <param name="pos">position array that is incremented</param>
+    /// <param name="i1">index in position array to be incremented</param>
+    private void increment(int[] pos, int i1)
+    {
+        if(i1 >= pos.Length)
+        {
+            throw new ArgumentException();
+        }
+
+        if(pos[i1] == 0)
+        {
+            pos[i1] = 1;
+        }
+        else
+        {
+            pos[i1] = 0;
+            if(i1 + 1 < pos.Length)
+            {
+                increment(pos, i1 + 1);
+            }
+        }
+    }
+
+    /// <summary>
+    ///     calcPos is utility method that converts pos array into an int index
+    /// </summary>
+    /// <param name="pos">int array that stores position</param>
+    /// <returns>index value of position array</returns>
+    private int calcPos(int[] pos)
+    {
+        int tmp = 0;
+
+        // x + 2 * (y + 2 * (z + 2 * (w + ...)))
+
+        for (int i1 = pos.Length - 1; i1 > 0; i1--)
+        {
+            tmp = 2 * (pos[i1] + tmp);
+        }
+
+        tmp += pos[0];
+
+        return tmp;
+    }
 
     /// <summary>
     ///     abstract sample method gets noise value at a given position
     /// </summary>
     /// <param name="pos">array of float repsenting a given position</param>
     /// <returns>Sample value at a given position</returns>
-    public abstract float sample(float[] pos);
+    public float sample(float[] samplePos)
+    {
+        if (this.dim != samplePos.Length)
+        {
+            throw new ArgumentException();
+        }
+
+        float[][] vectors = new float[1 << this.dim][];
+        float[][] dist = new float[1 << this.dim][];
+        float[] vertexVal = new float[1 << this.dim];
+
+        float sampleConst = 2.084991f;
+
+        int[] pos = new int[this.dim];
+
+        for (int i1 = 0; i1 < this.dim; i1++)
+        {
+            pos[i1] = (int) Math.Floor(samplePos[i1]);
+        }
+
+        T pointer = getVector(pos);
+
+        pos = new int[this.dim];
+
+        int posTmp;
+        for(int i1 = 0; i1 < 1 << this.dim; i1++)
+        {
+            //converting vector position into array index
+            posTmp = calcPos(pos);
+            /*
+            string tmp = "";
+
+            for(int i2 = 0; i2 < pos.Length; i2++)
+            {
+                tmp += $"{pos[i2]}\t";
+            }
+
+            Debug.Log($"pos:{tmp}\nindex:{posTmp}\nsize:{vectors.Length}");
+            */
+            //get vector at position
+            vectors[posTmp] = getVector(pos, pointer).val();
+
+            //get distance from node
+            dist[posTmp] = new float[this.dim];
+
+            for(int i2 = 0; i2 < this.dim; i2++)
+            {
+                dist[posTmp][i2] = samplePos[i2] % 1 - pos[i2];
+            }
+
+            //getting vertexVal
+            vertexVal[posTmp] = dotProduct(vectors[posTmp], dist[posTmp]);
+            if(pos.Length > 0)
+            {
+                increment(pos, 0);
+            }
+        }
+        /*
+        Debug.Log
+        (
+            $"vertex:{String.Join(",", new List<float[]>(vectors).ConvertAll(f => $"({f[0]},{f[1]})").ToArray())}\n" +
+            $"dist:{String.Join(",", new List<float[]>(dist).ConvertAll(f => $"({f[0]},{f[1]})").ToArray())}\n" +
+            $"vertexVal:{String.Join(",", vertexVal)}"
+        );*/
+        int dimTmp = this.dim;
+
+        int[][] tmpArray = new int[][] { new int[] { 0 }, new int[] { 1 } };
+
+        int posTmp1;
+        int posTmp2;
+
+        int i = 0;
+
+        while (dimTmp > 0)
+        {
+            pos = new int[dimTmp - 1];
+            for (int i1 = 0; i1 < 1 << (dimTmp - 1); i1++)
+            {
+                posTmp1 = calcPos(tmpArray[0].Concat(pos).ToArray());
+                posTmp2 = calcPos(tmpArray[1].Concat(pos).ToArray());
+                
+                if (pos.Length > 0)
+                {
+                    vertexVal[calcPos(pos)] = cosineInterpolate(vertexVal[posTmp1], vertexVal[posTmp2], samplePos[i] % 1);
+
+                    increment(pos, 0);
+                }
+                else
+                {
+                    vertexVal[0] = cosineInterpolate(vertexVal[posTmp1], vertexVal[posTmp2], samplePos[i] % 1);
+                }
+            }
+            /*
+            Debug.Log
+            (
+                $"i:{i}\n" +
+                $"vertexVal:{String.Join(",", vertexVal)}"
+            );*/
+
+            dimTmp -= 1;
+            i++;
+        }
+
+        return (vertexVal[0] + sampleConst / 2f) / sampleConst;
+    }
 
     /// <summary>
     ///     dotProduct returns the dotProduct of two vectors
@@ -207,7 +373,6 @@ public abstract class Perlin : Noise
         return y1 * (1 - mu) + y2 * mu;
     }
 
-
     /// <summary>
     ///     generateVectors is an abstract method to randomly generate perlin noise vector nodes
     /// </summary>
@@ -215,6 +380,21 @@ public abstract class Perlin : Noise
     /// <param name="end">int array that stores the ending position at which nodes will stop generating</param>
     /// <param name="template">array of perlin noise vectors</param>
     public abstract void generateVectors(int[] start, int[] end);
+
+    // <summary>
+    ///     getVector gets the perlin noise vector at a given position
+    /// </summary>
+    /// <param name="pos">int array of the position of the perlin noise vector</param>
+    /// <returns>float array of noise vector</returns>
+    protected abstract T getVector(int[] pos);
+
+    /// <summary>
+    ///     getNode gets the perlin noise noise at a given position
+    /// </summary>
+    /// <param name="pos">int array of the position of the perlin noise vector relative to startNode</param>
+    /// <param name="startNode">Vector2DNode instance is the start position</param>
+    /// <returns>Vector2DNode of noise vector at pos</returns>
+    protected abstract T getVector(int[] pos, T start);
 
     /// <summary>
     ///     toString method returns a repsentation of perlin noise in a string format
