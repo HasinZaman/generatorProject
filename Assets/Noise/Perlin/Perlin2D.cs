@@ -133,7 +133,7 @@ public class Perlin2D : Perlin<Perlin2D.Vector2DNode>
     /// <param name="template">array of perlin noise vectors</param>
     public override void generateVectors(int[] start, int[] end)
     {
-        if (start.Length != 2 && end.Length != 2)
+        if (start.Length != this.dim && end.Length != this.dim)
         {
             throw new ArgumentException("start and end paramater must be length 2");
         }
@@ -163,7 +163,6 @@ public class Perlin2D : Perlin<Perlin2D.Vector2DNode>
         //generating
         while (iterator[1].hasNext())
         {
-
             while (iterator[0].hasNext())
             {
                 if (iterator[0].getDelta() == 1)
