@@ -43,6 +43,8 @@ public abstract class VectorNode
         return this.vector;
     }
 
+    public abstract VectorNode get(int axis, int relativePos);
+
     /// <summary>
     ///     toString method converts object into a string repersentation
     /// </summary>

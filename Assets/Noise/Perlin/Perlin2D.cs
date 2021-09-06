@@ -30,6 +30,32 @@ public class Perlin2D : Perlin<Perlin2D.Vector2DNode>
 
             this.set(vector);
         }
+
+        public override VectorNode get(int axis, int relativePos)
+        {
+            switch(axis)
+            {
+                case 0:
+                    switch(relativePos)
+                    {
+                        case -1:
+                            return this.left;
+                        case 1:
+                            return this.right;
+                    }
+                    break;
+                case 1:
+                    switch(relativePos)
+                    {
+                        case -1:
+                            return this.down;
+                        case 1:
+                            return this.up;
+                    }
+                    break;
+            }
+            throw new ArgumentException();
+        }
     }
 
     /// <summary>
@@ -120,6 +146,21 @@ public class Perlin2D : Perlin<Perlin2D.Vector2DNode>
                     break;
             }
             iterator[0].next();
+        }
+
+        return pointer;
+    }
+
+    private Vector2DNode generateXaxis(Vector2DNode pointer)
+    {
+        if (pointer.right == null)
+        {
+            pointer.right = new Vector2DNode(templateVector[random.Next(0, templateVector.Length)]);
+            pointer.right.left = pointer;
+        }
+        else
+        {
+            pointer.right.set(templateVector[random.Next(0, templateVector.Length)]);
         }
 
         return pointer;

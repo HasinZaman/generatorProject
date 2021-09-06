@@ -40,6 +40,41 @@ public class Perlin3D : Perlin<Perlin3D.Vector3DNode>
 
             this.set(vector);
         }
+
+        public override VectorNode get(int axis, int relativePos)
+        {
+            switch (axis)
+            {
+                case 0:
+                    switch (relativePos)
+                    {
+                        case -1:
+                            return this.left;
+                        case 1:
+                            return this.right;
+                    }
+                    break;
+                case 1:
+                    switch (relativePos)
+                    {
+                        case -1:
+                            return this.down;
+                        case 1:
+                            return this.up;
+                    }
+                    break;
+                case 2:
+                    switch(relativePos)
+                    {
+                        case -1:
+                            return this.below;
+                        case 1:
+                            return this.above;
+                    }
+                    break;
+            }
+            throw new ArgumentException();
+        }
     }
  
     public Perlin3D(float[][] templateVector, int seed, int[] perlinVectorDim) : base(3)
