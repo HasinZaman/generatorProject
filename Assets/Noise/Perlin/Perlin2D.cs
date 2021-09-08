@@ -264,64 +264,7 @@ public class Perlin2D : Perlin<Perlin2D.Vector2DNode>
 
         Vector2DNode startNode = getVector(start);
 
-                    pointer1 = pointer1.left;
-
-                    if (pointer2 != null)
-                    {
-                        pointer2 = pointer2.left;
-
-                        if (iterator[1].getDelta() == 1)
-                        {
-                            pointer2.up = pointer1;
-                            pointer1.down = pointer2;
-                        }
-                        else
-                        {
-                            pointer1.up = pointer2;
-                            pointer2.down = pointer1;
-                        }
-                    }
-                }
-                iterator[0].next();
-            }
-            iterator[0].reverse();
-
-            //remeber start of current layer
-            pointer2 = pointer1;
-
-            //create next layer
-            if (iterator[1].getDelta() == 1)
-            {
-                if (pointer1.up == null)
-                {
-                    pointer1.up = new Vector2DNode(templateVector[random.Next(0, templateVector.Length)]);
-                }
-                else
-                {
-                    pointer1.up.set(templateVector[random.Next(0, templateVector.Length)]);
-                }
-
-                pointer1 = pointer1.up;
-                pointer1.down = pointer2;
-                pointer2.up = pointer1;
-            }
-            else
-            {
-                if (pointer1.down == null)
-                {
-                    pointer1.down = new Vector2DNode(templateVector[random.Next(0, templateVector.Length)]);
-                }
-                else
-                {
-                    pointer1.down.set(templateVector[random.Next(0, templateVector.Length)]);
-                }
-
-                pointer1 = pointer1.down;
-                pointer1.up = pointer2;
-                pointer2.down = pointer1;
-            }
-            iterator[1].next();
-        }
+        createFace(Math.Abs(end[0] - start[0]), Math.Abs(end[1] - start[1]), delta, startNode);
     }
     
     public override string toString()
