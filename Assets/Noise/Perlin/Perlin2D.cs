@@ -255,74 +255,14 @@ public class Perlin2D : Perlin<Perlin2D.Vector2DNode>
             throw new ArgumentException("start and end paramater must be length 2");
         }
 
-        //primary pointer
-        Vector2DNode pointer1 = null;
+        int[] delta = new int[this.dim];
 
-        //secondary pointer that points to the previous y layer
-        Vector2DNode pointer2 = null;
-
-        //setting point to the starting position
-        GeneratorIterator[] iterator = new GeneratorIterator[2];
-
-        pointer1 = this.getVector(start);
-
-        if (pointer1.down != null)
+        for(int i1 = 0; i1 < this.dim; i1++)
         {
-            pointer2 = pointer1.down;
+            delta[i1] = Math.Max(-1, Math.Min(1, end[i1] - start[i1]));
         }
 
-        iterator[0] = new GeneratorIterator(start[0], end[0] - 1);
-        iterator[1] = new GeneratorIterator(start[1], end[1]);
-
-
-        pointer1.set(templateVector[random.Next(0, templateVector.Length)]);
-
-        //generating
-        while (iterator[1].hasNext())
-        {
-            while (iterator[0].hasNext())
-            {
-                if (iterator[0].getDelta() == 1)
-                {
-                    if (pointer1.right == null)
-                    {
-                        pointer1.right = new Vector2DNode(templateVector[random.Next(0, templateVector.Length)]);
-                        pointer1.right.left = pointer1;
-                    }
-                    else
-                    {
-                        pointer1.right.set(templateVector[random.Next(0, templateVector.Length)]);
-                    }
-
-                    pointer1 = pointer1.right;
-
-                    if (pointer2 != null)
-                    {
-                        pointer2 = pointer2.right;
-
-                        if (iterator[1].getDelta() == 1)
-                        {
-                            pointer2.up = pointer1;
-                            pointer1.down = pointer2;
-                        }
-                        else
-                        {
-                            pointer2.down = pointer1;
-                            pointer1.up = pointer2;
-                        }
-                    }
-                }
-                else
-                {
-                    if (pointer1.left == null)
-                    {
-                        pointer1.left = new Vector2DNode(templateVector[random.Next(0, templateVector.Length)]);
-                        pointer1.left.right = pointer1;
-                    }
-                    else
-                    {
-                        pointer1.left.set(templateVector[random.Next(0, templateVector.Length)]);
-                    }
+        Vector2DNode startNode = getVector(start);
 
                     pointer1 = pointer1.left;
 
