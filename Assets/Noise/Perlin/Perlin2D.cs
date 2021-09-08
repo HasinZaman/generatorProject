@@ -151,12 +151,51 @@ public class Perlin2D : Perlin<Perlin2D.Vector2DNode>
         return pointer;
     }
 
-    private Vector2DNode generateXaxis(Vector2DNode pointer)
+    /// <summary>
+    ///     createLine method is a private method that creates a column of connected vectorNodes
+    /// </summary>
+    /// <param name="length">length of column</param>
+    /// <param name="direction">direction of in which nodes are connected</param>
+    /// <param name="start">Starting node</param>
+    /// <returns>Vector2DNode array of node column</returns>
+    private Vector2DNode[] createLine(int length, int direction, Vector2DNode start)
     {
-        if (pointer.right == null)
+        Vector2DNode[] tmp = new Vector2DNode[length];
+
+        Vector2DNode pointer = start;
+
+        for (int i1 = 0; i1 < length; i1++)
         {
-            pointer.right = new Vector2DNode(templateVector[random.Next(0, templateVector.Length)]);
-            pointer.right.left = pointer;
+            if(pointer == null)
+            {
+                tmp[i1] = new Vector2DNode(templateVector[random.Next(0, templateVector.Length)]);
+            }
+            else
+            {
+                tmp[i1] = pointer;
+                tmp[i1].set(templateVector[random.Next(0, templateVector.Length)]);
+            }
+
+            if(i1 != 0)
+            {
+                switch(direction)
+                {
+                    case -1:
+                        tmp[i1].up = tmp[i1 - 1];
+                        tmp[i1 - 1].down = tmp[i1];
+                        break;
+                    case 1:
+                        tmp[i1].down = tmp[i1 - 1];
+                        tmp[i1 - 1].up = tmp[i1];
+                        break;
+                }
+            }
+            pointer = tmp[i1];
+            pointer = (Vector2DNode) pointer.get(0, direction);
+        }
+
+        return tmp;
+    }
         }
         else
         {
