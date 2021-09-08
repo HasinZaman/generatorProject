@@ -31,6 +31,12 @@ public class Perlin2D : Perlin<Perlin2D.Vector2DNode>
             this.set(vector);
         }
 
+        /// <summary>
+        ///     get method converts ints into a refrence to neighbor node
+        /// </summary>
+        /// <param name="axis">axis number</param>
+        /// <param name="relativePos">int relative position of neighbor node on axis</param>
+        /// <returns>VectorNode neighbor of current Node</returns>
         public override VectorNode get(int axis, int relativePos)
         {
             switch(axis)
