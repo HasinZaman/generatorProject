@@ -196,13 +196,50 @@ public class Perlin2D : Perlin<Perlin2D.Vector2DNode>
 
         return tmp;
     }
+
+    /// <summary>
+    ///     createFace method is a private method that creates a 2d slice/face of VectorNodes
+    /// </summary>
+    /// <param name="x">number of VectorNodes in the x axis</param>
+    /// <param name="y">number of VectorNodes in the y axis</param>
+    /// <param name="direction">int array of direction for each axis</param>
+    /// <param name="start">starting node</param>
+    /// <returns>2d Vector2DNode array of node rectangle</returns>
+    private Vector2DNode[][] createFace(int x, int y, int[] direction, Vector2DNode start)
+    {
+        Vector2DNode[][] tmp = new Vector2DNode[x][];
+
+        //generating columns
+        if(start != null)
+        {
+            tmp[0] = createLine(y, direction[1], start);
         }
         else
         {
-            pointer.right.set(templateVector[random.Next(0, templateVector.Length)]);
+            tmp[0] = createLine(y, direction[1], null);
         }
 
-        return pointer;
+        for (int x1 = 1; x1 < x; x1++)
+        {
+            tmp[x1] = createLine(y, direction[1], null);
+
+            //connecting columns
+            for (int y1 = 0; y1 < y; y1++)
+            {
+                switch (direction[0])
+                {
+                    case -1:
+                        tmp[x1][y1].right = tmp[x1 - 1][y1];
+                        tmp[x1 - 1][y1].left = tmp[x1][y1];
+                        break;
+                    case 1:
+                        tmp[x1][y1].left = tmp[x1 - 1][y1];
+                        tmp[x1 - 1][y1].right = tmp[x1][y1];
+                        break;
+                }
+            }
+        }
+        return tmp;
     }
 
     /// <summary>
