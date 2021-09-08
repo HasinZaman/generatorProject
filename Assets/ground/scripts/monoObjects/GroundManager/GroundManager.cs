@@ -3,6 +3,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+///     GroundManager handles Chunk generation and maintenance
+/// </summary>
 public class GroundManager : MonoBehaviour
 {
     public ComputeShaderList shaderList;
@@ -16,17 +19,52 @@ public class GroundManager : MonoBehaviour
 
     int[] samples = new int[] {10, 10};
     int height = 10;
-    float bias = 1;
-    float amplitude = 7f / 9f;
     float[] start = new float[2] { 0.2f, 0.2f };
     float[] end = new float[2] { 1.8f, 1.8f };
 
+    /// <summary>
+    ///     noise class is Noise object used height map generation using one/multiple noise algorithms
+    /// </summary>
+    class noise : Noise
+    {
+        Perlin2D perlin2D;
+
+        public noise(float[][] templateVector, int seed, int[] perlinVectorDim)
+        {
+            perlin2D = new Perlin2D(templateVector, seed, perlinVectorDim);
+            Debug.Log(perlin2D.toString());
+            Debug.Log($"(0.5, 0.5) = {perlin2D.sample(new float[] { 0.5f, 0.5f })}");
+            Debug.Log($"(0.25, 0.75) = {perlin2D.sample(new float[] { 0.25f, 0.75f })}");
+            Debug.Log($"(0.1, 0.1) = {perlin2D.sample(new float[] { 0.1f, 0.1f })}");
+
+            //Debug.Log($"(0.9, 0.5) = {perlin2D.sample(new float[] { 0.9f, 0.5f })}");
+            //Debug.Log($"(1.1, 0.5) = {perlin2D.sample(new float[] { 1.1f, 0.5f })}");
+        }
+
+        public float sample(float[] pos)
+        {
+            float[] sample = new float[] { pos[0], pos[2]};
+            float[] coord = new float[] { pos[3], pos[4], pos[5] };
+
+            float tmp = perlin2D.sample(sample);
+
+            return (tmp * 10f + 1) - coord[1];
+        }
+
+        public string toString()
+        {
+            return perlin2D.toString();
+        }
+    }
+
     void Start()
     {
-        TwoDimensionalNoiseHeightMap twoDimensionalNoiseHeightMap = new TwoDimensionalNoiseHeightMap(NoiseVectors.TwoDimensionSet1, 0, new int[] { 3, 3 }, shaderList.Noise);
-        Debug.Log(twoDimensionalNoiseHeightMap.toString());
+        Noise n = new noise(NoiseVectors.TwoDimensionSet1, 0, new int[] { 3, 3 });
 
-        this.generate(twoDimensionalNoiseHeightMap, samples, height, bias, amplitude, start, end);
+        NoiseHeightMapGenerator noiseHeightMapGenerator = new NoiseHeightMapGenerator(n);
+        Debug.Log(n.toString());
+
+        this.generate(noiseHeightMapGenerator);
     }
 
     private int count = 0;
@@ -51,21 +89,16 @@ public class GroundManager : MonoBehaviour
     ///     generate method creates the chunks required for the ground
     /// </summary>
     /// <param name="HeightMapGenerator">HeightMapGenerator object that generates height map</param>
-    /// <param name="samplesPerChunk">int array of number samples & nodes along the x and z axis (Unity axis)</param>
-    /// <param name="height">int of the number of nodes along the y axis</param>
-    /// <param name="bias">A bias used to generate height node values</param>
-    /// <param name="amplitude">A amplitude modifier used to generate height node values</param>
-    /// <param name="start">float array of the intial sample values</param>
-    /// <param name="end">float array of the final sample values</param>
-    public void generate(HeightMapGenerator<Grid> HeightMapGenerator, int[] samplesPerChunk, int height, float bias, float amplitude, float[] start, float[] end )
+    public void generate(HeightMapGenerator<Grid> HeightMapGenerator)
     {
-        TwoDimensionalNoiseHeightMap.GridParam param = new TwoDimensionalNoiseHeightMap.GridParam();
+        NoiseHeightMapGenerator.NoiseParam param = new NoiseHeightMapGenerator.NoiseParam();
 
-        param.setSamples(samplesPerChunk[0], samplesPerChunk[1]);
         param.height = height;
 
-        param.bias = bias;
-        param.amplitude = amplitude;
+        param.start = new float[] {0.1f, 0.1f, 0.1f};
+        param.end = new float[] { 0.9f, 0.9f, 0.9f };
+        param.dim = new int[] { samples[0], height, samples[1] };
+        param.height = height;
 
         float[] delta = new float[2];
 
@@ -82,8 +115,8 @@ public class GroundManager : MonoBehaviour
         {
             for (int y1 = 0; y1 < chunkDim[1]; y1++)
             {
-                param.setStart(start[0] + delta[0] * x1, start[1] + delta[1] * y1);
-                param.setEnd(start[0] + delta[0] * (x1 + 1), start[1] + delta[1] * (y1 + 1));
+                param.start = new float[] { start[0] + delta[0] * x1, 0, start[1] + delta[1] * y1 };
+                param.end = new float[] { start[0] + delta[0] * (x1 + 1), 0, start[1] + delta[1] * (y1 + 1) };
 
                 chunk = Instantiate(chunkPrefab, this.transform);
 
