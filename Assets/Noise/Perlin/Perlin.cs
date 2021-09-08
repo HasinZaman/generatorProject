@@ -288,8 +288,8 @@ public abstract class Perlin<T> : Noise where T : VectorNode
                 increment(pos, 0);
             }
         }
-        /*
-        Debug.Log
+        
+        /*Debug.Log
         (
             $"vertex:{String.Join(",", new List<float[]>(vectors).ConvertAll(f => $"({f[0]},{f[1]})").ToArray())}\n" +
             $"dist:{String.Join(",", new List<float[]>(dist).ConvertAll(f => $"({f[0]},{f[1]})").ToArray())}\n" +
@@ -386,7 +386,10 @@ public abstract class Perlin<T> : Noise where T : VectorNode
     /// </summary>
     /// <param name="pos">int array of the position of the perlin noise vector</param>
     /// <returns>float array of noise vector</returns>
-    protected abstract T getVector(int[] pos);
+    protected T getVector(int[] pos)
+    {
+        return getVector(pos, (T) root.get(1,1));
+    }
 
     /// <summary>
     ///     getNode gets the perlin noise noise at a given position
@@ -394,7 +397,42 @@ public abstract class Perlin<T> : Noise where T : VectorNode
     /// <param name="pos">int array of the position of the perlin noise vector relative to startNode</param>
     /// <param name="startNode">Vector2DNode instance is the start position</param>
     /// <returns>Vector2DNode of noise vector at pos</returns>
-    protected abstract T getVector(int[] pos, T start);
+    protected T getVector(int[] pos, T start)
+    {
+        if(pos.Length != this.dim)
+        {
+            throw new ArgumentException();
+        }
+
+        if(start == null)
+        {
+            throw new ArgumentException();
+        }
+
+        T pointer = start;
+
+        int delta;
+
+        for (int i1 = 0; i1 < this.dim; i1++)
+        {
+            delta = Math.Min(1, Math.Max(-1, pos[i1]));
+
+            for (int i2 = 0; i2 < pos[i1]; i2 += delta)
+            {
+                if (pointer.get(i1, delta) == null)
+                {
+                    throw new Exception();
+                }
+                else
+                {
+                    pointer = (T)pointer.get(i1, delta);
+                }
+            }
+            
+        }
+
+        return pointer;
+    }
 
     /// <summary>
     ///     toString method returns a repsentation of perlin noise in a string format

@@ -102,14 +102,4 @@ public class Perlin3D : Perlin<Perlin3D.Vector3DNode>
     {
         throw new System.NotImplementedException();
     }
-
-    protected override Vector3DNode getVector(int[] pos)
-    {
-        throw new System.NotImplementedException();
-    }
-
-    protected override Vector3DNode getVector(int[] pos, Vector3DNode start)
-    {
-        throw new System.NotImplementedException();
-    }
 }
