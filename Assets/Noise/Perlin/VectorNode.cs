@@ -43,6 +43,12 @@ public abstract class VectorNode
         return this.vector;
     }
 
+    /// <summary>
+    ///     get method returns refrence to neighbor node
+    /// </summary>
+    /// <param name="axis">axis in which the neighbor refrence be retrived from</param>
+    /// <param name="relativePos">position of neighbor node relative to current node</param>
+    /// <returns>A refrence to neighbor node</returns>
     public abstract VectorNode get(int axis, int relativePos);
 
     /// <summary>
