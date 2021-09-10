@@ -157,18 +157,8 @@ public class NoiseHeightMapGenerator : HeightMapGenerator<Grid>
 
                     
                     nodes[x + (y + z * dim[1]) * dim[0]] = new Node();
-                    if (tmp - y >= 1)
-                    {
-                        nodes[x + (y + z * dim[1]) * dim[0]].setValue(1);
-                    }
-                    else if (tmp - y <= 0)
-                    {
-                        nodes[x + (y + z * dim[1]) * dim[0]].setValue(0);
-                    }
-                    else
-                    {
-                        nodes[x + (y + z * dim[1]) * dim[0]].setValue(tmp % 1);
-                    }
+
+                    nodes[x + (y + z * dim[1]) * dim[0]].setValue(Math.Max(0, Math.Min(1, tmp)));
 
                 }
                 pos[1].restart();
