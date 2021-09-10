@@ -322,8 +322,8 @@ public abstract class Perlin<T> : Noise where T : VectorNode
             (
                 $"i:{i}\n" +
                 $"vertexVal:{String.Join(",", vertexVal)}"
-            );*/
-
+            );
+            */
             dimTmp -= 1;
             i++;
         }
