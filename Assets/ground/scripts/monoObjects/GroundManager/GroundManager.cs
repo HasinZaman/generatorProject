@@ -12,15 +12,15 @@ public class GroundManager : MonoBehaviour
     public GameObject chunkPrefab;
 
     Chunk[] chunks;
-    int[] chunkDim = new int[2] { 5, 5 };
+    int[] chunkDim = new int[2] { 1, 1 };
 
     float[] nodeDistTemplate = new float[] { 1, 1, 1 };
     int[] gridDim = new int[] { 4, 4, 4 };
 
     int[] samples = new int[] {10, 10};
     int height = 10;
-    float[] start = new float[2] { 0.2f, 0.2f };
-    float[] end = new float[2] { 1.8f, 1.8f };
+    float[] start = new float[2] { 0.1f, 0.1f };
+    float[] end = new float[2] { 0.9f, 0.9f };
 
     /// <summary>
     ///     noise class is Noise object used height map generation using one/multiple noise algorithms
@@ -28,38 +28,34 @@ public class GroundManager : MonoBehaviour
     class noise : Noise
     {
         Perlin2D perlin2D;
+        Perlin3D perlin3D;
 
         public noise(float[][] templateVector, int seed, int[] perlinVectorDim)
         {
-            perlin2D = new Perlin2D(templateVector, seed, perlinVectorDim);
-            Debug.Log(perlin2D.toString());
-            Debug.Log($"(0.5, 0.5) = {perlin2D.sample(new float[] { 0.5f, 0.5f })}");
-            Debug.Log($"(0.25, 0.75) = {perlin2D.sample(new float[] { 0.25f, 0.75f })}");
-            Debug.Log($"(0.1, 0.1) = {perlin2D.sample(new float[] { 0.1f, 0.1f })}");
-
-            //Debug.Log($"(0.9, 0.5) = {perlin2D.sample(new float[] { 0.9f, 0.5f })}");
-            //Debug.Log($"(1.1, 0.5) = {perlin2D.sample(new float[] { 1.1f, 0.5f })}");
+            //perlin2D = new Perlin2D(templateVector, seed, perlinVectorDim);
+            perlin3D = new Perlin3D(NoiseVectors.ThreeDimensionSet2, seed, perlinVectorDim);
         }
 
         public float sample(float[] pos)
         {
-            float[] sample = new float[] { pos[0], pos[2]};
+            float[] sample = new float[] { pos[0], pos[1], pos[2]};
+
             float[] coord = new float[] { pos[3], pos[4], pos[5] };
 
-            float tmp = perlin2D.sample(sample);
+            float tmp = perlin3D.sample(sample);
 
-            return (tmp * 10f + 1) - coord[1];
+            return (tmp * 1f - 0.0f);
         }
 
         public string toString()
         {
-            return perlin2D.toString();
+            return perlin3D.toString();
         }
     }
 
     void Start()
     {
-        Noise n = new noise(NoiseVectors.TwoDimensionSet1, 0, new int[] { 3, 3 });
+        Noise n = new noise(NoiseVectors.ThreeDimensionSet1, 0, new int[] { 10, 10, 10 });
 
         NoiseHeightMapGenerator noiseHeightMapGenerator = new NoiseHeightMapGenerator(n);
         Debug.Log(n.toString());
@@ -96,7 +92,7 @@ public class GroundManager : MonoBehaviour
         param.height = height;
 
         param.start = new float[] {0.1f, 0.1f, 0.1f};
-        param.end = new float[] { 0.9f, 0.9f, 0.9f };
+        param.end = new float[] { 2.9f, 2.9f, 2.9f };
         param.dim = new int[] { samples[0], height, samples[1] };
         param.height = height;
 
@@ -115,8 +111,8 @@ public class GroundManager : MonoBehaviour
         {
             for (int y1 = 0; y1 < chunkDim[1]; y1++)
             {
-                param.start = new float[] { start[0] + delta[0] * x1, 0, start[1] + delta[1] * y1 };
-                param.end = new float[] { start[0] + delta[0] * (x1 + 1), 0, start[1] + delta[1] * (y1 + 1) };
+                param.start = new float[] { start[0] + delta[0] * x1, start[1] + delta[1] * y1, 0 };
+                param.end = new float[] { start[0] + delta[0] * (x1 + 1), start[1] + delta[1] * (y1 + 1), 0.8f };
 
                 chunk = Instantiate(chunkPrefab, this.transform);
 
@@ -126,6 +122,7 @@ public class GroundManager : MonoBehaviour
                 chunks[x1 + y1 * chunkDim[0]] = chunk.GetComponent<Chunk>();
 
                 chunks[x1 + y1 * chunkDim[0]].setChunk(HeightMapGenerator.getHeightMap(param), shaderList.MarchingCube, nodeDistTemplate);
+                Debug.Log(chunks[x1 + y1 * chunkDim[0]].toString());
             }
         }
     }
