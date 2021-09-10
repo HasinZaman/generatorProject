@@ -292,7 +292,6 @@ public class Perlin3D : Perlin<Perlin3D.Vector3DNode>
     /// <returns>string representation of class</returns>
     public override string toString()
     {
-        throw new System.NotImplementedException();
         Vector3DNode pointer1 = root.up;
 
         string tmp = "";
