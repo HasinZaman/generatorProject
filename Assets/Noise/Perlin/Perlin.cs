@@ -281,12 +281,14 @@ public abstract class Perlin<T> : Noise where T : VectorNode
             }
         }
         
-        /*Debug.Log
+        /*
+        Debug.Log
         (
-            $"vertex:{String.Join(",", new List<float[]>(vectors).ConvertAll(f => $"({f[0]},{f[1]})").ToArray())}\n" +
-            $"dist:{String.Join(",", new List<float[]>(dist).ConvertAll(f => $"({f[0]},{f[1]})").ToArray())}\n" +
+            $"vertex:{String.Join(",", new List<float[]>(vectors).ConvertAll(f => $"({f[0]},{f[1]},{f[2]})").ToArray())}\n" +
+            $"dist:{String.Join(",", new List<float[]>(dist).ConvertAll(f => $"({f[0]},{f[1]},{f[2]})").ToArray())}\n" +
             $"vertexVal:{String.Join(",", vertexVal)}"
-        );*/
+        );
+        */
         int dimTmp = this.dim;
 
         int[][] tmpArray = new int[][] { new int[] { 0 }, new int[] { 1 } };
