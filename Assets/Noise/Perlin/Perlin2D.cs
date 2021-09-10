@@ -1,5 +1,4 @@
 ﻿using System;
-using UnityEngine;
 
 /// <summary>
 ///     Perlin2D class generates 2d perlin noise
