@@ -260,16 +260,8 @@ public abstract class Perlin<T> : Noise where T : VectorNode
         {
             //converting vector position into array index
             posTmp = calcPos(pos);
-            /*
-            string tmp = "";
-
-            for(int i2 = 0; i2 < pos.Length; i2++)
-            {
-                tmp += $"{pos[i2]}\t";
-            }
-
-            Debug.Log($"pos:{tmp}\nindex:{posTmp}\nsize:{vectors.Length}");
-            */
+            
+            //Debug.Log($"pos:{String.Join("\n", pos)}\nindex:{posTmp}\nsize:{vectors.Length}");
             //get vector at position
             vectors[posTmp] = getVector(pos, pointer).val();
 
