@@ -84,6 +84,8 @@ public class Perlin3D : Perlin<Perlin3D.Vector3DNode>
             throw new ArgumentException();
         }
 
+        root = new Vector3DNode(null);
+
         root.up = new Vector3DNode(null);
 
         this.templateVector = templateVector;
