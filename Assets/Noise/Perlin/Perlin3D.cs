@@ -142,6 +142,51 @@ public class Perlin3D : Perlin<Perlin3D.Vector3DNode>
         return tmp;
     }
 
+    /// <summary>
+    ///     createFace method is a private method that creates a 2d slice/face of VectorNodes
+    /// </summary>
+    /// <param name="x">number of VectorNodes in the x axis</param>
+    /// <param name="y">number of VectorNodes in the y axis</param>
+    /// <param name="direction">int array of direction for each axis</param>
+    /// <param name="start">starting node</param>
+    /// <returns>2d Vector3DNode array of node rectangle</returns>
+    private Vector3DNode[][] createFace(int x, int y, int[] direction, Vector3DNode start)
+    {
+        Vector3DNode[][] tmp = new Vector3DNode[x][];
+
+        //generating columns
+        if (start != null)
+        {
+            tmp[0] = createLine(y, direction[1], start);
+        }
+        else
+        {
+            tmp[0] = createLine(y, direction[1], null);
+        }
+
+        for (int x1 = 1; x1 < x; x1++)
+        {
+            tmp[x1] = createLine(y, direction[1], null);
+
+            //connecting columns
+            for (int y1 = 0; y1 < y; y1++)
+            {
+                switch (direction[0])
+                {
+                    case -1:
+                        tmp[x1][y1].right = tmp[x1 - 1][y1];
+                        tmp[x1 - 1][y1].left = tmp[x1][y1];
+                        break;
+                    case 1:
+                        tmp[x1][y1].left = tmp[x1 - 1][y1];
+                        tmp[x1 - 1][y1].right = tmp[x1][y1];
+                        break;
+                }
+            }
+        }
+        return tmp;
+    }
+
     public override void generateVectors(int[] start, int[] end)
     {
         throw new System.NotImplementedException();
