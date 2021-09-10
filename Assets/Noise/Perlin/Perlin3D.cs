@@ -227,9 +227,28 @@ public class Perlin3D : Perlin<Perlin3D.Vector3DNode>
         return tmp;
     }
 
+    /// <summary>
+    ///     generateVectors is an abstract method to randomly generate perlin noise vector nodes
+    /// </summary>
+    /// <param name="start">int array that stores the starting position at which nodes will be genrated</param>
+    /// <param name="end">int array that stores the ending position at which nodes will stop generating</param>
     public override void generateVectors(int[] start, int[] end)
     {
-        throw new System.NotImplementedException();
+        if (start.Length != this.dim && end.Length != this.dim)
+        {
+            throw new ArgumentException("start and end paramater must be length 2");
+        }
+
+        int[] delta = new int[this.dim];
+
+        for (int i1 = 0; i1 < this.dim; i1++)
+        {
+            delta[i1] = Math.Max(-1, Math.Min(1, end[i1] - start[i1]));
+        }
+
+        Vector3DNode startNode = getVector(start);
+
+        createForm(Math.Abs(end[0] - start[0]), Math.Abs(end[1] - start[1]), Math.Abs(end[2] - start[2]), delta, startNode);
     }
 
     /// <summary>
