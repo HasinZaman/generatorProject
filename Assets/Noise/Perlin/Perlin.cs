@@ -316,7 +316,9 @@ public abstract class Perlin<T> : Noise where T : VectorNode
                 {
                     vertexVal[0] = cosineInterpolate(vertexVal[posTmp1], vertexVal[posTmp2], samplePos[i] % 1);
                 }
+
             }
+            
             /*
             Debug.Log
             (
