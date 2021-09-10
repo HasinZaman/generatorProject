@@ -232,8 +232,87 @@ public class Perlin3D : Perlin<Perlin3D.Vector3DNode>
         throw new System.NotImplementedException();
     }
 
+    /// <summary>
+    ///     sliceToString method returns the string form of a 2d slice at a given z level
+    /// </summary>
+    /// <param name="start">starting z level node</param>
+    /// <returns>String form 2d slice at given z level</returns>
+    private string sliceToString(Vector3DNode start)
+    {
+        string temp = "";
+
+        Vector3DNode pointer = start;
+
+        int i1 = 0;
+
+        //get top most value
+        while (pointer.up != null)
+        {
+            i1++;
+            pointer = pointer.up;
+        }
+
+        //get left most value
+
+        while (pointer.left != null)
+        {
+            pointer = pointer.left;
+        }
+
+        while (pointer.down != null)
+        {
+            while (pointer.right != null)
+            {
+                temp += $"{pointer.toString()}\t";
+                pointer = pointer.right;
+            }
+            temp += $"{pointer.toString()}\t";
+
+            while (pointer.left != null)
+            {
+                pointer = pointer.left;
+            }
+            pointer = pointer.down;
+            temp += "\n";
+        }
+
+        while (pointer.right != null)
+        {
+            temp += $"{pointer.toString()}\t";
+            pointer = pointer.right;
+        }
+        temp += $"{pointer.toString()}";
+
+        return temp;
+    }
+
+    /// <summary>
+    ///     toString method represents class 3d vector grid in the form of a string
+    /// </summary>
+    /// <returns>string representation of class</returns>
     public override string toString()
     {
         throw new System.NotImplementedException();
+        Vector3DNode pointer1 = root.up;
+
+        string tmp = "";
+
+        int i1 = 0;
+
+        while (pointer1.above != null)
+        {
+            pointer1 = pointer1.above;
+            i1++;
+        }
+
+        while (pointer1 != null)
+        {
+            tmp += $"Layer:{i1}\n{sliceToString(pointer1)}\n";
+            
+            i1--;
+            pointer1 = pointer1.below;
+        }
+
+        return tmp;
     }
 }
