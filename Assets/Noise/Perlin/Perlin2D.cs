@@ -1,6 +1,9 @@
 ﻿using System;
 using UnityEngine;
 
+/// <summary>
+///     Perlin2D class generates 2d perlin noise
+/// </summary>
 public class Perlin2D : Perlin<Perlin2D.Vector2DNode>
 {
     public class Vector2DNode : VectorNode
@@ -184,7 +187,6 @@ public class Perlin2D : Perlin<Perlin2D.Vector2DNode>
     /// </summary>
     /// <param name="start">int array that stores the starting position at which nodes will be genrated</param>
     /// <param name="end">int array that stores the ending position at which nodes will stop generating</param>
-    /// <param name="template">array of perlin noise vectors</param>
     public override void generateVectors(int[] start, int[] end)
     {
         if (start.Length != this.dim && end.Length != this.dim)
@@ -203,7 +205,11 @@ public class Perlin2D : Perlin<Perlin2D.Vector2DNode>
 
         createFace(Math.Abs(end[0] - start[0]), Math.Abs(end[1] - start[1]), delta, startNode);
     }
-    
+
+    /// <summary>
+    ///     toString method represents class 2d vector grid in the form of a string
+    /// </summary>
+    /// <returns>string representation of class</returns>
     public override string toString()
     {
         string temp = "";
