@@ -1,5 +1,6 @@
 ﻿using System;
 
+/// </summary>
 public class Perlin3D : Perlin<Perlin3D.Vector3DNode>
 {
     public class Vector3DNode : VectorNode
@@ -93,6 +94,52 @@ public class Perlin3D : Perlin<Perlin3D.Vector3DNode>
         random = new System.Random(seed);
 
         generateVectors(new int[3] { 0, 0, 0 }, perlinVectorDim);
+    }
+
+    /// <summary>
+    ///     createLine method is a private method that creates a column of connected vectorNodes
+    /// </summary>
+    /// <param name="length">length of column</param>
+    /// <param name="direction">direction of in which nodes are connected</param>
+    /// <param name="start">Starting node</param>
+    /// <returns>Vector3DNode array of node column</returns>
+    private Vector3DNode[] createLine(int length, int direction, Vector3DNode start)
+    {
+        Vector3DNode[] tmp = new Vector3DNode[length];
+
+        Vector3DNode pointer = start;
+
+        for (int i1 = 0; i1 < length; i1++)
+        {
+            if (pointer == null)
+            {
+                tmp[i1] = new Vector3DNode(templateVector[random.Next(0, templateVector.Length)]);
+            }
+            else
+            {
+                tmp[i1] = pointer;
+                tmp[i1].set(templateVector[random.Next(0, templateVector.Length)]);
+            }
+
+            if (i1 != 0)
+            {
+                switch (direction)
+                {
+                    case -1:
+                        tmp[i1].up = tmp[i1 - 1];
+                        tmp[i1 - 1].down = tmp[i1];
+                        break;
+                    case 1:
+                        tmp[i1].down = tmp[i1 - 1];
+                        tmp[i1 - 1].up = tmp[i1];
+                        break;
+                }
+            }
+            pointer = tmp[i1];
+            pointer = (Vector3DNode) pointer.get(0, direction);
+        }
+
+        return tmp;
     }
 
     public override void generateVectors(int[] start, int[] end)
