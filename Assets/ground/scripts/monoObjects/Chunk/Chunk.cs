@@ -129,4 +129,13 @@ public class Chunk : MonoBehaviour
 
         this.meshGenerator = new MeshGenerator(grid, shader, "getVertices", 0.5f, nodeDist);
     }
+
+    /// <summary>
+    ///     toString method returns string representation of grid
+    /// </summary>
+    /// <returns>string representation of grid</returns>
+    public string toString()
+    {
+        return meshGenerator.toString();
+    }
 }
