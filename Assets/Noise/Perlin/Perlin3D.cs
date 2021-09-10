@@ -1,5 +1,7 @@
 ﻿using System;
 
+/// <summary>
+///     Perlin3D class generates 3d perlin noise
 /// </summary>
 public class Perlin3D : Perlin<Perlin3D.Vector3DNode>
 {
@@ -42,6 +44,12 @@ public class Perlin3D : Perlin<Perlin3D.Vector3DNode>
             this.set(vector);
         }
 
+        /// <summary>
+        ///     get method converts ints into a refrence to neighbor node
+        /// </summary>
+        /// <param name="axis">axis number</param>
+        /// <param name="relativePos">int relative position of neighbor node on axis</param>
+        /// <returns>VectorNode neighbor of current Node</returns>
         public override VectorNode get(int axis, int relativePos)
         {
             switch (axis)
