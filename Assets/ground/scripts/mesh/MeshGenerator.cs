@@ -210,4 +210,12 @@ public class MeshGenerator
         return getMesh(1);
     }
 
+    /// <summary>
+    ///     toString method returns a string representation grid
+    /// </summary>
+    /// <returns>string representation of class</returns>
+    public string toString()
+    {
+        return grid.toString();
+    }
 }
