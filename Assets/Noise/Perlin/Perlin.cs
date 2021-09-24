@@ -229,7 +229,7 @@ public abstract class Perlin<T> : Noise where T : VectorNode
     /// <summary>
     ///     abstract sample method gets noise value at a given position
     /// </summary>
-    /// <param name="pos">array of float repsenting a given position</param>
+    /// <param name="samplePos">array of float repsenting a given position</param>
     /// <returns>Sample value at a given position</returns>
     public float sample(float[] samplePos)
     {
@@ -374,7 +374,6 @@ public abstract class Perlin<T> : Noise where T : VectorNode
     /// </summary>
     /// <param name="start">int array that stores the starting position at which nodes will be genrated</param>
     /// <param name="end">int array that stores the ending position at which nodes will stop generating</param>
-    /// <param name="template">array of perlin noise vectors</param>
     public abstract void generateVectors(int[] start, int[] end);
 
     // <summary>
