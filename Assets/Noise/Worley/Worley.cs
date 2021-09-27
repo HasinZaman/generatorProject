@@ -114,7 +114,7 @@ public abstract class Worley<T> : Noise where T : CellNode
 
                 for (int i2 = 0; i2 < this.dim; i2++)
                 {
-                    dist += (float)Math.Pow(Math.Abs(pointDist[i2] + cellPos[i2] + relativePos[i2] - pos[i2]), 2);
+                    dist += (float) Math.Pow(Math.Abs(pointDist[i2] + cellPos[i2] + relativePos[i2] - pos[i2]), 2);
                 }
 
                 dist = (float)Math.Sqrt(dist);
@@ -123,10 +123,9 @@ public abstract class Worley<T> : Noise where T : CellNode
                 {
                     min = dist;
                 }
-                increment(relativePos, 0);
             }
+            increment(relativePos, 0);
         }
-
         return min / worleyConst;
     }
 
