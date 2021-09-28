@@ -1,4 +1,5 @@
 ﻿using System;
+
 /// <summary>
 ///     Worley abstract class creates foundation for higher level Dimension noise 
 /// </summary>
