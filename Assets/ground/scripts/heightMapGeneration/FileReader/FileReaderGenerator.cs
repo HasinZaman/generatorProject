@@ -3,8 +3,8 @@
 /// </summary>
 public abstract class FileReaderGenerator : HeightMapGenerator<Grid>
 {
-    static string folder = "";
-    static string fileExtension = "";
+    private string folder = "";
+    private string fileExtension = "";
 
     /// <summary>
     ///     fileName is the name of file that will be read from
