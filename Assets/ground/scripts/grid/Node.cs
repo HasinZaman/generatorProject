@@ -89,4 +89,12 @@ public class Node : IComparable
         this.val = val;
     }
 
+    /// <summary>
+    ///     toString method repersentation object in the format of a string
+    /// </summary>
+    /// <returns>String repersentation of Object</returns>
+    public string toString()
+    {
+        return $"({val.ToString()})";
+    }
 }
