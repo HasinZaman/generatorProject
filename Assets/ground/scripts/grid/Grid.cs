@@ -513,25 +513,38 @@ public class Grid
     /// <summary>
     ///     toString method repersentation object in the format of a string
     /// </summary>
+    /// <param name="delimiterInfoSplit">A string that seperates string </param>
+    /// <param name="delimiterX">A string that sperates nodes along the x axis</param>
+    /// <param name="delimiterY">A string that sperates nodes along the y axis</param>
+    /// <param name="delimiterZ">A string that sperates nodes along the z axis</param>
     /// <returns>String repersentation of Object</returns>
-    public string toString()
+    public string toString(string delimiterInfoSplit, string delimiterX, string delimiterY, string delimiterZ)
     {
-        string str = "";
+        string str = $"{String.Join(",", this.dim)}{delimiterInfoSplit}";
 
         for (int y = 0; y < dim[1]; y++)
         {
             for (int x = 0; x < dim[0]; x++)
             {
-                str += $"{getNode(x,y,0).getValue().ToString("0.00")}";
+                str += $"{getNode(x, y, 0).getValue().ToString("0.00")}";
                 for (int z = 1; z < dim[2]; z++)
                 {
-                    str += $"\t{getNode(x, y, z).getValue().ToString("0.00")}";
+                    str += $"{delimiterZ}{getNode(x, y, z).toString()}";
                 }
-                str += "\n";
+                str += delimiterX;
             }
-            str += "\n";
+            str += delimiterY;
         }
 
         return str;
+    }
+
+    /// <summary>
+    ///     toString method repersentation object in the format of a string
+    /// </summary>
+    /// <returns>String repersentation of Object</returns>
+    public string toString()
+    {
+        return this.toString("\n", "\n", "\n", "\t");
     }
 }
