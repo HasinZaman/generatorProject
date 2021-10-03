@@ -34,5 +34,6 @@ public abstract class FileReaderGenerator<NF, N, G> : HeightMapGenerator<G, File
     /// <returns>
     ///     A grid with the HeightMap data
     /// </returns>
-    public abstract Grid getHeightMap(object param);
+    public abstract G getHeightMap(FileParam param);
+     
 }
