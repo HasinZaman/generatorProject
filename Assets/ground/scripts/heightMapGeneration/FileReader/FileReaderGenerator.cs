@@ -1,7 +1,10 @@
 ﻿/// <summary>
 ///     FileReaderGenerator abstract class handles the foundation of child class that creates chunks from a file
 /// </summary>
-public abstract class FileReaderGenerator : HeightMapGenerator<Grid>
+/// <typeparam name="NF">NodeFactory class/child class</typeparam>
+/// <typeparam name="N">Node class/child class</typeparam>
+/// <typeparam name="G">Grid class/child class</typeparam>
+public abstract class FileReaderGenerator<NF, N, G> : HeightMapGenerator<G, FileParam> where NF : NodeFactory<N> where N : Node where G : Grid
 {
     private string folder = "";
     private string fileExtension = "";
