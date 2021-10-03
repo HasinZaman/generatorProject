@@ -28,8 +28,6 @@ public abstract class FileReaderGenerator<NF, N, G> : HeightMapGenerator<G, File
         this.folder = folder;
     }
 
-    protected abstract Node readNextNode();
-
     /// <summary>
     ///     getHeightMap generates a Grid object that contains the nodes for a HeightMap
     /// </summary>
