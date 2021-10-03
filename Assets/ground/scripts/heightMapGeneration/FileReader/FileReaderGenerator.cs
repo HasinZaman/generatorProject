@@ -6,6 +6,9 @@
 /// <typeparam name="G">Grid class/child class</typeparam>
 public abstract class FileReaderGenerator<NF, N, G> : HeightMapGenerator<G, FileParam> where NF : NodeFactory<N> where N : Node where G : Grid
 {
+    /// <summary>
+    ///     folder in which file is stored
+    /// </summary>
     private string folder = "";
     private string fileExtension = "";
 
