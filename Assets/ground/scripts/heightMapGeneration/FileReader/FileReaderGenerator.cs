@@ -10,12 +10,12 @@ public abstract class FileReaderGenerator<NF, N, G> : HeightMapGenerator<G, File
     ///     folder in which file is stored
     /// </summary>
     private string folder = "";
-    private string fileExtension = "";
 
     /// <summary>
-    ///     fileName is the name of file that will be read from
+    ///     extension of file
     /// </summary>
-    private string fileName;
+    private string fileExtension = "";
+
 
     /// <summary>
     ///     constructor sets up FileReaderGenerator object
