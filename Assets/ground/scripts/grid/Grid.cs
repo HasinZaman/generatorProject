@@ -1,6 +1,6 @@
 ﻿using System;
 /// <summary>
-/// 
+///     Grid stores Nodes in a 3 dimensions
 /// </summary>
 public class Grid
 {
