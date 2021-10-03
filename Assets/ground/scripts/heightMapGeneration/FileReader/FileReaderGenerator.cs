@@ -20,6 +20,8 @@ public abstract class FileReaderGenerator<NF, N, G> : HeightMapGenerator<G, File
     /// <summary>
     ///     constructor sets up FileReaderGenerator object
     /// </summary>
+    /// <param name="fileExtension"></param>
+    /// <param name="folder"></param>
     public FileReaderGenerator(string fileExtension, string folder)
     {
         this.fileExtension = fileExtension;
