@@ -1,4 +1,5 @@
-﻿/// <summary>
+﻿using System.IO;
+/// <summary>
 ///     FileReaderGenerator abstract class handles the foundation of child class that creates chunks from a file
 /// </summary>
 /// <typeparam name="NF">NodeFactory class/child class</typeparam>
@@ -26,6 +27,32 @@ public abstract class FileReaderGenerator<NF, N, G> : HeightMapGenerator<G, File
     {
         this.fileExtension = fileExtension;
         this.folder = folder;
+    }
+
+    /// <summary>
+    ///     validFileCheck determines if a file exists and has the correct file extensions
+    /// </summary>
+    /// <param name="file">string of the file that is being checked</param>
+    /// <returns>bool of whether the file exists and is in the correct format</returns>
+    protected bool validFileCheck(string file)
+    {
+        int index;
+
+        //checking file extension is correct
+        index = file.LastIndexOf('.');
+
+        if (index == -1)
+        {
+            return false;
+        }
+
+        if (!file.Substring(index + 1).Equals(this.fileExtension))
+        {
+            return false;
+        }
+
+        //checks if file exists
+        return File.Exists($"{folder}//{file}");
     }
 
     /// <summary>
