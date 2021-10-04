@@ -7,4 +7,9 @@ public class FileParam
     ///     fileName is a string of the file that is being loaded
     /// </summary>
     public string fileName;
+
+    /// <summary>
+    ///     line is the position in a file to get grid information
+    /// </summary>
+    public int line = -1;
 }
