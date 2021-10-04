@@ -33,27 +33,28 @@ public abstract class FileReaderGenerator<NF, N, G, P> : HeightMapGenerator<G, P
     /// <summary>
     ///     validFileCheck determines if a file exists and has the correct file extensions
     /// </summary>
-    /// <param name="file">string of the file that is being checked</param>
+    /// <param name="fileName">string of the file that is being checked</param>
     /// <returns>bool of whether the file exists and is in the correct format</returns>
-    protected bool validFileCheck(string file)
+    protected bool validFileCheck(string fileName)
     {
         int index;
 
         //checking file extension is correct
-        index = file.LastIndexOf('.');
+        index = fileName.LastIndexOf('.');
 
         if (index == -1)
         {
             return false;
         }
 
-        if (!file.Substring(index + 1).Equals(this.fileExtension))
+        if (!fileName.Substring(index + 1).Equals(this.fileExtension))
         {
             return false;
         }
 
         //checks if file exists
-        return File.Exists($"{folder}//{file}");
+        return File.Exists(this.getFileAddress(fileName));
+    }
     }
 
     /// <summary>
