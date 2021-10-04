@@ -9,6 +9,9 @@ using System.IO;
 /// <typeparam name="G">Grid class/child class</typeparam>
 public class ChunkFileReader<NF, N, G> : FileReaderGenerator<NF, N, G, FileParam> where NF : NodeFactory<N> where N : Node where G : Grid
 {
+    /// <summary>
+    ///     Constructor sets up ChunkFileReader object
+    /// </summary>
     public ChunkFileReader() : base(".world", "worlds")
     {
 
