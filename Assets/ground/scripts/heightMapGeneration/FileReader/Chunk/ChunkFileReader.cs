@@ -63,5 +63,9 @@ public class ChunkFileReader<NF, N, G> : FileReaderGenerator<NF, N, G, FileParam
 
         return stringToHeightMap(rawGrid[param.line]);
     }
+
+    public override G[] getHeightMaps(FileParam param)
+    {
+        throw new NotImplementedException();
     }
 }
