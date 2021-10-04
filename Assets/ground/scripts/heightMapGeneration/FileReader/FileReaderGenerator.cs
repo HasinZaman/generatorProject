@@ -55,6 +55,15 @@ public abstract class FileReaderGenerator<NF, N, G, P> : HeightMapGenerator<G, P
         //checks if file exists
         return File.Exists(this.getFileAddress(fileName));
     }
+
+    /// <summary>
+    ///     getFileAddress gets the file address
+    /// </summary>
+    /// <param name="fileName">string of the file name</param>
+    /// <returns></returns>
+    protected string getFileAddress(string fileName)
+    {
+        return $"{folder}//{fileName}";
     }
 
     /// <summary>
@@ -64,7 +73,6 @@ public abstract class FileReaderGenerator<NF, N, G, P> : HeightMapGenerator<G, P
     /// <returns>
     ///     A grid with the HeightMap data
     /// </returns>
-    public abstract G getHeightMap(FileParam param);
      
     public abstract G getHeightMap(P param);
 }
