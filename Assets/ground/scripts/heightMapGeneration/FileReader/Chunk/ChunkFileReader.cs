@@ -36,6 +36,32 @@ public class ChunkFileReader<NF, N, G> : FileReaderGenerator<NF, N, G, FileParam
     /// </returns>
     public override G getHeightMap(FileParam param)
     {
-        throw new System.NotImplementedException();
+        if (!validFileCheck(param.fileName))
+        {
+            throw new ArgumentException("File Does not exist");
+        }
+
+        if(param.line < -1)
+        {
+            throw new ArgumentException("File Does not exist");
+        }
+
+        StreamReader file = new StreamReader(this.getFileAddress(param.fileName));
+        string[] rawGrid = file.ReadToEnd().Split('\n');
+
+        file.Close();
+
+        if (param.line == -1)
+        {
+            param.line = 0;
+        }
+
+        if(param.line >= rawGrid.Length)
+        {
+            throw new ArgumentException($"param.line({param.line}) must be less than file lines({rawGrid.Length})");
+        }
+
+        return stringToHeightMap(rawGrid[param.line]);
+    }
     }
 }
