@@ -5,7 +5,8 @@
 /// <typeparam name="NF">NodeFactory class/child class</typeparam>
 /// <typeparam name="N">Node class/child class</typeparam>
 /// <typeparam name="G">Grid class/child class</typeparam>
-public abstract class FileReaderGenerator<NF, N, G> : HeightMapGenerator<G, FileParam> where NF : NodeFactory<N> where N : Node where G : Grid
+/// <typeparam name="P">FileParam class/child class</typeparam>
+public abstract class FileReaderGenerator<NF, N, G, P> : HeightMapGenerator<G, P> where NF : NodeFactory<N> where N : Node where G : Grid where P : FileParam
 {
     /// <summary>
     ///     folder in which file is stored
@@ -58,9 +59,11 @@ public abstract class FileReaderGenerator<NF, N, G> : HeightMapGenerator<G, File
     /// <summary>
     ///     getHeightMap generates a Grid object that contains the nodes for a HeightMap
     /// </summary>
+    /// <param name="param">FileParam/FileParam child object that stores data key in reading file</param>
     /// <returns>
     ///     A grid with the HeightMap data
     /// </returns>
     public abstract G getHeightMap(FileParam param);
      
+    public abstract G getHeightMap(P param);
 }
