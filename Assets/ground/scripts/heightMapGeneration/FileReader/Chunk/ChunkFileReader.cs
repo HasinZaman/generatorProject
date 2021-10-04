@@ -26,6 +26,14 @@ public class ChunkFileReader<NF, N, G> : FileReaderGenerator<NF, N, G, FileParam
     {
         throw new ArgumentException();
     }
+
+    /// <summary>
+    ///     getHeightMap generates a Grid object that contains the nodes for a HeightMap
+    /// </summary>
+    /// <param name="param">FileParam/FileParam child object that stores data key in reading file</param>
+    /// <returns>
+    ///     A grid with the HeightMap data
+    /// </returns>
     public override G getHeightMap(FileParam param)
     {
         throw new System.NotImplementedException();
