@@ -17,6 +17,15 @@ public class ChunkFileReader<NF, N, G> : FileReaderGenerator<NF, N, G, FileParam
 
     }
 
+    /// <summary>
+    ///     stringToHeightMap converts a string into a grid object
+    /// </summary>
+    /// <param name="gridRaw">String that will proccessed into a grid object</param>
+    /// <returns>Grid object of gridRaw string</returns>
+    private G stringToHeightMap(string gridRaw)
+    {
+        throw new ArgumentException();
+    }
     public override G getHeightMap(FileParam param)
     {
         throw new System.NotImplementedException();
