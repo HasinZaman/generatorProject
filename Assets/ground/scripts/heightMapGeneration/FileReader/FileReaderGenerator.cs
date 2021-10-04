@@ -74,4 +74,14 @@ public abstract class FileReaderGenerator<NF, N, G, P> : HeightMapGenerator<G, P
     ///     A grid with the HeightMap data
     /// </returns>
     public abstract G getHeightMap(P param);
+
+    /// <summary>
+    ///     getHeightMaps generates a set of Grid objects that contains the nodes for a HeightMap
+    /// </summary>
+    /// <param name="param">FileParam/FileParam child object that stores data key in reading file</param>
+    /// <returns>
+    ///     An array of grids with the HeightMap data
+    /// </returns>
+    public abstract G[] getHeightMaps(P param);
+
 }
