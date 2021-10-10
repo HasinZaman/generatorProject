@@ -529,7 +529,7 @@ public class Grid
                 str += $"{getNode(x, y, 0).getValue().ToString("0.00")}";
                 for (int z = 1; z < dim[2]; z++)
                 {
-                    str += $"{delimiterZ}{getNode(x, y, z).toString()}";
+                    str += $"{delimiterZ}{getNode(x, y, z).getValue().ToString("0.00")}";
                 }
                 str += delimiterX;
             }
