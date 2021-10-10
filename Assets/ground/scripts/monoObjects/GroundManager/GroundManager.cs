@@ -61,6 +61,8 @@ public class GroundManager : MonoBehaviour
         Debug.Log(n.toString());
 
         this.generate(noiseHeightMapGenerator);
+
+        this.save("world");
     }
 
     private int count = 0;
