@@ -14,7 +14,7 @@ public class FileWriter
     /// <param name="content">String of the contents of file</param>
     public static void create(string name, string extension, string directory, string content)
     {
-        File.WriteAllText($"{directory}\\{name}.{extension}", content);
+        File.WriteAllText($"{directory}/{name}.{extension}", content);
     }
 
     /// <summary>
