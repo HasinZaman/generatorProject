@@ -136,6 +136,15 @@ public class Chunk : MonoBehaviour
     /// <returns>string representation of grid</returns>
     public string toString()
     {
-        return meshGenerator.toString();
+        return $"{transform.name}:{meshGenerator.toString()}";
+    }
+
+    /// <summary>
+    ///     repr method is a string representation of grid used for saving files
+    /// </summary>
+    /// <returns>string representation of grid used for saving files</returns>
+    public string repr()
+    {
+        return $"{transform.name}:{meshGenerator.repr()}";
     }
 }
