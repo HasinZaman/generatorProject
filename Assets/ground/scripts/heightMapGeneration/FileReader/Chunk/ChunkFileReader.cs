@@ -7,7 +7,7 @@ using System.IO;
 /// <typeparam name="NF">Node Factory class/child class</typeparam>
 /// <typeparam name="N">Node class/child class</typeparam>
 /// <typeparam name="G">Grid class/child class</typeparam>
-public class ChunkFileReader<NF, N, G> : FileReaderGenerator<NF, N, G, FileParam> where NF : NodeFactory<N> where N : Node where G : Grid
+public class ChunkFileReader<NF, N, G> : FileReaderGenerator<NF, N, G, ChunkParam> where NF : NodeFactory<N> where N : Node where G : Grid
 {
     /// <summary>
     ///     Constructor sets up ChunkFileReader object
@@ -34,37 +34,17 @@ public class ChunkFileReader<NF, N, G> : FileReaderGenerator<NF, N, G, FileParam
     /// <returns>
     ///     A grid with the HeightMap data
     /// </returns>
-    public override G getHeightMap(FileParam param)
+    public override G getHeightMap(ChunkParam param)
     {
         if (!validFileCheck(param.fileName))
         {
             throw new ArgumentException("File Does not exist");
         }
 
-        if(param.line < -1)
-        {
-            throw new ArgumentException("File Does not exist");
-        }
-
-        StreamReader file = new StreamReader(this.getFileAddress(param.fileName));
-        string[] rawGrid = file.ReadToEnd().Split('\n');
-
-        file.Close();
-
-        if (param.line == -1)
-        {
-            param.line = 0;
-        }
-
-        if(param.line >= rawGrid.Length)
-        {
-            throw new ArgumentException($"param.line({param.line}) must be less than file lines({rawGrid.Length})");
-        }
-
-        return stringToHeightMap(rawGrid[param.line]);
+        throw new NotImplementedException();
     }
 
-    public override G[] getHeightMaps(FileParam param)
+    public override G[] getHeightMaps(ChunkParam param)
     {
         throw new NotImplementedException();
     }
