@@ -62,7 +62,7 @@ public class GroundManager : MonoBehaviour
 
         this.generate(noiseHeightMapGenerator);
 
-        this.save("world");
+        ChunkFileWriter.write(chunks, "world0");
     }
 
     private int count = 0;
@@ -128,22 +128,6 @@ public class GroundManager : MonoBehaviour
                 //Debug.Log(chunks[x1 + y1 * chunkDim[0]].toString());
             }
         }
-    }
-
-    /// <summary>
-    ///     save method creates .world
-    /// </summary>
-    /// /// <param name="name">name of file</param>
-    public void save(string name)
-    {
-        string content=$"{chunks[0].repr()}";
-
-        for(int i1 = 1; i1 < chunks.Length; i1++)
-        {
-            content += $"\n{chunks[i1].repr()}";
-        }
-
-        FileWriter.create(name, "world", "worlds", content);
     }
 
     /// <summary>
