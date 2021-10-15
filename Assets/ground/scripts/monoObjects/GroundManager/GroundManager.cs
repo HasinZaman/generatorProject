@@ -83,6 +83,25 @@ public class GroundManager : MonoBehaviour
         }
     }
 
+    public void loadWorld(ChunkFileReader<NodeFactory.node, Node> chunkLoad)
+    {
+        ChunkParam fileParam = new ChunkParam();
+
+        fileParam.fileName = $"C({0},{0})";
+
+        GameObject chunk = Instantiate(chunkPrefab, this.transform);
+        chunk.name = $"({0},{0})";
+
+        chunks = new Chunk[1];
+        chunks[0] = chunk.GetComponent<Chunk>();
+
+        Grid g = chunkLoad.getHeightMap(fileParam);
+
+        Debug.Log(g.toString());
+
+        chunks[0].setChunk(g, shaderList.MarchingCube, nodeDistTemplate);
+    }
+
     /// <summary>
     ///     generate method creates the chunks required for the ground
     /// </summary>
