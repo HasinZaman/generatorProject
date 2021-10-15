@@ -95,6 +95,6 @@ public class Node : IComparable
     /// <returns>String repersentation of Object</returns>
     public string toString()
     {
-        return $"({val.ToString()})";
+        return $"({val.ToString("0.000")})";
     }
 }
