@@ -41,7 +41,12 @@ public class ChunkFileReader<NF, N> : FileReaderGenerator<NF, N, Grid, ChunkPara
         this.saveName = saveName;
     }
 
-    private int[] stringToInt(string str)
+    /// <summary>
+    ///     private utility method converts a string into a int array
+    /// </summary>
+    /// <param name="str">string that is converted into int array</param>
+    /// <returns>int array of string input</returns>
+    private int[] stringToIntArray(string str)
     {
         string[] tmp1 = str.Split(',');
         int[] tmp2 = new int[tmp1.Length];
@@ -79,6 +84,7 @@ public class ChunkFileReader<NF, N> : FileReaderGenerator<NF, N, Grid, ChunkPara
 
         //assigning dim
         dim = stringToInt(tmp[0]);
+        dim = stringToIntArray(tmp[0]);
         pos = new int[2] { 0, 0 };
 
         nodes = new N[tmp.Length - 1];
