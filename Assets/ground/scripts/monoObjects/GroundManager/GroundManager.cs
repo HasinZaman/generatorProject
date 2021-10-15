@@ -108,6 +108,7 @@ public class GroundManager : MonoBehaviour
     /// <param name="HeightMapGenerator">HeightMapGenerator object that generates height map</param>
     public void generate(HeightMapGenerator<Grid, NoiseHeightMapGenerator.NoiseParam> HeightMapGenerator)
     {
+        
         NoiseHeightMapGenerator.NoiseParam param = new NoiseHeightMapGenerator.NoiseParam();
 
         param.height = height;
