@@ -27,17 +27,31 @@ namespace NodeFactory
         /// <summary>
         ///     create method converts string into a Node
         /// </summary>
-        /// <param name="raw">string representation of Node</param>
+        /// <param name="str">string representation of Node</param>
         /// <returns>Node of raw string</returns>
-        public Node create(string raw)
+        public Node create(string str)
         {
-            if(raw[raw.Length] != '(' || raw[0] != ')')
-            {
-                throw new ArgumentException();
-            }
-            string num = raw.Substring(1, raw.Length - 2);
+            float val;
 
-            Node tmp = new Node(int.Parse(num));
+            if (!float.TryParse(str, out val))
+            {
+                throw new ArgumentException($"'{str}' could not be converted into node value");
+            }
+
+            Node tmp;
+
+            if (val > 1)
+            {
+                tmp = new Node(1);
+            }
+            else if(val < 0)
+            {
+                tmp = new Node(0);
+            }
+            else
+            {
+                tmp = new Node(val);
+            }
 
             return tmp;
         }
