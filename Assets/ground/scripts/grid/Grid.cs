@@ -526,10 +526,10 @@ public class Grid
         {
             for (int x = 0; x < dim[0]; x++)
             {
-                str += $"{getNode(x, y, 0).getValue().ToString("0.00")}";
+                str += $"{getNode(x, y, 0).toString()}";
                 for (int z = 1; z < dim[2]; z++)
                 {
-                    str += $"{delimiterZ}{getNode(x, y, z).getValue().ToString("0.00")}";
+                    str += $"{delimiterZ}{getNode(x, y, z).toString()}";
                 }
                 str += delimiterX;
             }
