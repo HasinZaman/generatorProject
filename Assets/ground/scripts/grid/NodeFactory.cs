@@ -31,9 +31,16 @@ namespace NodeFactory
         /// <returns>Node of raw string</returns>
         public Node create(string str)
         {
+            if(str[0] != '(' || str[str.Length - 1] != ')')
+            {
+                throw new ArgumentException($"'{str}' is invalid format");
+            }
+
+            string valStr = str.Substring(1, str.Length - 2);
+
             float val;
 
-            if (!float.TryParse(str, out val))
+            if (!float.TryParse(valStr, out val))
             {
                 throw new ArgumentException($"'{str}' could not be converted into node value");
             }
