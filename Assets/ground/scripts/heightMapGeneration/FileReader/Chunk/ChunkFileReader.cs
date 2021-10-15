@@ -67,12 +67,14 @@ public class ChunkFileReader<NF, N> : FileReaderGenerator<NF, N, Grid, ChunkPara
     /// </returns>
     public override Grid getHeightMap(ChunkParam param)
     {
-        if (!validFileCheck($"{this.saveName}\\{param.fileName}.{this.fileExtension}"))
+        if (!validFileCheck($"{this.saveName}//{param.fileName}.{this.fileExtension}"))
         {
-            throw new ArgumentException("File Does not exist");
+            throw new ArgumentException($"File \"{getFileAddress($"{this.saveName}//{param.fileName}.{this.fileExtension}")}\" Does not exist");
         }
 
         string strTmp = File.ReadAllText($"{this.folder}\\{this.saveName}\\{param.fileName}.{this.fileExtension}");
+
+        int lineSize;
 
         string[] tmp;
         string[] rawNodes;
@@ -82,23 +84,27 @@ public class ChunkFileReader<NF, N> : FileReaderGenerator<NF, N, Grid, ChunkPara
 
         tmp = strTmp.Split('|');
 
-        //assigning dim
-        dim = stringToInt(tmp[0]);
         dim = stringToIntArray(tmp[0]);
         pos = new int[2] { 0, 0 };
 
-        nodes = new N[tmp.Length - 1];
+        nodes = new N[dim[0] * dim[1] * dim[2]];
+
+        lineSize = dim[2];
 
         for (int i1 = 1; i1 < tmp.Length; i1++)
         {
             rawNodes = tmp[i1].Split(',');
-            for (int i2 = 0; i2 < rawNodes.Length; i2++)
-            {
-                nodes[pos[0] + dim[0] * (pos[1] + dim[1] * i2)] = (Node)nodeFactory.create(rawNodes[i2]);
-            }
 
-            pos[1] = (pos[1] + (pos[0] + 1) / dim[1]) % dim[1];
-            pos[0] = (pos[0] + 1) % dim[0];
+            if (dim[2] == rawNodes.Length)
+            {
+                for (int i2 = 0; i2 < rawNodes.Length; i2++)
+                {
+                    nodes[pos[0] + dim[0] * (pos[1] + dim[1] * i2)] = (Node)nodeFactory.create(rawNodes[i2]);
+                }
+
+                pos[1] = (pos[1] + (pos[0] + 1) / dim[0]) % dim[1];
+                pos[0] = (pos[0] + 1) % dim[0];
+            }
         }
 
         return new Grid(nodes, dim);
