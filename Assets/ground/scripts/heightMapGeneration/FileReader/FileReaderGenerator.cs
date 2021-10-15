@@ -6,17 +6,17 @@
 /// <typeparam name="N">Node class/child class</typeparam>
 /// <typeparam name="G">Grid class/child class</typeparam>
 /// <typeparam name="P">FileParam class/child class</typeparam>
-public abstract class FileReaderGenerator<NF, N, G, P> : HeightMapGenerator<G, P> where NF : NodeFactory<N> where N : Node where G : Grid where P : FileParam
+public abstract class FileReaderGenerator<NF, N, G, P> : HeightMapGenerator<G, P> where NF : NodeFactory.NodeFactory<N> where N : Node where G : Grid where P : FileParam
 {
     /// <summary>
     ///     folder in which file is stored
     /// </summary>
-    private string folder = "";
+    protected string folder = "";
 
     /// <summary>
     ///     extension of file
     /// </summary>
-    private string fileExtension = "";
+    protected string fileExtension = "";
 
 
     /// <summary>
