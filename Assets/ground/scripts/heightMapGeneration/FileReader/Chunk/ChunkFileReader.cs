@@ -17,7 +17,7 @@ public class ChunkFileReader<NF, N> : FileReaderGenerator<NF, N, Grid, ChunkPara
     /// <summary>
     ///     Constructor sets up ChunkFileReader object
     /// </summary>
-    public ChunkFileReader(NF nodeFactory) : base(".chunk", "worlds")
+    public ChunkFileReader(NF nodeFactory) : base("chunk", "worlds")
     {
         this.nodeFactory = nodeFactory;
     }
@@ -26,8 +26,9 @@ public class ChunkFileReader<NF, N> : FileReaderGenerator<NF, N, Grid, ChunkPara
     ///     Constructor sets up ChunkFileReader object
     /// </summary>
     /// <param name="saveName">name of save file</param>
-    public ChunkFileReader(string saveName) : base(".chunk", "worlds")
+    public ChunkFileReader(NF nodeFactory, string saveName) : base("chunk", "worlds")
     {
+        this.nodeFactory = nodeFactory;
         this.saveName = saveName;
     }
 
