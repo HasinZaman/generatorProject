@@ -45,6 +45,9 @@ public class GroundManager : MonoBehaviour
             float tmp = perlin3D.sample(sample);
 
             return (tmp * 1f - 0.0f);
+            float tmp = perlin2D.sample(sample);
+            
+            return (tmp * 25f - coord[1] + 1);
         }
 
         public string toString()
@@ -61,6 +64,11 @@ public class GroundManager : MonoBehaviour
         Debug.Log(n.toString());
 
         this.generate(noiseHeightMapGenerator);
+        loadWorld(new ChunkFileReader<NodeFactory.node, Node>(new NodeFactory.node(), "world0"));
+
+        //this.generate(noiseHeightMapGenerator);
+
+        //ChunkFileWriter.write(chunks, "world0");
     }
 
     private int count = 0;
