@@ -218,4 +218,13 @@ public class MeshGenerator
     {
         return grid.toString();
     }
+
+    /// <summary>
+    ///     repr method is a string representation of grid used for saving files
+    /// </summary>
+    /// <returns>string representation of grid used for saving files</returns>
+    public string repr()
+    {
+        return $"{grid.toString("|", "|", "", ",")}";
+    }
 }

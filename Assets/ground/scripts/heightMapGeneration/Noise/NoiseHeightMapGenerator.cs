@@ -1,10 +1,9 @@
 ﻿using System;
-using UnityEngine;
 
 /// <summary>
 ///     NoiseHeightMapGenerator is an abstract class to create a height map using perlin noise
 /// </summary>
-public class NoiseHeightMapGenerator : HeightMapGenerator<Grid>
+public class NoiseHeightMapGenerator : HeightMapGenerator<Grid, NoiseHeightMapGenerator.NoiseParam>
 {
    
     /// <summary>
@@ -117,7 +116,7 @@ public class NoiseHeightMapGenerator : HeightMapGenerator<Grid>
     /// <returns>
     ///     Grid that repesents the heightMap created with perlin noise
     /// </returns>
-    public Grid getHeightMap(object param)
+    public Grid getHeightMap(NoiseParam param)
     {
         if (typeof(NoiseParam) != param.GetType())
         {
