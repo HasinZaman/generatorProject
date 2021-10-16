@@ -1,8 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-
-public static class NoiseVectors
+﻿public static class NoiseVectors
 {
     public static float[][] TwoDimensionSet1 =
         new float[][] {
