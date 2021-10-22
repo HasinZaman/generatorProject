@@ -99,11 +99,21 @@ public class GroundManager : MonoBehaviour
 
     GameObject[] renderedChunks;
     Grid[] loadedChunks;
+    ChunkFileReader<NodeFactory.node, Node> chunkFileReader;
 
-
-    public Grid loadChunk(ChunkFileReader<NodeFactory.node, Node> chunkLoad)
+    /// <summary>
+    ///     loadChunk creates Grid from .chunk file
+    /// </summary>
+    /// <param name="x">x pos of chunk</param>
+    /// <param name="y">y pos of chunk</param>
+    /// <returns>Grid of .chunk file</returns>
+    public Grid loadChunk(int x, int y)
     {
-        throw new NotImplementedException();
+        ChunkParam fileParam = new ChunkParam();
+
+        fileParam.fileName = $"C({x},{y})";
+
+        return chunkFileReader.getHeightMap(fileParam);
     }
 
     public void updateChunks()
