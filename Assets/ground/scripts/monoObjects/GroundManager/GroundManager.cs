@@ -42,12 +42,12 @@ public class GroundManager : MonoBehaviour
 
             float[] coord = new float[] { pos[3], pos[4], pos[5] };
 
-            float tmp = perlin3D.sample(sample);
+            //float tmp = perlin3D.sample(sample);
 
-            return (tmp * 1f - 0.0f);
-            //float tmp = perlin2D.sample(sample);
+            //return (tmp * 1f - 0.0f);
+            float tmp = perlin2D.sample(sample);
             
-            //return (tmp * 25f - coord[1] + 1);
+            return (tmp * 25f - coord[1] + 1);
         }
 
         public string toString()
@@ -65,12 +65,14 @@ public class GroundManager : MonoBehaviour
         Debug.Log(n.toString());
 
         this.generate(noiseHeightMapGenerator);
-        loadWorld(new ChunkFileReader<NodeFactory.node, Node>(new NodeFactory.node(), "world0"));
+        //loadWorld(new ChunkFileReader<NodeFactory.node, Node>(new NodeFactory.node(), "world0"));
 
         //this.generate(noiseHeightMapGenerator);
 
         //ChunkFileWriter.write(chunks, "world0");
     }
+
+    int count = 0;
 
     private void Update()
     {
