@@ -44,6 +44,29 @@ public class ChunkManager
     /// <param name="deLoadDist"></param>
     public void setLoadDist(float renderDist, float deRenderDist, float loadDist, float deLoadDist)
     {
+        if(renderDist > deRenderDist)
+        {
+            throw new ArgumentException($"renderDist({renderDist}) must be less than deRenderDist({deRenderDist})");
+        }
+
+        if(loadDist > deLoadDist)
+        {
+            throw new ArgumentException($"loadDist({loadDist}) must be less than deLoadDist({deLoadDist})");
+        }
+
+        if (deRenderDist >= loadDist)
+        {
+            throw new ArgumentException($"deRenderDist({deRenderDist}) must be less than loadDist({loadDist})");
+        }
+
+        this.renderDist = renderDist;
+        this.deRenderDist = deRenderDist;
+        this.loadDist = loadDist;
+        this.deLoadDist = deLoadDist;
+
+        //calculate size
+        renderedChunks = new GameObject[(int) Mathf.Max(circleArea(this.deRenderDist) / (chunkDist[0] * chunkDist[1]))];
+        loadedChunks = new Grid[(int) Mathf.Max(circleArea(this.deLoadDist) / (chunkDist[0] * chunkDist[1]) - circleArea(this.deRenderDist) / (chunkDist[0] * chunkDist[1]))];
     }
 
     /// <summary>
@@ -72,5 +95,27 @@ public class ChunkManager
     public void convertChunk(GameObject c, Grid g)
     {
         throw new NotImplementedException();
+    }
+
+    private float circleArea(float radius)
+    {
+        float area = 0;
+
+        for(float i1 = 0; i1 < radius; i1+= chunkDist[0])
+        {
+            area += chunkDist[0] * ceil(Mathf.Sqrt(Mathf.Pow(radius, 2) - Mathf.Pow(floor(i1, chunkDist[0]), 2)), chunkDist[0]);
+        }
+
+        return area * 4;
+    }
+
+    private float floor(float i, float b)
+    {
+        return Mathf.Floor(i / b) * b;
+    }
+
+    private float ceil(float i, float b)
+    {
+        return Mathf.Ceil(i / b) * b;
     }
 }
