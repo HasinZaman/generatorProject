@@ -89,6 +89,33 @@ public class GroundManager : MonoBehaviour
     }
 
     /// ------ Chunk management methods ------
+    int loadDist;
+    int unLoadDist;
+    int renderDist;
+    int unRenderDist;
+
+    public GameObject centerObj;
+    public int[] pos = new int[2] { 0, 0 };
+
+    GameObject[] renderedChunks;
+    Grid[] loadedChunks;
+
+
+    public Grid loadChunk(ChunkFileReader<NodeFactory.node, Node> chunkLoad)
+    {
+        throw new NotImplementedException();
+    }
+
+    public void updateChunks()
+    {
+        throw new NotImplementedException();
+    }
+
+    public void convertChunk(GameObject c, Grid g)
+    {
+        throw new NotImplementedException();
+    }
+
     public void loadWorld(ChunkFileReader<NodeFactory.node, Node> chunkLoad)
     {
         ChunkParam fileParam = new ChunkParam();
