@@ -25,6 +25,14 @@ public class ChunkManager
     /// <param name="z"></param>
     public void setChunkDist(float x, float y, float z)
     {
+        if(x < 0 || y < 0 || z < 0)
+        {
+            throw new ArgumentException($"Paramaters must be: x({x}) > 0  and y({y}) > 0 and z({z}) > 0");
+        }
+
+        chunkDist[0] = x;
+        chunkDist[1] = y;
+        chunkDist[2] = z;
     }
 
     /// <summary>
