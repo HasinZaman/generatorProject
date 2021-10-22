@@ -56,6 +56,7 @@ public class GroundManager : MonoBehaviour
         }
     }
 
+    /// ------ MonoBehaviour methods ------
     void Start()
     {
         Noise n = new noise(NoiseVectors.TwoDimensionSet1, 0, new int[] { 10, 10 });
@@ -87,6 +88,7 @@ public class GroundManager : MonoBehaviour
         }
     }
 
+    /// ------ Chunk management methods ------
     public void loadWorld(ChunkFileReader<NodeFactory.node, Node> chunkLoad)
     {
         ChunkParam fileParam = new ChunkParam();
@@ -106,6 +108,8 @@ public class GroundManager : MonoBehaviour
         chunks[0].setChunk(g, shaderList.MarchingCube, nodeDistTemplate);
     }
 
+
+    /// ------ Chunk Generation methods ------
     /// <summary>
     ///     generate method creates the chunks required for the ground
     /// </summary>
