@@ -71,8 +71,6 @@ public class GroundManager : MonoBehaviour
         //ChunkFileWriter.write(chunks, "world0");
     }
 
-    private int count = 0;
-
     private void Update()
     {
         if(count == 100)
@@ -154,14 +152,5 @@ public class GroundManager : MonoBehaviour
                 //Debug.Log(chunks[x1 + y1 * chunkDim[0]].toString());
             }
         }
-    }
-
-    /// <summary>
-    ///     Load takes a file and generates chunks
-    /// </summary>
-    /// <param name="file"></param>
-    public void load(string file)
-    {
-        throw new NotImplementedException();
     }
 }
