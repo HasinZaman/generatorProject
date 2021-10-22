@@ -45,9 +45,9 @@ public class GroundManager : MonoBehaviour
             float tmp = perlin3D.sample(sample);
 
             return (tmp * 1f - 0.0f);
-            float tmp = perlin2D.sample(sample);
+            //float tmp = perlin2D.sample(sample);
             
-            return (tmp * 25f - coord[1] + 1);
+            //return (tmp * 25f - coord[1] + 1);
         }
 
         public string toString()
