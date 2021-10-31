@@ -3,6 +3,8 @@ using UnityEngine;
 
 public class ChunkManager
 {
+    private GameObject chunkPrefab;
+
     float[] chunkDist = new float[3];
 
     float loadDist;
@@ -13,9 +15,19 @@ public class ChunkManager
     public GameObject centerObj;
     public int[] pos = new int[2] { 0, 0 };
 
-    GameObject[] renderedChunks;
-    Grid[] loadedChunks;
+    ChunkGridNode[] activeChunks;
+    LinkedStack<GameObject> freeChunks = new LinkedStack<GameObject>();
+
     ChunkFileReader<NodeFactory.node, Node> chunkFileReader;
+
+    /// <summary>
+    ///     ChunkGridNode stores a grid and assoicated gameObject
+    /// </summary>
+    struct ChunkGridNode
+    {
+        Grid grid;
+        GameObject gameObject;
+    }
 
     /// <summary>
     ///     setChunkDist method sets the width, height and length of a chunk
