@@ -30,6 +30,15 @@ public class ChunkManager
     }
 
     /// <summary>
+    ///     Created ChunkManager constructor
+    /// </summary>
+    /// <param name="chunkPrefab">prefab</param>
+    public ChunkManager(GameObject chunkPrefab)
+    {
+        this.chunkPrefab = chunkPrefab;
+    }
+
+    /// <summary>
     ///     setChunkDist method sets the width, height and length of a chunk
     /// </summary>
     /// <param name="x"></param>
