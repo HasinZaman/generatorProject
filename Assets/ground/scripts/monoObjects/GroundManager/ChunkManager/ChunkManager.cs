@@ -85,9 +85,24 @@ public class ChunkManager
         this.loadDist = loadDist;
         this.deLoadDist = deLoadDist;
 
-        //calculate size
-        renderedChunks = new GameObject[(int) Mathf.Ceil(deRenderDist * deRenderDist)];
-        loadedChunks = new Grid[(int)Mathf.Ceil(deLoadDist * deLoadDist) - renderedChunks.Length];
+        activeChunks = new ChunkGridNode[(int) (Mathf.Ceil(deLoadDist/chunkDist[0] * 2 + 1) * Mathf.Ceil(deLoadDist / chunkDist[2] * 2 + 1))];
+
+        GameObject tmp;
+
+        for(int i1 = 0; i1 < (int)(Mathf.Ceil(deRenderDist / chunkDist[0] * 2 + 1) * Mathf.Ceil(deRenderDist / chunkDist[2] * 2 + 1)); i1++)
+        {
+            tmp = UnityEngine.Object.Instantiate(chunkPrefab);
+
+            tmp.SetActive(false);
+
+            freeChunks.push(tmp);
+        }
+
+        for(int i1 = 0; i1 < activeChunks.Length; i1++)
+        {
+            activeChunks[i1] = new ChunkGridNode();
+        }
+
     }
 
     /// <summary>
