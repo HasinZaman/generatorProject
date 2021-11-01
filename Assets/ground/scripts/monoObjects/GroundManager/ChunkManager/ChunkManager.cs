@@ -185,5 +185,18 @@ public class ChunkManager
         return i1;
     }
 
+    private bool rangeCheck(int i1, int min, int max)
+    {
+        if (i1 < min)
+        {
+            return false;
+        }
+        else if (i1 > max)
+        {
+            return false;
+        }
+
+        return true;
+    }
 
 }
