@@ -13,6 +13,7 @@ public class ChunkManager
     public GameObject centerObj;
     public int[] pos = new int[2] { 0, 0 };
 
+    int[] activeChunksDim = new int[2];
     ChunkGridNode[] activeChunks;
     FreeChunkStack freeChunks = new FreeChunkStack();
 
@@ -117,8 +118,9 @@ public class ChunkManager
         this.deLoadDist = deLoadDist;
 
         activeChunks = new ChunkGridNode[(int) (Mathf.Ceil(deLoadDist/chunkDist[0] * 2 + 1) * Mathf.Ceil(deLoadDist / chunkDist[2] * 2 + 1))];
-
-        for(int i1 = 0; i1 < activeChunks.Length; i1++)
+        activeChunksDim[0] = (int) Mathf.Ceil(deLoadDist / chunkDist[0] * 2 + 1);
+        activeChunksDim[1] = (int) Mathf.Ceil(deLoadDist / chunkDist[2] * 2 + 1);
+        for (int i1 = 0; i1 < activeChunks.Length; i1++)
         {
             activeChunks[i1] = new ChunkGridNode();
         }
