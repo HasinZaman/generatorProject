@@ -3,8 +3,6 @@ using UnityEngine;
 
 public class ChunkManager
 {
-    private GameObject chunkPrefab;
-
     float[] chunkDist = new float[3];
 
     float loadDist;
@@ -16,9 +14,42 @@ public class ChunkManager
     public int[] pos = new int[2] { 0, 0 };
 
     ChunkGridNode[] activeChunks;
-    LinkedStack<GameObject> freeChunks = new LinkedStack<GameObject>();
+    FreeChunkStack freeChunks = new FreeChunkStack();
 
     ChunkFileReader<NodeFactory.node, Node> chunkFileReader;
+
+    /// <summary>
+    ///     FreeChunkStack stores a statck of chunks
+    /// </summary>
+    class FreeChunkStack : LinkedStack<GameObject>
+    {
+        public static GameObject chunkPrefab;
+
+        /// <summary>
+        ///     pop returns top most element of stack. If stack is empty, then a new Chunk GameObject is returned
+        /// </summary>
+        /// <returns>ChunkGameObject</returns>
+        public override GameObject pop()
+        {
+            if(this.isEmpty())
+            {
+                return UnityEngine.Object.Instantiate(FreeChunkStack.chunkPrefab);
+            }
+            GameObject elem = base.pop();
+            elem.SetActive(true);
+            return elem;
+        }
+
+        /// <summary>
+        ///     Chunk GameObject is prepared and inserted into stack
+        /// </summary>
+        /// <param name="elem">Chunk GameObject</param>
+        public override void push(GameObject elem)
+        {
+            elem.SetActive(false);
+            base.push(elem);
+        }
+    }
 
     /// <summary>
     ///     ChunkGridNode stores a grid and assoicated gameObject
@@ -35,7 +66,7 @@ public class ChunkManager
     /// <param name="chunkPrefab">prefab</param>
     public ChunkManager(GameObject chunkPrefab)
     {
-        this.chunkPrefab = chunkPrefab;
+        FreeChunkStack.chunkPrefab = chunkPrefab;
     }
 
     /// <summary>
@@ -86,17 +117,6 @@ public class ChunkManager
         this.deLoadDist = deLoadDist;
 
         activeChunks = new ChunkGridNode[(int) (Mathf.Ceil(deLoadDist/chunkDist[0] * 2 + 1) * Mathf.Ceil(deLoadDist / chunkDist[2] * 2 + 1))];
-
-        GameObject tmp;
-
-        for(int i1 = 0; i1 < (int)(Mathf.Ceil(deRenderDist / chunkDist[0] * 2 + 1) * Mathf.Ceil(deRenderDist / chunkDist[2] * 2 + 1)); i1++)
-        {
-            tmp = UnityEngine.Object.Instantiate(chunkPrefab);
-
-            tmp.SetActive(false);
-
-            freeChunks.push(tmp);
-        }
 
         for(int i1 = 0; i1 < activeChunks.Length; i1++)
         {
