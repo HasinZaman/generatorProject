@@ -42,7 +42,7 @@ public class LinkedStack<E> : Stack<E>
     ///     pop method removes and returns top most element
     /// </summary>
     /// <returns>Top most elment</returns>
-    public E pop()
+    public virtual E pop()
     {
         if(i == 0)
         {
@@ -60,7 +60,7 @@ public class LinkedStack<E> : Stack<E>
     ///     Adds element into the stack
     /// </summary>
     /// <param name="elem"></param>
-    public void push(E elem)
+    public virtual void push(E elem)
     {
         Element tmp = new Element(elem, root);
 
