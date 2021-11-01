@@ -88,7 +88,7 @@ public class ChunkManager
     }
 
     /// <summary>
-    ///     setLoadDist method sets 
+    ///     setLoadDist method sets load, deload dist and array activeChunk
     /// </summary>
     /// <param name="renderDist"></param>
     /// <param name="deRenderDist"></param>
