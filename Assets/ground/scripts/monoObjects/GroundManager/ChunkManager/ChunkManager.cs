@@ -130,16 +130,77 @@ public class ChunkManager
     /// </summary>
     public void update()
     {
-        //updating pos
         int[] posTmp = new int[2];
-        if(centerObj != null)
+        int delta = 0;
+        int start = 0;
+        //determine current chunkPos
+        if (centerObj != null)
         {
             posTmp[0] = Mathf.RoundToInt(centerObj.transform.position.x / chunkDist[0]);
             posTmp[1] = Mathf.RoundToInt(centerObj.transform.position.z / chunkDist[2]);
         }
 
-        if(posTmp[0] != pos[0] || posTmp[1] != posTmp[1])
+        //horizontal shift
+        if(posTmp[0] != pos[0])
         {
+            delta = clamp(posTmp[0] - pos[0], 0, 1);
+            
+            switch(delta)
+            {
+                case -1:
+                    start = activeChunksDim[0] - 1;
+                    break;
+                case 1:
+                    start = 0;
+                    break;
+            }
+
+            for(int x = start; rangeCheck(x, -1, activeChunksDim[0]); x+= delta)
+            {
+                for(int y = 0; y < activeChunksDim[1]; y++)
+                {
+                    if (x + delta < 0 || x + delta >= activeChunksDim[0])//if out of bounds 
+                    {
+                        activeChunks[x + y * activeChunksDim[0]].grid = loadChunk(x + delta, y);
+                    }
+                    else
+                    {
+                        activeChunks[x + y * activeChunksDim[0]].grid = activeChunks[x + delta + y * activeChunksDim[0]].grid;
+                    }
+                }
+            }
+            delta = posTmp[0] - pos[0];
+        }
+
+        //vertical shift
+        if(posTmp[1] != posTmp[1])
+        {
+            delta = clamp(posTmp[1] - pos[1], 0, 1);
+
+            switch (delta)
+            {
+                case -1:
+                    start = activeChunksDim[0] - 1;
+                    break;
+                case 1:
+                    start = 0;
+                    break;
+            }
+
+            for(int y = start; rangeCheck(y, -1, activeChunksDim[1]); y+=delta)
+            {
+                for(int x  = 0; x < activeChunksDim[0]; x++)
+                {
+                    if (y + delta < 0 || y + delta >= activeChunksDim[0])//if out of bounds 
+                    {
+                        activeChunks[x + y * activeChunksDim[0]].grid = loadChunk(x, y + delta);
+                    }
+                    else
+                    {
+                        activeChunks[x + y * activeChunksDim[0]].grid = activeChunks[x + (y + delta) * activeChunksDim[0]].grid;
+                    }
+                }
+            }
 
         }
         //update rendered chunks
