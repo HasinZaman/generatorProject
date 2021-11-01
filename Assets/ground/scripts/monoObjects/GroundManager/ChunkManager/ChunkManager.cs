@@ -134,8 +134,8 @@ public class ChunkManager
         int[] posTmp = new int[2];
         if(centerObj != null)
         {
-            posTmp[0] = (int)(centerObj.transform.position.x / chunkDist[0]);
-            posTmp[1] = (int)(centerObj.transform.position.z / chunkDist[2]);
+            posTmp[0] = Mathf.RoundToInt(centerObj.transform.position.x / chunkDist[0]);
+            posTmp[1] = Mathf.RoundToInt(centerObj.transform.position.z / chunkDist[2]);
         }
 
         if(posTmp[0] != pos[0] || posTmp[1] != posTmp[1])
