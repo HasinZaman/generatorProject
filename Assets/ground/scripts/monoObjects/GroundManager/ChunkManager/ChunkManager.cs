@@ -170,5 +170,20 @@ public class ChunkManager
     {
         throw new NotImplementedException();
     }
+    
+    private int clamp(int i1, int min, int max)
+    {
+        if(i1 < min)
+        {
+            return min;
+        }
+        else if(i1 > max)
+        {
+            return max;
+        }
+
+        return i1;
+    }
+
 
 }
