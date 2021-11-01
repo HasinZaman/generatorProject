@@ -1,4 +1,5 @@
-﻿/// <summary>
+﻿using System;
+/// <summary>
 ///     Stack implementation with linked elements
 /// </summary>
 /// <typeparam name="E"></typeparam>
@@ -45,7 +46,7 @@ public class LinkedStack<E> : Stack<E>
     {
         if(i == 0)
         {
-            return default(E);
+            throw new InvalidOperationException();
         }
 
         Element tmp = root;
@@ -85,7 +86,7 @@ public class LinkedStack<E> : Stack<E>
     {
         if(root == null)
         {
-            return default(E);
+            throw new InvalidOperationException();
         }
 
         return root.val;
