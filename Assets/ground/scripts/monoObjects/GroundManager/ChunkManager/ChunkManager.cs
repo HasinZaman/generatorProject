@@ -110,7 +110,25 @@ public class ChunkManager
     /// </summary>
     public void update()
     {
+        //updating pos
+        int[] posTmp = new int[2];
+        if(centerObj != null)
+        {
+            posTmp[0] = (int)(centerObj.transform.position.x / chunkDist[0]);
+            posTmp[1] = (int)(centerObj.transform.position.z / chunkDist[2]);
+        }
 
+        if(posTmp[0] != pos[0] || posTmp[1] != posTmp[1])
+        {
+
+        }
+        //update rendered chunks
+        
+        //unload chunks
+        //load new chunks
+
+        //update loaded chunks
+        //
     }
 
     /// <summary>
