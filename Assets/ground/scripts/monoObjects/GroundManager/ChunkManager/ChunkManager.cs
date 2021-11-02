@@ -57,8 +57,8 @@ public class ChunkManager
     /// </summary>
     struct ChunkGridNode
     {
-        Grid grid;
-        GameObject gameObject;
+        public Grid grid;
+        public GameObject chunk;
     }
 
     /// <summary>
@@ -134,8 +134,11 @@ public class ChunkManager
     public void update()
     {
         int[] posTmp = new int[2];
-        int delta = 0;
-        int start = 0;
+        int deltaX = 0;
+        int deltaY = 0;
+        int startX = 0;
+        int startY = 0;
+
         //determine current chunkPos
         if (centerObj != null)
         {
@@ -143,76 +146,80 @@ public class ChunkManager
             posTmp[1] = Mathf.RoundToInt(centerObj.transform.position.z / chunkDist[2]);
         }
 
-        //horizontal shift
-        if(posTmp[0] != pos[0])
+        if(posTmp[0] != pos[0] || posTmp[1] != pos[1])
         {
-            delta = clamp(posTmp[0] - pos[0], 0, 1);
-            
-            switch(delta)
+            deltaX = clamp(posTmp[0] - pos[0], 0, 1);
+            deltaY = clamp(posTmp[1] - pos[1], 0, 1);
+
+            switch (deltaX)
             {
                 case -1:
-                    start = activeChunksDim[0] - 1;
+                    startX = activeChunksDim[0] - 1;
                     break;
                 case 1:
-                    start = 0;
+                    startX = 0;
                     break;
             }
 
-            for(int x = start; rangeCheck(x, -1, activeChunksDim[0]); x+= delta)
+            switch (deltaY)
             {
-                for(int y = 0; y < activeChunksDim[1]; y++)
+                case -1:
+                    startY = activeChunksDim[0] - 1;
+                    break;
+                case 1:
+                    startY = 0;
+                    break;
+            }
+
+            for (int x = startX; rangeCheck(x, -1, activeChunksDim[0]); x+= deltaX)
+            {
+                for (int y = startY; rangeCheck(y, -1, activeChunksDim[1]); y += deltaY)
                 {
-                    if (x + delta < 0 || x + delta >= activeChunksDim[0])//if out of bounds 
-                    {
-                        activeChunks[x + y * activeChunksDim[0]].grid = loadChunk(x + delta, y);
+                    if (rangeCheck(x + deltaX, -1, activeChunksDim[0]) || rangeCheck(y + deltaY, -1, activeChunksDim[1]))//if out of bounds
+                    {//loadChunk(x + delta, y)
+                        activeChunks[x + y * activeChunksDim[0]].grid = null;
                     }
                     else
                     {
-                        activeChunks[x + y * activeChunksDim[0]].grid = activeChunks[x + delta + y * activeChunksDim[0]].grid;
+                        // update grid 
+                        // (new grid is null) AND (Position of chunk is less than or equal do the chunk load distance)
+                        if(activeChunks[x + deltaX + (y + startY) * activeChunksDim[0]].grid == null && x * x + y * y <= loadDist * loadDist)
+                        {
+                            activeChunks[x + y * activeChunksDim[0]].grid = loadChunk(x + deltaX, y + deltaY);
+                        }
+                        else
+                        {
+                            activeChunks[x + y * activeChunksDim[0]].grid = activeChunks[x + deltaX + (y + startY) * activeChunksDim[0]].grid;
+                        }
+
+                        if(x * x + y * y > deRenderDist * deRenderDist)//deload check
+                        {
+                            if (activeChunks[x + deltaX + (y + startY) * activeChunksDim[0]].chunk != null)
+                            {
+                                freeChunks.push(activeChunks[x + deltaX + (y + startY) * activeChunksDim[0]].chunk);
+                                activeChunks[x + deltaX + (y + startY) * activeChunksDim[0]].chunk = null;
+                            }
+                        }
+                        else
+                        {
+                            if (x * x + y * y <= renderDist * renderDist && activeChunks[x + deltaX + (y + startY) * activeChunksDim[0]].chunk == null)//load new chunk check
+                            {
+                                activeChunks[x + y * activeChunksDim[0]].chunk = freeChunks.pop();
+                                activeChunks[x + y * activeChunksDim[0]].chunk.GetComponent<Chunk>().setGrid(activeChunks[x + y * activeChunksDim[0]].grid);
+                            }
+                            else//move rendered chuncks to new position
+                            {
+                                activeChunks[x + y * activeChunksDim[0]].chunk = activeChunks[x + deltaX + (y + startY) * activeChunksDim[0]].chunk;
+                                activeChunks[x + deltaX + (y + startY) * activeChunksDim[0]].chunk = null;
+                            }
+                        }
                     }
                 }
             }
-            delta = posTmp[0] - pos[0];
+
+            pos[0] = posTmp[0];
+            pos[1] = posTmp[1];
         }
-
-        //vertical shift
-        if(posTmp[1] != posTmp[1])
-        {
-            delta = clamp(posTmp[1] - pos[1], 0, 1);
-
-            switch (delta)
-            {
-                case -1:
-                    start = activeChunksDim[0] - 1;
-                    break;
-                case 1:
-                    start = 0;
-                    break;
-            }
-
-            for(int y = start; rangeCheck(y, -1, activeChunksDim[1]); y+=delta)
-            {
-                for(int x  = 0; x < activeChunksDim[0]; x++)
-                {
-                    if (y + delta < 0 || y + delta >= activeChunksDim[0])//if out of bounds 
-                    {
-                        activeChunks[x + y * activeChunksDim[0]].grid = loadChunk(x, y + delta);
-                    }
-                    else
-                    {
-                        activeChunks[x + y * activeChunksDim[0]].grid = activeChunks[x + (y + delta) * activeChunksDim[0]].grid;
-                    }
-                }
-            }
-
-        }
-        //update rendered chunks
-        
-        //unload chunks
-        //load new chunks
-
-        //update loaded chunks
-        //
     }
 
     /// <summary>
