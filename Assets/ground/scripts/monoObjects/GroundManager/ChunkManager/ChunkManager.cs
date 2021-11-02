@@ -25,7 +25,7 @@ public class ChunkManager
     class FreeChunkStack : LinkedStack<GameObject>
     {
         public static GameObject chunkPrefab;
-
+        public static Transform groundObject;
         /// <summary>
         ///     pop returns top most element of stack. If stack is empty, then a new Chunk GameObject is returned
         /// </summary>
@@ -34,7 +34,7 @@ public class ChunkManager
         {
             if(this.isEmpty())
             {
-                return UnityEngine.Object.Instantiate(FreeChunkStack.chunkPrefab);
+                return UnityEngine.Object.Instantiate(FreeChunkStack.chunkPrefab, FreeChunkStack.groundObject);
             }
             GameObject elem = base.pop();
             elem.SetActive(true);
@@ -65,9 +65,10 @@ public class ChunkManager
     ///     Created ChunkManager constructor
     /// </summary>
     /// <param name="chunkPrefab">prefab</param>
-    public ChunkManager(GameObject chunkPrefab)
+    public ChunkManager(GameObject chunkPrefab, Transform groundObject)
     {
         FreeChunkStack.chunkPrefab = chunkPrefab;
+        FreeChunkStack.groundObject = groundObject;
     }
 
     /// <summary>
