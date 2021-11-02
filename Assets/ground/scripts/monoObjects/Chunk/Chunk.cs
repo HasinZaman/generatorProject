@@ -92,6 +92,15 @@ public class Chunk : MonoBehaviour
     }
 
     /// <summary>
+    ///     setGrid updates of meshGenerator
+    /// </summary>
+    /// <param name="grid">new Grid</param>
+    public void setGrid(Grid grid)
+    {
+        this.meshGenerator.setGrid(grid);
+    }
+
+    /// <summary>
     ///     setChunk method initates chunk
     /// </summary>
     /// <param name="grid"></param>
